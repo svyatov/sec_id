@@ -1,9 +1,9 @@
 # SecId
 [![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://badge.fury.io/rb/sec_id)
 [![Build Status](https://travis-ci.org/svyatov/sec_id.svg?branch=master)](https://travis-ci.org/svyatov/sec_id)
+[![Depfu](https://badges.depfu.com/badges/ccb54ed1642be2d4d102b83d7d6a604c/overview.svg)](https://depfu.com/github/svyatov/sec_id?project_id=6878)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/maintainability)](https://codeclimate.com/github/svyatov/sec_id/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/test_coverage)](https://codeclimate.com/github/svyatov/sec_id/test_coverage)
-[![Depfu](https://badges.depfu.com/badges/ccb54ed1642be2d4d102b83d7d6a604c/overview.svg)](https://depfu.com/github/svyatov/sec_id?project_id=6878)
 
 Validate security identification numbers with ease!
 
