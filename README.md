@@ -5,7 +5,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/maintainability)](https://codeclimate.com/github/svyatov/sec_id/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/test_coverage)](https://codeclimate.com/github/svyatov/sec_id/test_coverage)
 
-Validate security identification numbers with ease!
+Validate securities identification numbers with ease!
 
 Check-digit calculation is also available.
 

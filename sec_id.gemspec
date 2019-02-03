@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Leonid Svyatov']
   spec.email         = ['leonid@svyatov.ru']
 
-  spec.summary       = 'Validate security identification numbers with ease!'
-  spec.description   = %(#{spec.summary} Currently supported standards: ISIN, CUSIP, SEDOL, IBAN.)
+  spec.summary       = 'Validate securities identification numbers with ease!'
+  spec.description   = %(#{spec.summary} Currently supported standards: ISIN, CUSIP, SEDOL.)
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 
