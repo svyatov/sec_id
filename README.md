@@ -9,9 +9,10 @@ Validate security identification numbers with ease!
 Check-digit calculation is also available.
 
 Currently supported standards:
-[ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number)
+[ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
+[CUSIP](https://en.wikipedia.org/wiki/CUSIP)
 
-WIP: [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
+WIP:
 [SEDOL](https://en.wikipedia.org/wiki/SEDOL),
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
 
@@ -20,7 +21,7 @@ WIP: [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 1.0'
+gem 'sec_id', '~> 1.1'
 ```
 
 And then execute:
@@ -114,6 +115,27 @@ isin.valid?                # => true
 isin.valid_format?         # => true
 isin.restore!              # => 'US5949181045'
 isin.calculate_check_digit # => 5
+```
+
+### SecId::CUSIP full example
+
+```ruby
+# class level
+SecId::CUSIP.valid?('594918104')       # => true
+SecId::CUSIP.valid_format?('59491810') # => true
+SecId::CUSIP.restore!('59491810')      # => '594918104'
+SecId::CUSIP.check_digit('59491810')   # => 5
+
+# instance level
+cusip = SecId::CUSIP.new('594918104')
+cusip.cusip                 # => '594918104'
+cusip.cusip6                # => '594918'
+cusip.issue                 # => '10'
+cusip.check_digit           # => 4
+cusip.valid?                # => true
+cusip.valid_format?         # => true
+cusip.restore!              # => '594918104'
+cusip.calculate_check_digit # => 4
 ```
 
 ## Development

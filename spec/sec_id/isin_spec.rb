@@ -21,8 +21,8 @@ RSpec.describe SecId::ISIN do
 
     describe '#restore!' do
       it 'restores check-digit and returns full ISIN number' do
-        expect(isin.restore!).to eq('IE00B296YR77')
-        expect(isin.isin).to eq('IE00B296YR77')
+        expect(isin.restore!).to eq(isin_number)
+        expect(isin.isin).to eq(isin_number)
       end
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe SecId::ISIN do
     let(:isin_number) { 'IE00B296YR7' }
 
     it 'parses ISIN number correctly' do
-      expect(isin.identifier).to eq('IE00B296YR7')
+      expect(isin.identifier).to eq(isin_number)
       expect(isin.country_code).to eq('IE')
       expect(isin.nsin).to eq('00B296YR7')
       expect(isin.check_digit).to be_nil
@@ -126,8 +126,8 @@ RSpec.describe SecId::ISIN do
       end
     end
 
-    context 'when ISIN is valid' do
-      it 'restores check-digit and returns full ISIN number' do
+    context 'when ISIN is valid or missing check-digit' do
+      it 'returns true' do
         expect(described_class.valid_format?('AU0000XVGZA')).to eq(true)
         expect(described_class.valid_format?('AU0000VXGZA7')).to eq(true)
         expect(described_class.valid_format?('GB000263494')).to eq(true)

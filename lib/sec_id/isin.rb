@@ -38,9 +38,9 @@ module SecId
     end
 
     def calculate_check_digit
-      raise InvalidFormatError, "ISIN '#{isin}' is invalid and check-digit cannot be calculated!" unless valid_format?
+      return mod_10(luhn_sum) if valid_format?
 
-      mod_10 luhn_sum
+      raise InvalidFormatError, "ISIN '#{isin}' is invalid and check-digit cannot be calculated!"
     end
 
     private
@@ -56,6 +56,10 @@ module SecId
       end
 
       sum
+    end
+
+    def digitized_identifier
+      @digitized_identifier ||= identifier.each_char.flat_map(&method(:char_to_digits))
     end
   end
 end
