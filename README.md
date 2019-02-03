@@ -1,12 +1,15 @@
 # SecId
+[![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://badge.fury.io/rb/sec_id)
+[![Build Status](https://travis-ci.org/svyatov/sec_id.svg?branch=master)](https://travis-ci.org/svyatov/sec_id)
 
 Validate security identification numbers with ease!
 
 Check-digit calculation is also available.
 
 Currently supported standards:
-[ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
-[CUSIP](https://en.wikipedia.org/wiki/CUSIP),
+[ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number)
+
+WIP: [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
 [SEDOL](https://en.wikipedia.org/wiki/SEDOL),
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
 
