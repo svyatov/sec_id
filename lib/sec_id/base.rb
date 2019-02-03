@@ -22,6 +22,26 @@ module SecId
       new(id).calculate_check_digit
     end
 
+    def initialize(_sec_id_number)
+      raise NotImplementedError
+    end
+
+    def valid?
+      raise NotImplementedError
+    end
+
+    def valid_format?
+      raise NotImplementedError
+    end
+
+    def restore!
+      raise NotImplementedError
+    end
+
+    def calculate_check_digit
+      raise NotImplementedError
+    end
+
     def to_s
       "#{identifier}#{check_digit}"
     end
@@ -35,6 +55,7 @@ module SecId
 
     def char_to_digits(char)
       return char.to_i unless LETTERS.include? char
+
       number = char.to_i(36)
       [number / 10, number % 10]
     end

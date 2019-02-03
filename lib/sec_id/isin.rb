@@ -8,7 +8,7 @@ module SecId
         (?<country_code>[A-Z]{2})
         (?<nsin>[A-Z0-9]{9}))
       (?<check_digit>\d)?
-    \z/x
+    \z/x.freeze
 
     attr_reader :isin, :country_code, :nsin
 
@@ -24,6 +24,7 @@ module SecId
 
     def valid?
       return false unless valid_format?
+
       check_digit == calculate_check_digit
     end
 
@@ -38,6 +39,7 @@ module SecId
 
     def calculate_check_digit
       raise InvalidFormatError, "ISIN '#{isin}' is invalid and check-digit cannot be calculated!" unless valid_format?
+
       mod_10 luhn_sum
     end
 

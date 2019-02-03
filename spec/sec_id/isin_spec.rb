@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-
 RSpec.describe SecId::ISIN do
   let(:isin) { described_class.new(isin_number) }
 

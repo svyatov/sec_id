@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'simplecov'
+
 SimpleCov.start do
   add_filter { |src| !src.filename.start_with?("#{SimpleCov.root}/lib") }
 end
