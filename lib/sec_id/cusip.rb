@@ -10,39 +10,20 @@ module SecId
       (?<check_digit>\d)?
     \z/x.freeze
 
-    VALID_COUNTRY_CODES_FOR_CONVERSION_TO_ISIN = %w[US CA].freeze
-
-    attr_reader :cusip, :cusip6, :issue
+    attr_reader :cusip6, :issue
 
     def initialize(cusip)
-      @cusip = cusip.to_s.strip.upcase
-      cusip_parts = @cusip.match(ID_REGEX) || {}
-
+      cusip_parts = parse cusip
       @identifier = cusip_parts[:identifier]
       @cusip6 = cusip_parts[:cusip6]
       @issue = cusip_parts[:issue]
-      @check_digit = cusip_parts[:check_digit].to_i if cusip_parts[:check_digit]
-    end
-
-    def valid?
-      return false unless valid_format?
-
-      check_digit == calculate_check_digit
-    end
-
-    def valid_format?
-      identifier ? true : false
-    end
-
-    def restore!
-      @check_digit = calculate_check_digit
-      @cusip = to_s
+      @check_digit = cusip_parts[:check_digit]&.to_i
     end
 
     def calculate_check_digit
       return mod_10(modified_luhn_sum) if valid_format?
 
-      raise InvalidFormatError, "CUSIP '#{cusip}' is invalid and check-digit cannot be calculated!"
+      raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
     end
 
     private
@@ -53,7 +34,6 @@ module SecId
 
       digitized_identifier.reverse.each_slice(2) do |even, odd|
         double_even = (even || 0) * 2
-        double_even -= 9 if double_even > 9
         sum += div_10_mod_10(double_even) + div_10_mod_10(odd || 0)
       end
 
@@ -62,10 +42,6 @@ module SecId
 
     def digitized_identifier
       @digitized_identifier ||= identifier.each_char.map(&method(:char_to_digit))
-    end
-
-    def div_10_mod_10(number)
-      (number / 10) + (number % 10)
     end
   end
 end

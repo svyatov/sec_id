@@ -24,7 +24,7 @@ module SecId
       '*' => 36, '@' => 37, '#' => 38
     }.freeze
 
-    attr_reader :identifier, :check_digit
+    attr_reader :full_number, :identifier, :check_digit
 
     def self.valid?(id)
       new(id).valid?
@@ -47,15 +47,18 @@ module SecId
     end
 
     def valid?
-      raise NotImplementedError
+      return false unless valid_format?
+
+      check_digit == calculate_check_digit
     end
 
     def valid_format?
-      raise NotImplementedError
+      identifier ? true : false
     end
 
     def restore!
-      raise NotImplementedError
+      @check_digit = calculate_check_digit
+      @full_number = to_s
     end
 
     def calculate_check_digit
@@ -73,6 +76,11 @@ module SecId
       raise NotImplementedError
     end
 
+    def parse(sec_id_number)
+      @full_number = sec_id_number.to_s.strip.upcase
+      @full_number.match(self.class::ID_REGEX) || {}
+    end
+
     def char_to_digits(char)
       CHAR_TO_DIGITS.fetch(char)
     end
@@ -83,6 +91,10 @@ module SecId
 
     def mod_10(sum)
       (10 - (sum % 10)) % 10
+    end
+
+    def div_10_mod_10(number)
+      (number / 10) + (number % 10)
     end
   end
 end

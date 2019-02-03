@@ -10,37 +10,20 @@ module SecId
       (?<check_digit>\d)?
     \z/x.freeze
 
-    attr_reader :isin, :country_code, :nsin
+    attr_reader :country_code, :nsin
 
     def initialize(isin)
-      @isin = isin.to_s.strip.upcase
-      isin_parts = @isin.match(ID_REGEX) || {}
-
+      isin_parts = parse isin
       @identifier = isin_parts[:identifier]
       @country_code = isin_parts[:country_code]
       @nsin = isin_parts[:nsin]
-      @check_digit = isin_parts[:check_digit].to_i if isin_parts[:check_digit]
-    end
-
-    def valid?
-      return false unless valid_format?
-
-      check_digit == calculate_check_digit
-    end
-
-    def valid_format?
-      identifier ? true : false
-    end
-
-    def restore!
-      @check_digit = calculate_check_digit
-      @isin = to_s
+      @check_digit = isin_parts[:check_digit]&.to_i
     end
 
     def calculate_check_digit
       return mod_10(luhn_sum) if valid_format?
 
-      raise InvalidFormatError, "ISIN '#{isin}' is invalid and check-digit cannot be calculated!"
+      raise InvalidFormatError, "ISIN '#{full_number}' is invalid and check-digit cannot be calculated!"
     end
 
     private

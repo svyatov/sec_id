@@ -10,10 +10,10 @@ Check-digit calculation is also available.
 
 Currently supported standards:
 [ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
-[CUSIP](https://en.wikipedia.org/wiki/CUSIP)
+[CUSIP](https://en.wikipedia.org/wiki/CUSIP),
+[SEDOL](https://en.wikipedia.org/wiki/SEDOL)
 
-WIP:
-[SEDOL](https://en.wikipedia.org/wiki/SEDOL),
+Work in progress:
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
 
 ## Installation
@@ -21,7 +21,7 @@ WIP:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 1.1'
+gem 'sec_id', '~> 2.0'
 ```
 
 And then execute:
@@ -107,7 +107,7 @@ SecId::ISIN.check_digit('US594918104')   # => 5
 
 # instance level
 isin = SecId::ISIN.new('US5949181045')
-isin.isin                  # => 'US5949181045'
+isin.full_number           # => 'US5949181045'
 isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
 isin.check_digit           # => 5
@@ -128,7 +128,7 @@ SecId::CUSIP.check_digit('59491810')   # => 5
 
 # instance level
 cusip = SecId::CUSIP.new('594918104')
-cusip.cusip                 # => '594918104'
+cusip.full_number           # => '594918104'
 cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
 cusip.check_digit           # => 4
@@ -136,6 +136,25 @@ cusip.valid?                # => true
 cusip.valid_format?         # => true
 cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
+```
+
+### SecId::SEDOL full example
+
+```ruby
+# class level
+SecId::SEDOL.valid?('B0Z52W5')       # => true
+SecId::SEDOL.valid_format?('B0Z52W') # => true
+SecId::SEDOL.restore!('B0Z52W')      # => 'B0Z52W5'
+SecId::SEDOL.check_digit('B0Z52W')   # => 5
+
+# instance level
+cusip = SecId::SEDOL.new('B0Z52W5')
+cusip.full_number           # => 'B0Z52W5'
+cusip.check_digit           # => 5
+cusip.valid?                # => true
+cusip.valid_format?         # => true
+cusip.restore!              # => 'B0Z52W5'
+cusip.calculate_check_digit # => 5
 ```
 
 ## Development

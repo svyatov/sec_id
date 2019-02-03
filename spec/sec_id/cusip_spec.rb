@@ -22,7 +22,7 @@ RSpec.describe SecId::CUSIP do
     describe '#restore!' do
       it 'restores check-digit and returns full CUSIP number' do
         expect(cusip.restore!).to eq(cusip_number)
-        expect(cusip.cusip).to eq(cusip_number)
+        expect(cusip.full_number).to eq(cusip_number)
       end
     end
   end
@@ -46,7 +46,7 @@ RSpec.describe SecId::CUSIP do
     describe '#restore!' do
       it 'restores check-digit and returns full CUSIP number' do
         expect(cusip.restore!).to eq('38259P508')
-        expect(cusip.cusip).to eq('38259P508')
+        expect(cusip.full_number).to eq('38259P508')
       end
     end
   end

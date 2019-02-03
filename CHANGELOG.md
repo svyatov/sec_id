@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.0] - 2019-02-03
+
+### Added
+
+- SEDOL numbers support: `SecId::SEDOL`
+
+### Updated
+
+- **Breaking change**
+
+    API for accessing full number is unified across all classes:
+
+    ```
+    SecId::ISIN#full_number  # previously SecId::ISIN#isin
+    SecId::CUSIP#full_number # previously SecId::CUSIP#cusip
+    SecId::SEDOL#full_number
+    ```
+
+### Fixed
+
+- CUSIP check-digit algorithm fixed
+
 ## [1.1.0] - 2019-02-03
 
 ### Added

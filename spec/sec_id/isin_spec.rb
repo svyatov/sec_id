@@ -22,7 +22,7 @@ RSpec.describe SecId::ISIN do
     describe '#restore!' do
       it 'restores check-digit and returns full ISIN number' do
         expect(isin.restore!).to eq(isin_number)
-        expect(isin.isin).to eq(isin_number)
+        expect(isin.full_number).to eq(isin_number)
       end
     end
   end
@@ -69,7 +69,7 @@ RSpec.describe SecId::ISIN do
     describe '#restore!' do
       it 'restores check-digit and returns full ISIN number' do
         expect(isin.restore!).to eq('IE00B296YR77')
-        expect(isin.isin).to eq('IE00B296YR77')
+        expect(isin.full_number).to eq('IE00B296YR77')
       end
     end
   end
