@@ -5,7 +5,7 @@ language: ruby
 
 env:
   global:
-    - CC_TEST_REPORTER_ID=9995f7b2aa6866b0427aef31d946ff1feded8f6e109eaf6ccb58e91c73d0bfeb
+    - CC_TEST_REPORTER_ID=48c33b2bc3ccdc6dafe9ed76482eca03cde47b922a7859074fc2be791247e5fd
 
 rvm:
   - 2.3
