@@ -13,6 +13,7 @@ rvm:
   - 2.5
   - 2.6
   - ruby-head
+  - truffleruby
 
 matrix:
   allow_failures:
@@ -29,7 +30,3 @@ script:
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-
-notifications:
-  recipients: leonid@svyatov.ru
-  on_failure: change
