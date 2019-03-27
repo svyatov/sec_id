@@ -17,7 +17,9 @@ rvm:
 
 matrix:
   allow_failures:
-    - rvm: ruby-head
+    - rvm:
+      - ruby-head
+      - truffleruby
   fast_finish: true
 
 before_script:
