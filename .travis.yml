@@ -8,10 +8,9 @@ env:
     - CC_TEST_REPORTER_ID=48c33b2bc3ccdc6dafe9ed76482eca03cde47b922a7859074fc2be791247e5fd
 
 rvm:
-  - 2.3
-  - 2.4
   - 2.5
   - 2.6
+  - 2.7
   - ruby-head
   - truffleruby
 

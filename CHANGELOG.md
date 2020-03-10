@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.0] - 2020-03-10
+
+### Breaking changes
+
+- Minimum required Ruby version is 2.5 now
+
+### Updated
+
+- Small internal refactorings
+- TravisCI config updated: dropped Ruby 2.3 and 2.4, added Ruby 2.7
+- Rubocop's Ruby target version changed to 2.5
+
 ## [2.0.0] - 2019-02-03
 
 ### Added

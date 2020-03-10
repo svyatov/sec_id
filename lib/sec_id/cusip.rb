@@ -32,7 +32,7 @@ module SecId
     def modified_luhn_sum
       sum = 0
 
-      digitized_identifier.reverse.each_slice(2) do |even, odd|
+      id_digits.reverse.each_slice(2) do |even, odd|
         double_even = (even || 0) * 2
         sum += div_10_mod_10(double_even) + div_10_mod_10(odd || 0)
       end
@@ -40,8 +40,8 @@ module SecId
       sum
     end
 
-    def digitized_identifier
-      @digitized_identifier ||= identifier.each_char.map(&method(:char_to_digit))
+    def id_digits
+      @id_digits ||= identifier.each_char.map(&method(:char_to_digit))
     end
   end
 end
