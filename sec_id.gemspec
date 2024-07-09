@@ -15,17 +15,12 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 
-  spec.required_ruby_version = '>= 2.5.0'
+  spec.required_ruby_version = '>= 3.1.0'
 
   spec.require_paths = ['lib']
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
 
-  spec.add_development_dependency 'bundler', '>= 1.16'
-  spec.add_development_dependency 'rake', '>= 10.0'
-  spec.add_development_dependency 'rspec', '~> 3.9'
-  spec.add_development_dependency 'rubocop', '~> 1.18.4'
-  spec.add_development_dependency 'rubocop-rspec', '~> 1.38'
-  spec.add_development_dependency 'simplecov', '~> 0.21.2'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end

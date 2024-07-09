@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.0.0] - 2024-07-09
+
+### Breaking changes
+
+- Minimum required Ruby version is 3.1 now
+- Default repository branch renamed to `main`
+
+### Updated
+
+- Small internal refactorings
+- TravisCI -> GitHub Actions
+- Dropped tests for Ruby below 3.1
+- Rubocop's Ruby target version changed to 3.1
+
 ## [3.0.0] - 2020-03-10
 
 ### Breaking changes

@@ -2,10 +2,12 @@ require:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 3.1
   DisplayCopNames: true
   DisplayStyleGuide: true
   ExtraDetails: true
+  SuggestExtensions: false
+  NewCops: enable
 
 Layout/LineLength:
   Max: 120
@@ -25,6 +27,10 @@ Style/HashTransformValues:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+
+Lint/MissingSuper:
+  AllowedParentClasses:
+    - Base
 
 RSpec/MultipleExpectations:
   Max: 5

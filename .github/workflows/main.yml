@@ -1,0 +1,39 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby_version }}
+    strategy:
+      matrix:
+        ruby_version: [ruby-head, '3.3', '3.2', '3.1']
+
+    env:
+      COVERAGE: true
+      CC_TEST_REPORTER_ID: ${{ vars.CC_TEST_REPORTER_ID }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby_version }}
+        bundler-cache: true
+      continue-on-error: ${{ matrix.ruby_version == 'ruby-head' }}
+
+    - run: bundle exec rake
+      continue-on-error:  ${{ matrix.ruby_version == 'ruby-head' }}
+
+    - uses: paambaati/codeclimate-action@v8.0.0
+      # Only upload coverage for the latest Ruby
+      if: ${{ matrix.ruby_version == '3.3' }}

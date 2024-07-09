@@ -15,7 +15,7 @@ RSpec.describe SecId::CUSIP do
 
     describe '#valid?' do
       it 'returns true' do
-        expect(cusip.valid?).to eq(true)
+        expect(cusip.valid?).to be(true)
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe SecId::CUSIP do
 
     describe '#valid?' do
       it 'returns false' do
-        expect(cusip.valid?).to eq(false)
+        expect(cusip.valid?).to be(false)
       end
     end
 
@@ -54,9 +54,9 @@ RSpec.describe SecId::CUSIP do
   describe '.valid?' do
     context 'when CUSIP is incorrect' do
       it 'returns false' do
-        expect(described_class.valid?('5949181')).to eq(false)
-        expect(described_class.valid?('594918105')).to eq(false) # invalid check-digit
-        expect(described_class.valid?('5949181045')).to eq(false)
+        expect(described_class.valid?('5949181')).to be(false)
+        expect(described_class.valid?('594918105')).to be(false) # invalid check-digit
+        expect(described_class.valid?('5949181045')).to be(false)
       end
     end
 
@@ -65,7 +65,7 @@ RSpec.describe SecId::CUSIP do
         %w[
           594918104 38259P508 037833100 17275R102 68389X105 986191302
         ].each do |cusip_number|
-          expect(described_class.valid?(cusip_number)).to eq(true)
+          expect(described_class.valid?(cusip_number)).to be(true)
         end
       end
     end
@@ -93,18 +93,18 @@ RSpec.describe SecId::CUSIP do
   describe '.valid_format?' do
     context 'when CUSIP is incorrect' do
       it 'returns false' do
-        expect(described_class.valid_format?('0378331')).to eq(false)
-        expect(described_class.valid_format?('0378331009')).to eq(false)
+        expect(described_class.valid_format?('0378331')).to be(false)
+        expect(described_class.valid_format?('0378331009')).to be(false)
       end
     end
 
     context 'when CUSIP is valid or missing check-digit' do
       it 'returns true' do
-        expect(described_class.valid_format?('38259P50')).to eq(true)
-        expect(described_class.valid_format?('38259P508')).to eq(true)
-        expect(described_class.valid_format?('68389X10')).to eq(true)
-        expect(described_class.valid_format?('68389X105')).to eq(true)
-        expect(described_class.valid_format?('986191302')).to eq(true)
+        expect(described_class.valid_format?('38259P50')).to be(true)
+        expect(described_class.valid_format?('38259P508')).to be(true)
+        expect(described_class.valid_format?('68389X10')).to be(true)
+        expect(described_class.valid_format?('68389X105')).to be(true)
+        expect(described_class.valid_format?('986191302')).to be(true)
       end
     end
   end

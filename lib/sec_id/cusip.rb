@@ -8,7 +8,7 @@ module SecId
         (?<cusip6>[A-Z0-9]{5}[A-Z0-9*@#])
         (?<issue>[A-Z0-9*@#]{2}))
       (?<check_digit>\d)?
-    \z/x.freeze
+    \z/x
 
     attr_reader :cusip6, :issue
 
@@ -21,7 +21,7 @@ module SecId
     end
 
     def calculate_check_digit
-      return mod_10(modified_luhn_sum) if valid_format?
+      return mod10(modified_luhn_sum) if valid_format?
 
       raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
     end
@@ -34,7 +34,7 @@ module SecId
 
       id_digits.reverse.each_slice(2) do |even, odd|
         double_even = (even || 0) * 2
-        sum += div_10_mod_10(double_even) + div_10_mod_10(odd || 0)
+        sum += div10mod10(double_even) + div10mod10(odd || 0)
       end
 
       sum
