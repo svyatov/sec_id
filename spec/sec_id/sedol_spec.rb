@@ -13,7 +13,7 @@ RSpec.describe SecId::SEDOL do
 
     describe '#valid?' do
       it 'returns true' do
-        expect(sedol.valid?).to eq(true)
+        expect(sedol.valid?).to be(true)
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe SecId::SEDOL do
 
     describe '#valid?' do
       it 'returns false' do
-        expect(sedol.valid?).to eq(false)
+        expect(sedol.valid?).to be(false)
       end
     end
 
@@ -50,9 +50,9 @@ RSpec.describe SecId::SEDOL do
   describe '.valid?' do
     context 'when SEDOL is incorrect' do
       it 'returns false' do
-        expect(described_class.valid?('A61351')).to eq(false)
-        expect(described_class.valid?('6135118')).to eq(false) # invalid check-digit
-        expect(described_class.valid?('61351115')).to eq(false)
+        expect(described_class.valid?('A61351')).to be(false)
+        expect(described_class.valid?('6135118')).to be(false) # invalid check-digit
+        expect(described_class.valid?('61351115')).to be(false)
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe SecId::SEDOL do
         %w[
           2307389 5529027 B03MLX2 B0Z52W5 B19GKT4 6135111
         ].each do |sedol_number|
-          expect(described_class.valid?(sedol_number)).to eq(true)
+          expect(described_class.valid?(sedol_number)).to be(true)
         end
       end
     end
@@ -89,18 +89,18 @@ RSpec.describe SecId::SEDOL do
   describe '.valid_format?' do
     context 'when SEDOL is incorrect' do
       it 'returns false' do
-        expect(described_class.valid_format?('E23073')).to eq(false)
-        expect(described_class.valid_format?('23073894')).to eq(false)
+        expect(described_class.valid_format?('E23073')).to be(false)
+        expect(described_class.valid_format?('23073894')).to be(false)
       end
     end
 
     context 'when SEDOL is valid or missing check-digit' do
       it 'returns true' do
-        expect(described_class.valid_format?('B09CBL4')).to eq(true)
-        expect(described_class.valid_format?('219071')).to eq(true)
-        expect(described_class.valid_format?('B923452')).to eq(true)
-        expect(described_class.valid_format?('B99876')).to eq(true)
-        expect(described_class.valid_format?('2307389')).to eq(true)
+        expect(described_class.valid_format?('B09CBL4')).to be(true)
+        expect(described_class.valid_format?('219071')).to be(true)
+        expect(described_class.valid_format?('B923452')).to be(true)
+        expect(described_class.valid_format?('B99876')).to be(true)
+        expect(described_class.valid_format?('2307389')).to be(true)
       end
     end
   end

@@ -26,20 +26,22 @@ module SecId
   class Base
     attr_reader :full_number, :identifier, :check_digit
 
-    def self.valid?(id)
-      new(id).valid?
-    end
+    class << self
+      def valid?(id)
+        new(id).valid?
+      end
 
-    def self.valid_format?(id)
-      new(id).valid_format?
-    end
+      def valid_format?(id)
+        new(id).valid_format?
+      end
 
-    def self.restore!(id_without_check_digit)
-      new(id_without_check_digit).restore!
-    end
+      def restore!(id_without_check_digit)
+        new(id_without_check_digit).restore!
+      end
 
-    def self.check_digit(id)
-      new(id).calculate_check_digit
+      def check_digit(id)
+        new(id).calculate_check_digit
+      end
     end
 
     def initialize(_sec_id_number)
@@ -89,11 +91,11 @@ module SecId
       SecId::CHAR_TO_DIGIT.fetch(char)
     end
 
-    def mod_10(sum)
+    def mod10(sum)
       (10 - (sum % 10)) % 10
     end
 
-    def div_10_mod_10(number)
+    def div10mod10(number)
       (number / 10) + (number % 10)
     end
   end

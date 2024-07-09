@@ -6,7 +6,7 @@ module SecId
     ID_REGEX = /\A
       (?<identifier>[0-9BCDFGHJKLMNPQRSTVWXYZ]{6})
       (?<check_digit>\d)?
-    \z/x.freeze
+    \z/x
 
     CHARACTER_WEIGHTS = [1, 3, 1, 7, 3, 9].freeze
 
@@ -17,7 +17,7 @@ module SecId
     end
 
     def calculate_check_digit
-      return mod_10(weighted_sum) if valid_format?
+      return mod10(weighted_sum) if valid_format?
 
       raise InvalidFormatError, "SEDOL '#{full_number}' is invalid and check-digit cannot be calculated!"
     end

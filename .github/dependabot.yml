@@ -1,20 +1,11 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
 version: 2
 updates:
-- package-ecosystem: bundler
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "02:00"
-  open-pull-requests-limit: 15
-  allow:
-  - dependency-type: direct
-  - dependency-type: indirect
-  ignore:
-  - dependency-name: rubocop
-    versions:
-    - 1.10.0
-    - 1.11.0
-    - 1.12.0
-    - 1.12.1
-    - 1.9.0
-    - 1.9.1
+  - package-ecosystem: "bundler" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
