@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'simplecov'
 
-SimpleCov.start do
-  add_filter { |src| !src.filename.start_with?("#{SimpleCov.root}/lib") }
+if ENV['COVERAGE']
+  require 'simplecov'
+
+  if ENV['CI']
+    require 'simplecov_json_formatter'
+    SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+  end
+
+  SimpleCov.start do
+    add_filter { |src| !src.filename.start_with?("#{SimpleCov.root}/lib") }
+  end
 end
 
 require 'sec_id'

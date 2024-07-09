@@ -16,5 +16,5 @@ gem 'rspec_junit_formatter'
 gem 'rubocop', '~> 1.64'
 gem 'rubocop-rspec', '~> 3.0'
 
-gem 'simplecov', '~> 0.22'
-gem 'simplecov_json_formatter'
+gem 'simplecov', '~> 0.22', require: false
+gem 'simplecov_json_formatter', require: false
