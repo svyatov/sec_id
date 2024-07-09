@@ -8,8 +8,11 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 # Specify your gem's development dependencies below
-gem 'rake', '>= 10.0'
 gem 'rspec', '~> 3.9'
+gem 'rspec_junit_formatter'
+
 gem 'rubocop', '~> 1.64'
 gem 'rubocop-rspec', '~> 3.0'
+
 gem 'simplecov', '~> 0.22'
+gem 'simplecov_json_formatter'
