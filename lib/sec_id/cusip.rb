@@ -35,6 +35,11 @@ module SecId
       isin
     end
 
+    # CUSIP International Numbering System
+    def cins?
+      !cusip6[0].match?(/[0-9]/)
+    end
+
     private
 
     # https://en.wikipedia.org/wiki/Luhn_algorithm

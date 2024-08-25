@@ -89,6 +89,24 @@ RSpec.describe SecId::CUSIP do
     end
   end
 
+  describe '#cins?' do
+    context 'when a CINS' do
+      let(:cusip_number) { 'G0052B105' }
+
+      it 'returns true' do
+        expect(cusip.cins?).to be(true)
+      end
+    end
+
+    context 'when not a CINS' do
+      let(:cusip_number) { '084664BL4' }
+
+      it 'returns false' do
+        expect(cusip.cins?).to be(false)
+      end
+    end
+  end
+
   describe '.restore!' do
     context 'when CUSIP is incorrect' do
       it 'raises an error' do
