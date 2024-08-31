@@ -11,7 +11,8 @@ Check-digit calculation is also available.
 Currently supported standards:
 [ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
 [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
-[SEDOL](https://en.wikipedia.org/wiki/SEDOL)
+[SEDOL](https://en.wikipedia.org/wiki/SEDOL),
+[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier).
 
 Work in progress:
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
@@ -155,6 +156,27 @@ cusip.valid?                # => true
 cusip.valid_format?         # => true
 cusip.restore!              # => 'B0Z52W5'
 cusip.calculate_check_digit # => 5
+```
+
+### SecId::FIGI full example
+
+```ruby
+# class level
+SecId::FIGI.valid?('BBG000DMBXR2')        # => true
+SecId::FIGI.valid_format?('BBG000DMBXR2') # => true
+SecId::FIGI.restore!('BBG000DMBXR')       # => 'BBG000DMBXR2'
+SecId::FIGI.check_digit('BBG000DMBXR')    # => 2
+
+# instance level
+figi = SecId::FIGI.new('BBG000DMBXR2')
+figi.full_number           # => 'BBG000DMBXR2'
+figi.prefix                # => 'BB'
+figi.random_part           # => '000DMBXR'
+figi.check_digit           # => 2
+figi.valid?                # => true
+figi.valid_format?         # => true
+figi.restore!              # => 'BBG000DMBXR2'
+figi.calculate_check_digit # => 2
 ```
 
 ## Development
