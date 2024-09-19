@@ -12,7 +12,7 @@ Currently supported standards:
 [ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
 [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
 [SEDOL](https://en.wikipedia.org/wiki/SEDOL),
-[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier).
+[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier), [CIK](https://en.wikipedia.org/wiki/Central_Index_Key).
 
 Work in progress:
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
@@ -177,6 +177,27 @@ figi.valid?                # => true
 figi.valid_format?         # => true
 figi.restore!              # => 'BBG000DMBXR2'
 figi.calculate_check_digit # => 2
+```
+
+### SecId::CIK full example
+
+```ruby
+# class level
+SecId::CIK.valid?('0001094517')        # => true
+SecId::CIK.valid_format?('0001094517') # => true
+SecId::CIK.restore!('1094517')         # => '0001094517'
+SecId::CIK.check_digit('0001094517')   # raises NotImplementedError
+
+# instance level
+cik = SecId::CIK.new('0001094517')
+cik.full_number           # => '0001094517'
+cik.padding               # => '000'
+cik.identifier            # => '1094517'
+cik.valid?                # => true
+cik.valid_format?         # => true
+cik.restore!              # => '0001094517'
+cik.calculate_check_digit # raises NotImplementedError
+cik.check_digit           # => nil
 ```
 
 ## Development

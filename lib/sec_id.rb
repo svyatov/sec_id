@@ -7,6 +7,7 @@ require 'sec_id/isin'
 require 'sec_id/cusip'
 require 'sec_id/sedol'
 require 'sec_id/figi'
+require 'sec_id/cik'
 
 module SecId
   Error = Class.new(StandardError)
