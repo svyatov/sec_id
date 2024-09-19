@@ -116,6 +116,7 @@ isin.valid?                # => true
 isin.valid_format?         # => true
 isin.restore!              # => 'US5949181045'
 isin.calculate_check_digit # => 5
+isin.to_cusip              # => #<SecId::CUSIP>
 ```
 
 ### SecId::CUSIP full example
@@ -137,6 +138,7 @@ cusip.valid?                # => true
 cusip.valid_format?         # => true
 cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
+cusip.to_isin('US')         # => #<SecId::ISIN>
 ```
 
 ### SecId::SEDOL full example

@@ -26,6 +26,15 @@ module SecId
       raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
     end
 
+    def to_isin(country_code)
+      ISIN::CGS_COUNTRY_CODES.include?(country_code) \
+        or raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
+      restore!
+      isin = ISIN.new(country_code + full_number)
+      isin.restore!
+      isin
+    end
+
     private
 
     # https://en.wikipedia.org/wiki/Luhn_algorithm

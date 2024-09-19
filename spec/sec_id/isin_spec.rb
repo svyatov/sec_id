@@ -74,6 +74,26 @@ RSpec.describe SecId::ISIN do
     end
   end
 
+  describe '#to_cusip' do
+    context 'when CGS country code' do
+      let(:isin_number) { 'VI02153X1080' }
+
+      it 'returns a CUSIP' do
+        expect(isin.cgs?).to be(true)
+        expect(isin.to_cusip).to be_a(SecId::CUSIP)
+      end
+    end
+
+    context 'when non-CGS country code' do
+      let(:isin_number) { 'IE00B296YR77' }
+
+      it 'raises an error' do
+        expect(isin.cgs?).to be(false)
+        expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
+  end
+
   describe '.valid?' do
     context 'when ISIN is incorrect' do
       it 'returns false' do
