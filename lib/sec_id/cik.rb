@@ -24,12 +24,10 @@ module SecId
     end
 
     def restore!
-      if valid_format?
-        @padding = '0' * (10 - @identifier.length)
-        return(@full_number = @identifier.rjust(10, '0'))
-      end
+      raise InvalidFormatError, "CIK '#{full_number}' is invalid and cannot be restored!" unless valid_format?
 
-      raise InvalidFormatError, "CIK '#{full_number}' is invalid and cannot be restored!"
+      @padding = '0' * (10 - @identifier.length)
+      @full_number = @identifier.rjust(10, '0')
     end
   end
 end

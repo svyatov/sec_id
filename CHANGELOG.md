@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.1.0] - 2024-09-23
+
+### Added
+
+- FIGI support ([@wtn][], #84)
+- CIK support ([@wtn][], #85)
+- Convert between CUSIPs and ISINs ([@wtn][], #86, #88)
+- CINS check method for CUSIPs ([@wtn][], #87)
+
+### Updated
+
+- Small internal refactorings
+
 ## [4.0.0] - 2024-07-09
 
 ### Breaking changes

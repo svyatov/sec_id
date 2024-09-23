@@ -17,9 +17,11 @@ module SecId
     end
 
     def calculate_check_digit
-      return mod10(weighted_sum) if valid_format?
+      unless valid_format?
+        raise InvalidFormatError, "SEDOL '#{full_number}' is invalid and check-digit cannot be calculated!"
+      end
 
-      raise InvalidFormatError, "SEDOL '#{full_number}' is invalid and check-digit cannot be calculated!"
+      mod10(weighted_sum)
     end
 
     private

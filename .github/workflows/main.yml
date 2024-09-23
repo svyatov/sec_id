@@ -35,5 +35,5 @@ jobs:
       continue-on-error:  ${{ matrix.ruby_version == 'ruby-head' }}
 
     - uses: paambaati/codeclimate-action@v8.0.0
-      # Only upload coverage for the latest Ruby
-      if: ${{ matrix.ruby_version == '3.3' }}
+      # Only upload coverage for the latest Ruby and don't run for PRs from forks
+      if: ${{ matrix.ruby_version == '3.3' && github.event.pull_request.head.repo.fork == false }}

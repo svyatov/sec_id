@@ -12,7 +12,8 @@ Currently supported standards:
 [ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
 [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
 [SEDOL](https://en.wikipedia.org/wiki/SEDOL),
-[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier), [CIK](https://en.wikipedia.org/wiki/Central_Index_Key).
+[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier),
+[CIK](https://en.wikipedia.org/wiki/Central_Index_Key).
 
 Work in progress:
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
@@ -22,7 +23,7 @@ Work in progress:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 4.0'
+gem 'sec_id', '~> 4.1'
 ```
 
 And then execute:
@@ -139,6 +140,7 @@ cusip.valid_format?         # => true
 cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
 cusip.to_isin('US')         # => #<SecId::ISIN>
+cusip.cins?                 # => true
 ```
 
 ### SecId::SEDOL full example

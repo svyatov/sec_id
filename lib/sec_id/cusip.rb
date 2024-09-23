@@ -21,14 +21,18 @@ module SecId
     end
 
     def calculate_check_digit
-      return mod10(modified_luhn_sum) if valid_format?
+      unless valid_format?
+        raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
+      end
 
-      raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
+      mod10(modified_luhn_sum)
     end
 
     def to_isin(country_code)
-      ISIN::CGS_COUNTRY_CODES.include?(country_code) \
-        or raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
+      unless ISIN::CGS_COUNTRY_CODES.include?(country_code)
+        raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
+      end
+
       restore!
       isin = ISIN.new(country_code + full_number)
       isin.restore!
@@ -37,25 +41,21 @@ module SecId
 
     # CUSIP International Numbering System
     def cins?
-      !cusip6[0].match?(/[0-9]/)
+      cusip6[0] < '0' || cusip6[0] > '9'
     end
 
     private
 
     # https://en.wikipedia.org/wiki/Luhn_algorithm
     def modified_luhn_sum
-      sum = 0
-
-      id_digits.reverse.each_slice(2) do |even, odd|
+      reversed_id_digits.each_slice(2).reduce(0) do |sum, (even, odd)|
         double_even = (even || 0) * 2
-        sum += div10mod10(double_even) + div10mod10(odd || 0)
+        sum + div10mod10(double_even) + div10mod10(odd || 0)
       end
-
-      sum
     end
 
-    def id_digits
-      @id_digits ||= identifier.each_char.map(&method(:char_to_digit))
+    def reversed_id_digits
+      identifier.each_char.map(&method(:char_to_digit)).reverse!
     end
   end
 end

@@ -12,6 +12,8 @@ module SecId
       (?<check_digit>\d)?
     \z/x
 
+    RESTRICTED_PREFIXES = Set.new %w[BS BM GG GB GH KY VG]
+
     attr_reader :prefix, :random_part
 
     def initialize(figi)
@@ -22,26 +24,30 @@ module SecId
       @check_digit = figi_parts[:check_digit]&.to_i
     end
 
-    RESTRICTED_PREFIXES = Set.new %w[BS BM GG GB GH KY VG]
-
     def valid_format?
-      !identifier.nil? and !RESTRICTED_PREFIXES.include?(prefix)
+      !identifier.nil? && !RESTRICTED_PREFIXES.include?(prefix)
     end
 
     def calculate_check_digit
-      return mod10(modified_luhn_sum) if valid_format?
+      unless valid_format?
+        raise InvalidFormatError, "FIGI '#{full_number}' is invalid and check-digit cannot be calculated!"
+      end
 
-      raise InvalidFormatError, "FIGI '#{full_number}' is invalid and check-digit cannot be calculated!"
+      mod10(modified_luhn_sum)
     end
 
     private
 
+    # https://en.wikipedia.org/wiki/Luhn_algorithm
     def modified_luhn_sum
-      identifier[0, 11].reverse.chars.map.with_index do |char, index|
-        value = char_to_digit(char)
-        value *= 2 if index.odd?
-        value.to_s.chars.map(&:to_i)
-      end.flatten.sum
+      reversed_id_digits.each_with_index.reduce(0) do |sum, (digit, index)|
+        digit *= 2 if index.odd?
+        sum + digit.divmod(10).sum
+      end
+    end
+
+    def reversed_id_digits
+      identifier.each_char.map(&method(:char_to_digit)).reverse!
     end
   end
 end
