@@ -4,10 +4,10 @@
 
 ### Added
 
-- FIGI support ([@wtn][], #84)
-- CIK support ([@wtn][], #85)
-- Convert between CUSIPs and ISINs ([@wtn][], #86, #88)
-- CINS check method for CUSIPs ([@wtn][], #87)
+- FIGI support ([@wtn](https://github.com/wtn), [#84](https://github.com/svyatov/sec_id/pull/84))
+- CIK support ([@wtn](https://github.com/wtn), [#85](https://github.com/svyatov/sec_id/pull/85))
+- Convert between CUSIPs and ISINs ([@wtn](https://github.com/wtn), [#86](https://github.com/svyatov/sec_id/pull/86), [#88](https://github.com/svyatov/sec_id/pull/88))
+- CINS check method for CUSIPs ([@wtn](https://github.com/wtn), [#87](https://github.com/svyatov/sec_id/pull/87))
 
 ### Updated
 
