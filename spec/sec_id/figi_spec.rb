@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::FIGI do
+RSpec.describe SecID::FIGI do
   let(:figi) { described_class.new(figi_number) }
 
   context 'when FIGI is valid' do
@@ -45,7 +45,7 @@ RSpec.describe SecId::FIGI do
 
     describe '#restore!' do
       it 'raises an error' do
-        expect { figi.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { figi.restore! }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -68,7 +68,7 @@ RSpec.describe SecId::FIGI do
 
     describe '#restore!' do
       it 'raises an error' do
-        expect { figi.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { figi.restore! }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -119,9 +119,9 @@ RSpec.describe SecId::FIGI do
   describe '.restore!' do
     context 'when FIGI is incorrect' do
       it 'raises an error' do
-        expect { described_class.restore!('BBG000HY4H') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('BBG000HY4HWX') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('BBG000HY4HW90') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.restore!('BBG000HY4H') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.restore!('BBG000HY4HWX') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.restore!('BBG000HY4HW90') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -170,9 +170,9 @@ RSpec.describe SecId::FIGI do
   describe '.check_digit' do
     context 'when FIGI is incorrect' do
       it 'raises an error' do
-        expect { described_class.check_digit('BBG000HY4H') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('BBG000HY4HWX') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('BBG000HY4HW90') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.check_digit('BBG000HY4H') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.check_digit('BBG000HY4HWX') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.check_digit('BBG000HY4HW90') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

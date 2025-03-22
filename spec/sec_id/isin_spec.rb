@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::ISIN do
+RSpec.describe SecID::ISIN do
   let(:isin) { described_class.new(isin_number) }
 
   context 'when ISIN is valid' do
@@ -45,7 +45,7 @@ RSpec.describe SecId::ISIN do
 
     describe '#restore!' do
       it 'raises an error' do
-        expect { isin.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { isin.restore! }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -80,7 +80,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a CUSIP' do
         expect(isin.cgs?).to be(true)
-        expect(isin.to_cusip).to be_a(SecId::CUSIP)
+        expect(isin.to_cusip).to be_a(SecID::CUSIP)
       end
     end
 
@@ -89,7 +89,7 @@ RSpec.describe SecId::ISIN do
 
       it 'raises an error' do
         expect(isin.cgs?).to be(false)
-        expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
+        expect { isin.to_cusip }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -122,8 +122,8 @@ RSpec.describe SecId::ISIN do
   describe '.restore!' do
     context 'when ISIN is incorrect' do
       it 'raises an error' do
-        expect { described_class.restore!('US03783315') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('US03783315123') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.restore!('US03783315') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.restore!('US03783315123') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -160,8 +160,8 @@ RSpec.describe SecId::ISIN do
   describe '.check_digit' do
     context 'when ISIN is incorrect' do
       it 'raises an error' do
-        expect { described_class.check_digit('US03783315') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('US03783315123') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.check_digit('US03783315') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.check_digit('US03783315123') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

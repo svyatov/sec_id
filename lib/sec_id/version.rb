@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   VERSION = '4.1.0'
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # https://en.wikipedia.org/wiki/CUSIP
   class CUSIP < Base
     ID_REGEX = /\A

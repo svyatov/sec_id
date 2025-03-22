@@ -2,7 +2,7 @@
 
 require 'set'
 
-module SecId
+module SecID
   class FIGI < Base
     ID_REGEX = /\A
       (?<identifier>

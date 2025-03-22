@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # https://en.wikipedia.org/wiki/International_Securities_Identification_Number
   class ISIN < Base
     ID_REGEX = /\A

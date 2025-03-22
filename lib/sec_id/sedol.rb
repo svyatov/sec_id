@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # https://en.wikipedia.org/wiki/SEDOL
   class SEDOL < Base
     ID_REGEX = /\A

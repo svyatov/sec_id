@@ -9,7 +9,7 @@ require 'sec_id/sedol'
 require 'sec_id/figi'
 require 'sec_id/cik'
 
-module SecId
+module SecID
   Error = Class.new(StandardError)
   InvalidFormatError = Class.new(Error)
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::SEDOL do
+RSpec.describe SecID::SEDOL do
   let(:sedol) { described_class.new(sedol_number) }
 
   context 'when SEDOL is valid' do
@@ -70,8 +70,8 @@ RSpec.describe SecId::SEDOL do
   describe '.restore!' do
     context 'when SEDOL is incorrect' do
       it 'raises an error' do
-        expect { described_class.restore!('I09CB4') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('B09CBL40') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.restore!('I09CB4') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.restore!('B09CBL40') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -108,8 +108,8 @@ RSpec.describe SecId::SEDOL do
   describe '.check_digit' do
     context 'when SEDOL is incorrect' do
       it 'raises an error' do
-        expect { described_class.check_digit('55U290') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('55290275') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.check_digit('55U290') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.check_digit('55290275') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

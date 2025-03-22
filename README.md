@@ -1,4 +1,4 @@
-# SecId
+# SecID
 [![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://badge.fury.io/rb/sec_id)
 ![Build Status](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/maintainability)](https://codeclimate.com/github/svyatov/sec_id/maintainability)
@@ -45,11 +45,11 @@ Base API has 4 main methods which can be used both on class level and on instanc
 
   ```ruby
   # class level
-  SecId::ISIN.valid?('US5949181045') # => true
-  SecId::ISIN.valid?('US594918104')  # => false
+  SecID::ISIN.valid?('US5949181045') # => true
+  SecID::ISIN.valid?('US594918104')  # => false
 
   # instance level
-  isin = SecId::ISIN.new('US5949181045')
+  isin = SecID::ISIN.new('US5949181045')
   isin.valid? # => true
   ```
 
@@ -58,11 +58,11 @@ Base API has 4 main methods which can be used both on class level and on instanc
 
   ```ruby
   # class level
-  SecId::ISIN.valid_format?('US5949181045') # => true
-  SecId::ISIN.valid_format?('US594918104') # => true
+  SecID::ISIN.valid_format?('US5949181045') # => true
+  SecID::ISIN.valid_format?('US594918104') # => true
 
   # instance level
-  isin = SecId::ISIN.new('US594918104')
+  isin = SecID::ISIN.new('US594918104')
   isin.valid_format? # => true
   ```
 
@@ -71,10 +71,10 @@ Base API has 4 main methods which can be used both on class level and on instanc
 
   ```ruby
   # class level
-  SecId::ISIN.restore!('US594918104') # => 'US5949181045'
+  SecID::ISIN.restore!('US594918104') # => 'US5949181045'
 
   # instance level
-  isin = SecId::ISIN.new('US5949181045')
+  isin = SecID::ISIN.new('US5949181045')
   isin.restore! # => 'US5949181045'
   ```
 
@@ -86,10 +86,10 @@ Base API has 4 main methods which can be used both on class level and on instanc
 
   ```ruby
   # class level
-  SecId::ISIN.check_digit('US594918104') # => 5
+  SecID::ISIN.check_digit('US594918104') # => 5
 
   # instance level
-  isin = SecId::ISIN.new('US594918104')
+  isin = SecID::ISIN.new('US594918104')
   isin.calculate_check_digit # => 5
   isin.check_digit # => nil
   ```
@@ -98,17 +98,17 @@ Base API has 4 main methods which can be used both on class level and on instanc
   at instance level represents original check-digit of the number passed to `new`,
   which in this example is missing and thus it's `nil`.
 
-### SecId::ISIN full example
+### SecID::ISIN full example
 
 ```ruby
 # class level
-SecId::ISIN.valid?('US5949181045')       # => true
-SecId::ISIN.valid_format?('US594918104') # => true
-SecId::ISIN.restore!('US594918104')      # => 'US5949181045'
-SecId::ISIN.check_digit('US594918104')   # => 5
+SecID::ISIN.valid?('US5949181045')       # => true
+SecID::ISIN.valid_format?('US594918104') # => true
+SecID::ISIN.restore!('US594918104')      # => 'US5949181045'
+SecID::ISIN.check_digit('US594918104')   # => 5
 
 # instance level
-isin = SecId::ISIN.new('US5949181045')
+isin = SecID::ISIN.new('US5949181045')
 isin.full_number           # => 'US5949181045'
 isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
@@ -117,20 +117,20 @@ isin.valid?                # => true
 isin.valid_format?         # => true
 isin.restore!              # => 'US5949181045'
 isin.calculate_check_digit # => 5
-isin.to_cusip              # => #<SecId::CUSIP>
+isin.to_cusip              # => #<SecID::CUSIP>
 ```
 
-### SecId::CUSIP full example
+### SecID::CUSIP full example
 
 ```ruby
 # class level
-SecId::CUSIP.valid?('594918104')       # => true
-SecId::CUSIP.valid_format?('59491810') # => true
-SecId::CUSIP.restore!('59491810')      # => '594918104'
-SecId::CUSIP.check_digit('59491810')   # => 5
+SecID::CUSIP.valid?('594918104')       # => true
+SecID::CUSIP.valid_format?('59491810') # => true
+SecID::CUSIP.restore!('59491810')      # => '594918104'
+SecID::CUSIP.check_digit('59491810')   # => 5
 
 # instance level
-cusip = SecId::CUSIP.new('594918104')
+cusip = SecID::CUSIP.new('594918104')
 cusip.full_number           # => '594918104'
 cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
@@ -139,21 +139,21 @@ cusip.valid?                # => true
 cusip.valid_format?         # => true
 cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
-cusip.to_isin('US')         # => #<SecId::ISIN>
+cusip.to_isin('US')         # => #<SecID::ISIN>
 cusip.cins?                 # => true
 ```
 
-### SecId::SEDOL full example
+### SecID::SEDOL full example
 
 ```ruby
 # class level
-SecId::SEDOL.valid?('B0Z52W5')       # => true
-SecId::SEDOL.valid_format?('B0Z52W') # => true
-SecId::SEDOL.restore!('B0Z52W')      # => 'B0Z52W5'
-SecId::SEDOL.check_digit('B0Z52W')   # => 5
+SecID::SEDOL.valid?('B0Z52W5')       # => true
+SecID::SEDOL.valid_format?('B0Z52W') # => true
+SecID::SEDOL.restore!('B0Z52W')      # => 'B0Z52W5'
+SecID::SEDOL.check_digit('B0Z52W')   # => 5
 
 # instance level
-cusip = SecId::SEDOL.new('B0Z52W5')
+cusip = SecID::SEDOL.new('B0Z52W5')
 cusip.full_number           # => 'B0Z52W5'
 cusip.check_digit           # => 5
 cusip.valid?                # => true
@@ -162,17 +162,17 @@ cusip.restore!              # => 'B0Z52W5'
 cusip.calculate_check_digit # => 5
 ```
 
-### SecId::FIGI full example
+### SecID::FIGI full example
 
 ```ruby
 # class level
-SecId::FIGI.valid?('BBG000DMBXR2')        # => true
-SecId::FIGI.valid_format?('BBG000DMBXR2') # => true
-SecId::FIGI.restore!('BBG000DMBXR')       # => 'BBG000DMBXR2'
-SecId::FIGI.check_digit('BBG000DMBXR')    # => 2
+SecID::FIGI.valid?('BBG000DMBXR2')        # => true
+SecID::FIGI.valid_format?('BBG000DMBXR2') # => true
+SecID::FIGI.restore!('BBG000DMBXR')       # => 'BBG000DMBXR2'
+SecID::FIGI.check_digit('BBG000DMBXR')    # => 2
 
 # instance level
-figi = SecId::FIGI.new('BBG000DMBXR2')
+figi = SecID::FIGI.new('BBG000DMBXR2')
 figi.full_number           # => 'BBG000DMBXR2'
 figi.prefix                # => 'BB'
 figi.random_part           # => '000DMBXR'
@@ -183,17 +183,17 @@ figi.restore!              # => 'BBG000DMBXR2'
 figi.calculate_check_digit # => 2
 ```
 
-### SecId::CIK full example
+### SecID::CIK full example
 
 ```ruby
 # class level
-SecId::CIK.valid?('0001094517')        # => true
-SecId::CIK.valid_format?('0001094517') # => true
-SecId::CIK.restore!('1094517')         # => '0001094517'
-SecId::CIK.check_digit('0001094517')   # raises NotImplementedError
+SecID::CIK.valid?('0001094517')        # => true
+SecID::CIK.valid_format?('0001094517') # => true
+SecID::CIK.restore!('1094517')         # => '0001094517'
+SecID::CIK.check_digit('0001094517')   # raises NotImplementedError
 
 # instance level
-cik = SecId::CIK.new('0001094517')
+cik = SecID::CIK.new('0001094517')
 cik.full_number           # => '0001094517'
 cik.padding               # => '000'
 cik.identifier            # => '1094517'

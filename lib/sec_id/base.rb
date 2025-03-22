@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   CHAR_TO_DIGITS = {
     '0' => 0,      '1' => 1,      '2' => 2,      '3' => 3,      '4' => 4,
     '5' => 5,      '6' => 6,      '7' => 7,      '8' => 8,      '9' => 9,
@@ -84,11 +84,11 @@ module SecId
     end
 
     def char_to_digits(char)
-      SecId::CHAR_TO_DIGITS.fetch(char)
+      SecID::CHAR_TO_DIGITS.fetch(char)
     end
 
     def char_to_digit(char)
-      SecId::CHAR_TO_DIGIT.fetch(char)
+      SecID::CHAR_TO_DIGIT.fetch(char)
     end
 
     def mod10(sum)

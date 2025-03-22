@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::CUSIP do
+RSpec.describe SecID::CUSIP do
   let(:cusip) { described_class.new(cusip_number) }
 
   context 'when CUSIP is valid' do
@@ -76,7 +76,7 @@ RSpec.describe SecId::CUSIP do
       let(:cusip_number) { '02153X108' }
 
       it 'returns an ISIN' do
-        expect(cusip.to_isin('VI')).to be_a(SecId::ISIN)
+        expect(cusip.to_isin('VI')).to be_a(SecID::ISIN)
       end
     end
 
@@ -84,7 +84,7 @@ RSpec.describe SecId::CUSIP do
       let(:cusip_number) { '00B296YR7' }
 
       it 'raises an error' do
-        expect { cusip.to_isin('IE') }.to raise_error(SecId::InvalidFormatError)
+        expect { cusip.to_isin('IE') }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -110,8 +110,8 @@ RSpec.describe SecId::CUSIP do
   describe '.restore!' do
     context 'when CUSIP is incorrect' do
       it 'raises an error' do
-        expect { described_class.restore!('68389X1') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('68389X1055') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.restore!('68389X1') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.restore!('68389X1055') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -148,8 +148,8 @@ RSpec.describe SecId::CUSIP do
   describe '.check_digit' do
     context 'when CUSIP is incorrect' do
       it 'raises an error' do
-        expect { described_class.check_digit('9861913') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('9861913025') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.check_digit('9861913') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.check_digit('9861913025') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

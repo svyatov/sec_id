@@ -6,7 +6,7 @@ require 'sec_id/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'sec_id'
-  spec.version       = SecId::VERSION
+  spec.version       = SecID::VERSION
   spec.authors       = ['Leonid Svyatov']
   spec.email         = ['leonid@svyatov.ru']
 
