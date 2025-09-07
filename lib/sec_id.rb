@@ -8,6 +8,7 @@ require 'sec_id/cusip'
 require 'sec_id/sedol'
 require 'sec_id/figi'
 require 'sec_id/cik'
+require 'sec_id/occ'
 
 module SecId
   Error = Class.new(StandardError)

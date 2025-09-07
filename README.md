@@ -13,7 +13,8 @@ Currently supported standards:
 [CUSIP](https://en.wikipedia.org/wiki/CUSIP),
 [SEDOL](https://en.wikipedia.org/wiki/SEDOL),
 [FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier),
-[CIK](https://en.wikipedia.org/wiki/Central_Index_Key).
+[CIK](https://en.wikipedia.org/wiki/Central_Index_Key),
+[OCC](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol).
 
 Work in progress:
 [IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
@@ -202,6 +203,43 @@ cik.valid_format?         # => true
 cik.restore!              # => '0001094517'
 cik.calculate_check_digit # raises NotImplementedError
 cik.check_digit           # => nil
+```
+
+### SecId::OCC full example
+
+```ruby
+# class level
+SecId::OCC.valid?('BRKB  100417C00090000')        # => true
+SecId::OCC.valid_format?('BRKB  100417C00090000') # => true
+SecId::OCC.normalize!('BRKB100417C00090000')      # => 'BRKB  100417C00090000'
+SecId::OCC.build(
+  underlying: 'BRKB',
+  date: Date.new(2010, 4, 17),
+  type: 'C',
+  strike: 90,
+)                                                 # => #<SecId::OCC>
+
+# instance level
+occ = SecId::OCC.new('BRKB  100417C00090000')
+occ.full_symbol   # => 'BRKB  100417C00090000'
+occ.underlying    # => 'BRKB'
+occ.date_str      # => '100417'
+occ.date_obj      # => #<Date: 2010-04-17>
+occ.type          # => 'C'
+occ.strike        # => 90.0
+occ.valid?        # => true
+occ.valid_format? # => true
+occ.normalize!    # => 'BRKB  100417C00090000'
+
+occ = SecId::OCC.new('BRKB 2010-04-17C00090000')
+occ.valid_format? # => false
+occ.normalize!    # raises SecId::InvalidFormatError
+
+occ = SecId::OCC.new('X 250620C00050000')
+occ.full_symbol   # => 'X 250620C00050000'
+occ.valid?        # => true
+occ.normalize!    # => 'X     250620C00050000'
+occ.full_symbol   # => 'X     250620C00050000'
 ```
 
 ## Development
