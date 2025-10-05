@@ -189,19 +189,17 @@ figi.calculate_check_digit # => 2
 # class level
 SecId::CIK.valid?('0001094517')        # => true
 SecId::CIK.valid_format?('0001094517') # => true
-SecId::CIK.restore!('1094517')         # => '0001094517'
-SecId::CIK.check_digit('0001094517')   # raises NotImplementedError
+SecId::CIK.normalize!('1094517')       # => '0001094517'
 
 # instance level
 cik = SecId::CIK.new('0001094517')
-cik.full_number           # => '0001094517'
-cik.padding               # => '000'
-cik.identifier            # => '1094517'
-cik.valid?                # => true
-cik.valid_format?         # => true
-cik.restore!              # => '0001094517'
-cik.calculate_check_digit # raises NotImplementedError
-cik.check_digit           # => nil
+cik.full_number   # => '0001094517'
+cik.padding       # => '000'
+cik.identifier    # => '1094517'
+cik.valid?        # => true
+cik.valid_format? # => true
+cik.normalize!    # => '0001094517'
+cik.to_s          # => '0001094517'
 ```
 
 ## Development
