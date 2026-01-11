@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, SEDOL, FIGI, CIK, OCC).
+This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, SEDOL, FIGI, LEI, CIK, OCC).
 
 ### Class Hierarchy
 
@@ -24,7 +24,7 @@ All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which 
 - Core API: `valid?`, `valid_format?`, `restore!`, `check_digit`/`calculate_check_digit`
 - Class-level convenience methods that delegate to instance methods
 - Character-to-digit conversion maps (`CHAR_TO_DIGITS`, `CHAR_TO_DIGIT`) for check-digit algorithms
-- Helper methods: `mod10`, `div10mod10`, `parse`
+- Helper methods: `mod10`, `div10mod10`, `mod97`, `parse`
 
 ### Identifier Classes
 
@@ -50,3 +50,11 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - Max line length: 120 characters
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)
+
+## Pre-Commit Checklist
+
+Before committing changes, always verify these files are updated to accurately reflect the changes:
+
+- **README.md** - Update usage examples, Table of Contents, and supported standards list
+- **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change
+- **sec_id.gemspec** - Update `description` if adding/removing supported standards

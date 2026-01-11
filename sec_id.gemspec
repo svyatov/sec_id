@@ -11,7 +11,8 @@ Gem::Specification.new do |spec|
   spec.email         = ['leonid@svyatov.ru']
 
   spec.summary       = 'Validate securities identification numbers with ease!'
-  spec.description   = %(#{spec.summary} Currently supported standards: ISIN, CUSIP, SEDOL, FIGI, CIK, OCC.)
+  spec.description   = 'Validate, calculate check digits, and parse components of securities identifiers. ' \
+                       'Supports ISIN, CUSIP, SEDOL, FIGI, LEI, CIK, and OCC standards.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 

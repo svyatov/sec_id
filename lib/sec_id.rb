@@ -7,6 +7,7 @@ require 'sec_id/isin'
 require 'sec_id/cusip'
 require 'sec_id/sedol'
 require 'sec_id/figi'
+require 'sec_id/lei'
 require 'sec_id/cik'
 require 'sec_id/occ'
 

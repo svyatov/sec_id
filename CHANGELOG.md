@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- LEI support (Legal Entity Identifier, ISO 17442)
+
 ### Updated
 
 - Improved README: better formatting, navigation, and clear API distinction between check-digit and normalization identifiers
