@@ -1,8 +1,7 @@
 # SecId
 [![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://badge.fury.io/rb/sec_id)
+[![codecov](https://codecov.io/gh/svyatov/sec_id/graph/badge.svg)](https://codecov.io/gh/svyatov/sec_id)
 ![Build Status](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/maintainability)](https://codeclimate.com/github/svyatov/sec_id/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/a4759963a5ddc4d55b24/test_coverage)](https://codeclimate.com/github/svyatov/sec_id/test_coverage)
 
 Validate securities identification numbers with ease!
 
