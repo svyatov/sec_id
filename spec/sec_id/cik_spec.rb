@@ -9,7 +9,7 @@ RSpec.describe SecId::CIK do
     it 'parses CIK correctly' do
       expect(cik.padding).to eq('000')
       expect(cik.identifier).to eq('1521365')
-      expect(cik.check_digit).to be_nil
+      expect(cik.full_number).to eq(cik_number)
     end
 
     describe '#valid?' do
@@ -18,16 +18,16 @@ RSpec.describe SecId::CIK do
       end
     end
 
-    describe '#restore!' do
+    describe '#normalize!' do
       it 'returns full CIK number' do
-        expect(cik.restore!).to eq(cik_number)
+        expect(cik.normalize!).to eq(cik_number)
         expect(cik.full_number).to eq(cik_number)
       end
     end
 
-    describe '#calculate_check_digit' do
-      it 'raises an error' do
-        expect { cik.calculate_check_digit }.to raise_error(NotImplementedError)
+    describe '#to_s' do
+      it 'returns the full CIK number' do
+        expect(cik.to_s).to eq(cik_number)
       end
     end
   end
@@ -37,7 +37,7 @@ RSpec.describe SecId::CIK do
 
     it 'parses CIK number correctly' do
       expect(cik.identifier).to eq(cik_number)
-      expect(cik.check_digit).to be_nil
+      expect(cik.full_number).to eq(cik_number)
     end
 
     describe '#valid?' do
@@ -46,17 +46,22 @@ RSpec.describe SecId::CIK do
       end
     end
 
-    describe '#restore!' do
+    describe '#normalize!' do
       it 'returns full CIK number and sets padding' do
-        expect(cik.restore!).to eq('0000010624')
+        expect(cik.normalize!).to eq('0000010624')
         expect(cik.full_number).to eq('0000010624')
         expect(cik.padding).to eq('00000')
       end
     end
 
-    describe '#calculate_check_digit' do
-      it 'raises an error' do
-        expect { cik.calculate_check_digit }.to raise_error(NotImplementedError)
+    describe '#to_s' do
+      it 'returns the identifier before normalize' do
+        expect(cik.to_s).to eq(cik_number)
+      end
+
+      it 'returns the full number after normalize' do
+        cik.normalize!
+        expect(cik.to_s).to eq('0000010624')
       end
     end
   end
@@ -79,22 +84,22 @@ RSpec.describe SecId::CIK do
     end
   end
 
-  describe '.restore!' do
+  describe '.normalize!' do
     context 'when CIK is malformed' do
       it 'raises an error' do
-        expect { described_class.restore!('X9') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('0000000000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('09876543210') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize!('X9') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize!('0000000000') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize!('09876543210') }.to raise_error(SecId::InvalidFormatError)
       end
     end
 
     context 'when CIK is valid' do
-      it 'restores check-digit and returns full CIK number' do
-        expect(described_class.restore!('3')).to eq('0000000003')
-        expect(described_class.restore!('0000000003')).to eq('0000000003')
-        expect(described_class.restore!('1072424')).to eq('0001072424')
-        expect(described_class.restore!('001072424')).to eq('0001072424')
-        expect(described_class.restore!('0001072424')).to eq('0001072424')
+      it 'normalizes padding and returns full CIK number' do
+        expect(described_class.normalize!('3')).to eq('0000000003')
+        expect(described_class.normalize!('0000000003')).to eq('0000000003')
+        expect(described_class.normalize!('1072424')).to eq('0001072424')
+        expect(described_class.normalize!('001072424')).to eq('0001072424')
+        expect(described_class.normalize!('0001072424')).to eq('0001072424')
       end
     end
   end
@@ -116,14 +121,6 @@ RSpec.describe SecId::CIK do
         expect(described_class.valid_format?('001072424')).to be(true)
         expect(described_class.valid_format?('0001072424')).to be(true)
       end
-    end
-  end
-
-  describe '.check_digit' do
-    it 'raises an error' do
-      expect { described_class.check_digit('0000320193') }.to raise_error(NotImplementedError)
-      expect { described_class.check_digit('320193') }.to raise_error(NotImplementedError)
-      expect { described_class.check_digit('0') }.to raise_error(NotImplementedError)
     end
   end
 end
