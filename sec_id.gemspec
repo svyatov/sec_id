@@ -11,16 +11,14 @@ Gem::Specification.new do |spec|
   spec.email         = ['leonid@svyatov.ru']
 
   spec.summary       = 'Validate securities identification numbers with ease!'
-  spec.description   = %(#{spec.summary} Currently supported standards: ISIN, CUSIP, SEDOL.)
+  spec.description   = %(#{spec.summary} Currently supported standards: ISIN, CUSIP, SEDOL, FIGI, CIK, OCC.)
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 
   spec.required_ruby_version = '>= 3.1.0'
 
   spec.require_paths = ['lib']
-  spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.files = Dir['lib/**/*.rb'] + %w[CHANGELOG.md LICENSE.txt README.md sec_id.gemspec]
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
