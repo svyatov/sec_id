@@ -24,6 +24,9 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: diff_comma
+
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
