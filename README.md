@@ -23,7 +23,7 @@ Work in progress:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 4.1'
+gem 'sec_id', '~> 4.2'
 ```
 
 And then execute:

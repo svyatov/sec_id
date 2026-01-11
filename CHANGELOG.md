@@ -1,5 +1,23 @@
 # Changelog
 
+## [4.2.0] - 2025-01-12
+
+### Added
+
+- OCC support ([@wtn](https://github.com/wtn), [#93](https://github.com/svyatov/sec_id/pull/93))
+
+### Fixed
+
+- CUSIP#cins? usage example in README ([@wtn](https://github.com/wtn), [#91](https://github.com/svyatov/sec_id/pull/91))
+
+### Updated
+
+- Separate CIK from Base for cleaner architecture ([@wtn](https://github.com/wtn), [#92](https://github.com/svyatov/sec_id/pull/92))
+- Use rubocop-rspec plugin ([@wtn](https://github.com/wtn), [#90](https://github.com/svyatov/sec_id/pull/90))
+- Replace CodeClimate with Codecov
+- Add permissions to CI workflow
+- Clean up gemspec: update description and simplify files list
+
 ## [4.1.0] - 2024-09-23
 
 ### Added
