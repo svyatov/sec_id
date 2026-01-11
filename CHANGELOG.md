@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Updated
+
+- Improved README: better formatting, navigation, and clear API distinction between check-digit and normalization identifiers
+
 ## [4.2.0] - 2025-01-12
 
 ### Added

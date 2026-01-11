@@ -1,22 +1,27 @@
-# SecId
-[![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://badge.fury.io/rb/sec_id)
-[![codecov](https://codecov.io/gh/svyatov/sec_id/graph/badge.svg)](https://codecov.io/gh/svyatov/sec_id)
-![Build Status](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)
+# SecId [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI) [![License](https://img.shields.io/github/license/svyatov/sec_id)](LICENSE.txt)
 
-Validate securities identification numbers with ease!
+> Validate securities identification numbers with ease!
 
-Check-digit calculation is also available.
+## Table of Contents
 
-Currently supported standards:
-[ISIN](https://en.wikipedia.org/wiki/International_Securities_Identification_Number),
-[CUSIP](https://en.wikipedia.org/wiki/CUSIP),
-[SEDOL](https://en.wikipedia.org/wiki/SEDOL),
-[FIGI](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier),
-[CIK](https://en.wikipedia.org/wiki/Central_Index_Key),
-[OCC](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol).
+- [Supported Ruby Versions](#supported-ruby-versions)
+- [Installation](#installation)
+- [Supported Standards and Usage](#supported-standards-and-usage)
+  - [ISIN](#isin) - International Securities Identification Number
+  - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
+  - [SEDOL](#sedol) - Stock Exchange Daily Official List
+  - [FIGI](#figi) - Financial Instrument Global Identifier
+  - [CIK](#cik) - Central Index Key
+  - [OCC](#occ) - Options Clearing Corporation Symbol
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-Work in progress:
-[IBAN](https://en.wikipedia.org/wiki/International_Bank_Account_Number).
+**Work in progress:** IBAN (International Bank Account Number)
+
+## Supported Ruby Versions
+
+Ruby 3.1+ is required.
 
 ## Installation
 
@@ -28,77 +33,30 @@ gem 'sec_id', '~> 4.2'
 
 And then execute:
 
-    $ bundle
+```bash
+bundle install
+```
 
-Or install it yourself as:
+Or install it yourself:
 
-    $ gem install sec_id
+```bash
+gem install sec_id
+```
 
-## Usage
+## Supported Standards and Usage
 
-### Base API
+All identifier classes provide `valid?` and `valid_format?` methods at both class and instance levels.
 
-Base API has 4 main methods which can be used both on class level and on instance level:
+**Check-digit based identifiers** (ISIN, CUSIP, SEDOL, FIGI) also provide:
+- `restore!` - restores check-digit and returns the full number
+- `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
 
-* `valid?` - never raises any errors, always returns `true` or `false`,
-  numbers without the check-digit will return `false`
+**Normalization based identifiers** (CIK, OCC) provide instead:
+- `normalize!` - pads/formats the identifier to its standard form
 
-  ```ruby
-  # class level
-  SecId::ISIN.valid?('US5949181045') # => true
-  SecId::ISIN.valid?('US594918104')  # => false
+### ISIN
 
-  # instance level
-  isin = SecId::ISIN.new('US5949181045')
-  isin.valid? # => true
-  ```
-
-* `valid_format?` - never raises any errors, always returns `true` or `false`,
-  numbers without the check-digit but in valid format will return `true`
-
-  ```ruby
-  # class level
-  SecId::ISIN.valid_format?('US5949181045') # => true
-  SecId::ISIN.valid_format?('US594918104') # => true
-
-  # instance level
-  isin = SecId::ISIN.new('US594918104')
-  isin.valid_format? # => true
-  ```
-
-* `restore!` - restores check-digit and returns the full number,
-  raises an error if number's format is invalid and thus check-digit is impossible to calculate
-
-  ```ruby
-  # class level
-  SecId::ISIN.restore!('US594918104') # => 'US5949181045'
-
-  # instance level
-  isin = SecId::ISIN.new('US5949181045')
-  isin.restore! # => 'US5949181045'
-  ```
-
-* `check_digit` and `calculate_check_digit` - these are the same,
-  but the former is used at class level for bravity,
-  and the latter is used at instance level for clarity;
-  it calculates and returns the check-digit if the number is valid
-  and raises an error otherwise.
-
-  ```ruby
-  # class level
-  SecId::ISIN.check_digit('US594918104') # => 5
-
-  # instance level
-  isin = SecId::ISIN.new('US594918104')
-  isin.calculate_check_digit # => 5
-  isin.check_digit # => nil
-  ```
-
-  :exclamation: Please note that `isin.check_digit` returns `nil` because `#check_digit`
-  at instance level represents original check-digit of the number passed to `new`,
-  which in this example is missing and thus it's `nil`.
-
-### SecId::ISIN full example
+> [International Securities Identification Number](https://en.wikipedia.org/wiki/International_Securities_Identification_Number) - a 12-character alphanumeric code that uniquely identifies a security.
 
 ```ruby
 # class level
@@ -120,14 +78,16 @@ isin.calculate_check_digit # => 5
 isin.to_cusip              # => #<SecId::CUSIP>
 ```
 
-### SecId::CUSIP full example
+### CUSIP
+
+> [Committee on Uniform Securities Identification Procedures](https://en.wikipedia.org/wiki/CUSIP) - a 9-character alphanumeric code that identifies North American securities.
 
 ```ruby
 # class level
 SecId::CUSIP.valid?('594918104')       # => true
 SecId::CUSIP.valid_format?('59491810') # => true
 SecId::CUSIP.restore!('59491810')      # => '594918104'
-SecId::CUSIP.check_digit('59491810')   # => 5
+SecId::CUSIP.check_digit('59491810')   # => 4
 
 # instance level
 cusip = SecId::CUSIP.new('594918104')
@@ -143,7 +103,9 @@ cusip.to_isin('US')         # => #<SecId::ISIN>
 cusip.cins?                 # => false
 ```
 
-### SecId::SEDOL full example
+### SEDOL
+
+> [Stock Exchange Daily Official List](https://en.wikipedia.org/wiki/SEDOL) - a 7-character alphanumeric code used in the United Kingdom and Ireland.
 
 ```ruby
 # class level
@@ -153,16 +115,18 @@ SecId::SEDOL.restore!('B0Z52W')      # => 'B0Z52W5'
 SecId::SEDOL.check_digit('B0Z52W')   # => 5
 
 # instance level
-cusip = SecId::SEDOL.new('B0Z52W5')
-cusip.full_number           # => 'B0Z52W5'
-cusip.check_digit           # => 5
-cusip.valid?                # => true
-cusip.valid_format?         # => true
-cusip.restore!              # => 'B0Z52W5'
-cusip.calculate_check_digit # => 5
+sedol = SecId::SEDOL.new('B0Z52W5')
+sedol.full_number           # => 'B0Z52W5'
+sedol.check_digit           # => 5
+sedol.valid?                # => true
+sedol.valid_format?         # => true
+sedol.restore!              # => 'B0Z52W5'
+sedol.calculate_check_digit # => 5
 ```
 
-### SecId::FIGI full example
+### FIGI
+
+> [Financial Instrument Global Identifier](https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier) - a 12-character alphanumeric code that provides unique identification of financial instruments.
 
 ```ruby
 # class level
@@ -183,7 +147,9 @@ figi.restore!              # => 'BBG000DMBXR2'
 figi.calculate_check_digit # => 2
 ```
 
-### SecId::CIK full example
+### CIK
+
+> [Central Index Key](https://en.wikipedia.org/wiki/Central_Index_Key) - a 10-digit number used by the SEC to identify corporations and individuals who have filed disclosures.
 
 ```ruby
 # class level
@@ -202,7 +168,9 @@ cik.normalize!    # => '0001094517'
 cik.to_s          # => '0001094517'
 ```
 
-### SecId::OCC full example
+### OCC
+
+> [Options Clearing Corporation Symbol](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol) - a 21-character code used to identify equity options contracts.
 
 ```ruby
 # class level
