@@ -140,7 +140,7 @@ cusip.valid_format?         # => true
 cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
 cusip.to_isin('US')         # => #<SecId::ISIN>
-cusip.cins?                 # => true
+cusip.cins?                 # => false
 ```
 
 ### SecId::SEDOL full example
