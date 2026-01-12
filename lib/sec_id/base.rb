@@ -98,5 +98,9 @@ module SecId
     def div10mod10(number)
       (number / 10) + (number % 10)
     end
+
+    def mod97(numeric_string)
+      98 - (numeric_string.to_i % 97)
+    end
   end
 end

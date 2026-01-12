@@ -11,6 +11,7 @@
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [SEDOL](#sedol) - Stock Exchange Daily Official List
   - [FIGI](#figi) - Financial Instrument Global Identifier
+  - [LEI](#lei) - Legal Entity Identifier
   - [CIK](#cik) - Central Index Key
   - [OCC](#occ) - Options Clearing Corporation Symbol
 - [Development](#development)
@@ -145,6 +146,30 @@ figi.valid?                # => true
 figi.valid_format?         # => true
 figi.restore!              # => 'BBG000DMBXR2'
 figi.calculate_check_digit # => 2
+```
+
+### LEI
+
+> [Legal Entity Identifier](https://en.wikipedia.org/wiki/Legal_Entity_Identifier) - a 20-character alphanumeric code that uniquely identifies legal entities participating in financial transactions.
+
+```ruby
+# class level
+SecId::LEI.valid?('5493006MHB84DD0ZWV18')       # => true
+SecId::LEI.valid_format?('5493006MHB84DD0ZWV')  # => true
+SecId::LEI.restore!('5493006MHB84DD0ZWV')       # => '5493006MHB84DD0ZWV18'
+SecId::LEI.check_digit('5493006MHB84DD0ZWV')    # => 18
+
+# instance level
+lei = SecId::LEI.new('5493006MHB84DD0ZWV18')
+lei.full_number           # => '5493006MHB84DD0ZWV18'
+lei.lou_id                # => '5493'
+lei.reserved              # => '00'
+lei.entity_id             # => '6MHB84DD0ZWV'
+lei.check_digit           # => 18
+lei.valid?                # => true
+lei.valid_format?         # => true
+lei.restore!              # => '5493006MHB84DD0ZWV18'
+lei.calculate_check_digit # => 18
 ```
 
 ### CIK
