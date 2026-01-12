@@ -12,13 +12,12 @@
   - [SEDOL](#sedol) - Stock Exchange Daily Official List
   - [FIGI](#figi) - Financial Instrument Global Identifier
   - [LEI](#lei) - Legal Entity Identifier
+  - [IBAN](#iban) - International Bank Account Number
   - [CIK](#cik) - Central Index Key
   - [OCC](#occ) - Options Clearing Corporation Symbol
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
-
-**Work in progress:** IBAN (International Bank Account Number)
 
 ## Supported Ruby Versions
 
@@ -171,6 +170,34 @@ lei.valid_format?         # => true
 lei.restore!              # => '5493006MHB84DD0ZWV18'
 lei.calculate_check_digit # => 18
 ```
+
+### IBAN
+
+> [International Bank Account Number](https://en.wikipedia.org/wiki/International_Bank_Account_Number) - an internationally standardized system for identifying bank accounts across national borders (ISO 13616).
+
+```ruby
+# class level
+SecId::IBAN.valid?('DE89370400440532013000')       # => true
+SecId::IBAN.valid_format?('DE370400440532013000')  # => true
+SecId::IBAN.restore!('DE370400440532013000')       # => 'DE89370400440532013000'
+SecId::IBAN.check_digit('DE370400440532013000')    # => 89
+
+# instance level
+iban = SecId::IBAN.new('DE89370400440532013000')
+iban.full_number           # => 'DE89370400440532013000'
+iban.country_code          # => 'DE'
+iban.bban                  # => '370400440532013000'
+iban.bank_code             # => '37040044'
+iban.account_number        # => '0532013000'
+iban.check_digit           # => 89
+iban.valid?                # => true
+iban.valid_format?         # => true
+iban.restore!              # => 'DE89370400440532013000'
+iban.calculate_check_digit # => 89
+iban.known_country?        # => true
+```
+
+Full BBAN structural validation is supported for EU/EEA countries. Other countries have length-only validation.
 
 ### CIK
 

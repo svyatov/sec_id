@@ -5,6 +5,7 @@
 ### Added
 
 - LEI support (Legal Entity Identifier, ISO 17442)
+- IBAN support (International Bank Account Number, ISO 13616) with EU/EEA country validation
 
 ### Updated
 
