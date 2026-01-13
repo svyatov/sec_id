@@ -3,6 +3,16 @@
 RSpec.describe SecId::CIK do
   let(:cik) { described_class.new(cik_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
+  # Core normalization identifier behavior
+  it_behaves_like 'a normalization identifier',
+                  valid_id: '0001521365',
+                  unnormalized_id: '1521365',
+                  normalized_id: '0001521365',
+                  invalid_id: '0000000000'
+
   context 'when CIK is valid' do
     let(:cik_number) { '0001521365' }
 
@@ -10,12 +20,6 @@ RSpec.describe SecId::CIK do
       expect(cik.padding).to eq('000')
       expect(cik.identifier).to eq('1521365')
       expect(cik.full_number).to eq(cik_number)
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(cik.valid?).to be(true)
-      end
     end
 
     describe '#normalize!' do
@@ -38,12 +42,6 @@ RSpec.describe SecId::CIK do
     it 'parses CIK number correctly' do
       expect(cik.identifier).to eq(cik_number)
       expect(cik.full_number).to eq(cik_number)
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(cik.valid?).to be(true)
-      end
     end
 
     describe '#normalize!' do

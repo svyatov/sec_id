@@ -3,6 +3,18 @@
 RSpec.describe SecId::LEI do
   let(:lei) { described_class.new(lei_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
+  # Core check-digit identifier behavior
+  it_behaves_like 'a check-digit identifier',
+                  valid_id: '5493006MHB84DD0ZWV18',
+                  valid_id_without_check: '5493006MHB84DD0ZWV',
+                  restored_id: '5493006MHB84DD0ZWV18',
+                  invalid_format_id: 'INVALID',
+                  invalid_check_digit_id: '5493006MHB84DD0ZWV99',
+                  expected_check_digit: 18
+
   context 'when LEI is valid' do
     let(:lei_number) { '5493006MHB84DD0ZWV18' }
 
@@ -14,44 +26,9 @@ RSpec.describe SecId::LEI do
       expect(lei.check_digit).to eq(18)
     end
 
-    describe '#valid?' do
-      it 'returns true' do
-        expect(lei.valid?).to be(true)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full LEI' do
-        expect(lei.restore!).to eq(lei_number)
-        expect(lei.full_number).to eq(lei_number)
-      end
-    end
-
     describe '#to_s' do
       it 'returns full LEI' do
         expect(lei.to_s).to eq(lei_number)
-      end
-    end
-  end
-
-  context 'when LEI has invalid check-digit' do
-    let(:lei_number) { '5493006MHB84DD0ZWV99' }
-
-    it 'parses LEI correctly' do
-      expect(lei.identifier).to eq('5493006MHB84DD0ZWV')
-      expect(lei.check_digit).to eq(99)
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(lei.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns corrected LEI' do
-        expect(lei.restore!).to eq('5493006MHB84DD0ZWV18')
-        expect(lei.full_number).to eq('5493006MHB84DD0ZWV18')
       end
     end
   end
@@ -65,19 +42,6 @@ RSpec.describe SecId::LEI do
       expect(lei.reserved).to eq('00')
       expect(lei.entity_id).to eq('6MHB84DD0ZWV')
       expect(lei.check_digit).to be_nil
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(lei.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full LEI' do
-        expect(lei.restore!).to eq('5493006MHB84DD0ZWV18')
-        expect(lei.full_number).to eq('5493006MHB84DD0ZWV18')
-      end
     end
   end
 
@@ -115,18 +79,6 @@ RSpec.describe SecId::LEI do
       expect(lei.entity_id).to be_nil
       expect(lei.check_digit).to be_nil
     end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(lei.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'raises an error' do
-        expect { lei.restore! }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
   end
 
   context 'when LEI contains lowercase letters' do
@@ -139,19 +91,8 @@ RSpec.describe SecId::LEI do
   end
 
   describe '.valid?' do
-    context 'when LEI is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid?('INVALID')).to be(false)
-        expect(described_class.valid?('5493006MHB84DD0ZWV')).to be(false) # missing check-digit
-        expect(described_class.valid?('5493006MHB84DD0ZWV99')).to be(false) # wrong check-digit
-        expect(described_class.valid?('5493006MHB84DD0ZWV1')).to be(false) # too short
-        expect(described_class.valid?('5493006MHB84DD0ZWV123')).to be(false) # too long
-      end
-    end
-
     context 'when LEI is valid' do
-      it 'returns true' do
-        # Real-world LEI examples
+      it 'returns true for real-world LEI examples' do
         expect(described_class.valid?('5493006MHB84DD0ZWV18')).to be(true)
         expect(described_class.valid?('529900T8BM49AURSDO55')).to be(true)
         expect(described_class.valid?('HWUPKR0MPOU8FGXBT394')).to be(true)
@@ -162,34 +103,18 @@ RSpec.describe SecId::LEI do
   end
 
   describe '.valid_format?' do
-    context 'when LEI format is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid_format?('INVALID')).to be(false)
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV1')).to be(false) # too short
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV123')).to be(false) # too long
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV!!')).to be(false) # invalid chars
-      end
-    end
-
     context 'when LEI format is valid (with or without check-digit)' do
       it 'returns true' do
         expect(described_class.valid_format?('5493006MHB84DD0ZWV18')).to be(true)
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV')).to be(true) # missing check-digit
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV99')).to be(true) # wrong check-digit but valid format
+        expect(described_class.valid_format?('5493006MHB84DD0ZWV')).to be(true)
+        expect(described_class.valid_format?('5493006MHB84DD0ZWV99')).to be(true)
       end
     end
   end
 
   describe '.restore!' do
-    context 'when LEI format is incorrect' do
-      it 'raises an error' do
-        expect { described_class.restore!('INVALID') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('5493006MHB84DD0ZWV1') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when LEI format is valid' do
-      it 'restores check-digit and returns full LEI' do
+      it 'restores check-digit for various LEIs' do
         expect(described_class.restore!('5493006MHB84DD0ZWV')).to eq('5493006MHB84DD0ZWV18')
         expect(described_class.restore!('5493006MHB84DD0ZWV99')).to eq('5493006MHB84DD0ZWV18')
         expect(described_class.restore!('529900T8BM49AURSDO')).to eq('529900T8BM49AURSDO55')
@@ -199,15 +124,8 @@ RSpec.describe SecId::LEI do
   end
 
   describe '.check_digit' do
-    context 'when LEI format is incorrect' do
-      it 'raises an error' do
-        expect { described_class.check_digit('INVALID') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('5493006MHB84DD0ZWV1') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when LEI format is valid' do
-      it 'calculates and returns the check-digit' do
+      it 'calculates check-digit for various LEIs' do
         expect(described_class.check_digit('5493006MHB84DD0ZWV')).to eq(18)
         expect(described_class.check_digit('5493006MHB84DD0ZWV18')).to eq(18)
         expect(described_class.check_digit('529900T8BM49AURSDO')).to eq(55)

@@ -3,6 +3,16 @@
 RSpec.describe SecId::OCC do
   let(:occ) { described_class.new(occ_symbol) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
+  # Core normalization identifier behavior
+  it_behaves_like 'a normalization identifier',
+                  valid_id: 'EQX   260116C00005500',
+                  unnormalized_id: 'EQX260116C00005500',
+                  normalized_id: 'EQX   260116C00005500',
+                  invalid_id: 'ZVZZT'
+
   context 'when OCC symbol is in canonical form' do
     let(:occ_symbol) { 'EQX   260116C00005500' }
 
@@ -12,19 +22,6 @@ RSpec.describe SecId::OCC do
       expect(occ.date_str).to eq('260116')
       expect(occ.type).to eq('C')
       expect(occ.instance_variable_get(:@strike_mills)).to eq('00005500')
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(occ.valid?).to be(true)
-      end
-    end
-
-    describe '#normalize!' do
-      it 'returns full OCC symbol' do
-        expect(occ.normalize!).to eq(occ_symbol)
-        expect(occ.full_symbol).to eq(occ_symbol)
-      end
     end
 
     describe '#strike' do
@@ -75,19 +72,6 @@ RSpec.describe SecId::OCC do
       expect(occ.type).to eq('C')
       expect(occ.instance_variable_get(:@strike_mills)).to eq('00005500')
     end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(occ.valid?).to be(true)
-      end
-    end
-
-    describe '#normalize!' do
-      it 'normalizes spaces in underlying and returns full OCC symbol in canonical form' do
-        expect(occ.normalize!).to eq('EQX   260116C00005500')
-        expect(occ.full_symbol).to eq('EQX   260116C00005500')
-      end
-    end
   end
 
   describe '.valid?' do
@@ -127,16 +111,8 @@ RSpec.describe SecId::OCC do
   end
 
   describe '.normalize!' do
-    context 'when OCC symbol is invalid' do
-      it 'raises an error' do
-        expect { described_class.normalize!('KGC US 07/17/10 C13') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('X     25 620c00050000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('ZVZZT') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when OCC symbol is valid' do
-      it 'normalizes padding and returns full OCC symbol in canonical form' do
+      it 'normalizes padding for various OCC symbols' do
         expect(described_class.normalize!('PAAS1250919C00022500')).to eq('PAAS1 250919C00022500')
         expect(described_class.normalize!('X 250620C00050000')).to eq('X     250620C00050000')
         expect(described_class.normalize!('X250620C00050000')).to eq('X     250620C00050000')

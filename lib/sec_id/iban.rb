@@ -3,20 +3,49 @@
 require_relative 'iban/country_rules'
 
 module SecId
-  # https://en.wikipedia.org/wiki/International_Bank_Account_Number
+  # International Bank Account Number (IBAN) - an international standard for identifying
+  # bank accounts across national borders (ISO 13616).
+  #
+  # Format: 2-letter country code + 2-digit check digits + BBAN (Basic Bank Account Number, 11-30 chars)
+  # Note: Unlike other SecId identifiers, the check digits are in positions 3-4, not at the end.
+  #
+  # @see https://en.wikipedia.org/wiki/International_Bank_Account_Number
+  # @see https://www.iban.com/structure
+  #
+  # @example Validate an IBAN
+  #   SecId::IBAN.valid?('DE89370400440532013000')  #=> true
+  #
+  # @example Restore check digits
+  #   SecId::IBAN.restore!('DE00370400440532013000')  #=> 'DE89370400440532013000'
   class IBAN < Base
     include IBANCountryRules
 
-    # IBAN format: 2-letter country code + 2-digit check digits + BBAN (11-30 chars)
-    # Note: Check digits are in positions 3-4, unlike other SecId identifiers where check digit is at the end
-    # The regex captures the full IBAN without check digit positioning logic - we handle that in initialize
+    # Regular expression for parsing IBAN components.
+    # Note: Check digit positioning is handled in initialize, not in the regex.
     ID_REGEX = /\A
       (?<country_code>[A-Z]{2})
       (?<rest>[A-Z0-9]{13,32})
     \z/x
 
-    attr_reader :country_code, :bban, :bank_code, :branch_code, :account_number, :national_check
+    # @return [String, nil] the ISO 3166-1 alpha-2 country code
+    attr_reader :country_code
 
+    # @return [String, nil] the Basic Bank Account Number (country-specific format)
+    attr_reader :bban
+
+    # @return [String, nil] the bank code (extracted from BBAN if country rules define it)
+    attr_reader :bank_code
+
+    # @return [String, nil] the branch code (extracted from BBAN if country rules define it)
+    attr_reader :branch_code
+
+    # @return [String, nil] the account number (extracted from BBAN if country rules define it)
+    attr_reader :account_number
+
+    # @return [String, nil] the national check digit (extracted from BBAN if country rules define it)
+    attr_reader :national_check
+
+    # @param iban [String] the IBAN string to parse
     def initialize(iban)
       iban_parts = parse(iban)
       @country_code = iban_parts[:country_code]
@@ -30,20 +59,21 @@ module SecId
       extract_bban_components if valid_format?
     end
 
+    # @return [Integer] the calculated 2-digit check value (1-98)
+    # @raise [InvalidFormatError] if the IBAN format is invalid
     def calculate_check_digit
-      unless valid_format?
-        raise InvalidFormatError, "IBAN '#{full_number}' is invalid and check-digit cannot be calculated!"
-      end
-
+      validate_format_for_calculation!
       mod97(numeric_string_for_check)
     end
 
+    # @return [Boolean]
     def valid_format?
       return false unless identifier
 
       valid_bban_format?
     end
 
+    # @return [Boolean]
     def valid_bban_format?
       return false unless bban
 
@@ -53,14 +83,17 @@ module SecId
       bban.length == rule[:length] && bban.match?(rule[:format])
     end
 
+    # @return [Hash, nil] the validation rule or nil if country is unknown
     def country_rule
       COUNTRY_RULES[country_code]
     end
 
+    # @return [Boolean]
     def known_country?
       COUNTRY_RULES.key?(country_code) || LENGTH_ONLY_COUNTRIES.key?(country_code)
     end
 
+    # @return [String]
     def to_s
       return full_number unless check_digit
 
@@ -69,6 +102,8 @@ module SecId
 
     private
 
+    # @param rest [String] the IBAN string after country code
+    # @return [void]
     def extract_check_digit_and_bban(rest)
       expected = expected_bban_length_for_country
 
@@ -81,6 +116,14 @@ module SecId
       end
     end
 
+    # @return [Integer, nil] the expected BBAN length or nil if unknown
+    def expected_bban_length_for_country
+      COUNTRY_RULES.dig(country_code, :length) || LENGTH_ONLY_COUNTRIES[country_code]
+    end
+
+    # @param rest [String] the IBAN string after country code
+    # @param expected_bban_length [Integer, nil] the expected BBAN length for the country
+    # @return [Boolean]
     def check_digits?(rest, expected_bban_length)
       return false unless rest[0, 2].match?(/\A\d{2}\z/)
       return true unless expected_bban_length
@@ -89,17 +132,7 @@ module SecId
       rest.length == expected_bban_length + 2 || rest.length != expected_bban_length
     end
 
-    def expected_bban_length_for_country
-      COUNTRY_RULES.dig(country_code, :length) || LENGTH_ONLY_COUNTRIES[country_code]
-    end
-
-    def valid_bban_length_only?
-      expected_length = LENGTH_ONLY_COUNTRIES[country_code]
-      return true unless expected_length
-
-      bban.length == expected_length
-    end
-
+    # @return [void]
     def extract_bban_components
       rule = country_rule
       return unless rule&.key?(:components)
@@ -109,7 +142,15 @@ module SecId
       end
     end
 
-    # For MOD-97 check: BBAN + country_code + "00" -> convert letters to digits
+    # @return [Boolean]
+    def valid_bban_length_only?
+      expected_length = LENGTH_ONLY_COUNTRIES[country_code]
+      return true unless expected_length
+
+      bban.length == expected_length
+    end
+
+    # @return [String] the numeric string representation
     def numeric_string_for_check
       "#{bban}#{country_code}00".each_char.map { |char| char_to_digit(char) }.join
     end

@@ -12,6 +12,9 @@ AllCops:
 Layout/LineLength:
   Max: 120
 
+Naming/PredicatePrefix:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 
@@ -26,6 +29,9 @@ Style/HashTransformValues:
 
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: diff_comma
+
+Metrics/MethodLength:
+  Max: 15
 
 Metrics/BlockLength:
   Exclude:

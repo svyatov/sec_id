@@ -11,6 +11,18 @@
 
 - Improved README: better formatting, navigation, and clear API distinction between check-digit and normalization identifiers
 
+### Internal
+
+- Refactored CIK and OCC to inherit from Base class with `has_check_digit?` hook for cleaner architecture
+- Added `Normalizable` module for consistent `normalize!` class method across identifiers
+- Added `validate_format_for_calculation!` helper method to Base class to reduce code duplication
+- Added comprehensive YARD documentation to all classes (public and private methods)
+- Applied Stepdown Rule to method ordering throughout codebase
+- Created shared RSpec examples for edge cases (nil, empty, whitespace inputs)
+- Created shared RSpec examples for check-digit and normalization identifiers
+- Applied shared examples to all identifier specs, removing ~350 lines of duplicate test code
+- Improved test maintainability with 582 tests covering all identifier types
+
 ## [4.2.0] - 2025-01-12
 
 ### Added

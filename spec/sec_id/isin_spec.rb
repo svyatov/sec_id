@@ -3,6 +3,18 @@
 RSpec.describe SecId::ISIN do
   let(:isin) { described_class.new(isin_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
+  # Core check-digit identifier behavior
+  it_behaves_like 'a check-digit identifier',
+                  valid_id: 'IE00B296YR77',
+                  valid_id_without_check: 'IE00B296YR7',
+                  restored_id: 'IE00B296YR77',
+                  invalid_format_id: '00B296YR77',
+                  invalid_check_digit_id: 'IE00B296YR70',
+                  expected_check_digit: 7
+
   context 'when ISIN is valid' do
     let(:isin_number) { 'IE00B296YR77' }
 
@@ -11,19 +23,6 @@ RSpec.describe SecId::ISIN do
       expect(isin.country_code).to eq('IE')
       expect(isin.nsin).to eq('00B296YR7')
       expect(isin.check_digit).to eq(7)
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(isin.valid?).to be(true)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full ISIN number' do
-        expect(isin.restore!).to eq(isin_number)
-        expect(isin.full_number).to eq(isin_number)
-      end
     end
   end
 
@@ -36,18 +35,6 @@ RSpec.describe SecId::ISIN do
       expect(isin.nsin).to be_nil
       expect(isin.check_digit).to be_nil
     end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(isin.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'raises an error' do
-        expect { isin.restore! }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
   end
 
   context 'when ISIN number is missing check-digit' do
@@ -58,19 +45,6 @@ RSpec.describe SecId::ISIN do
       expect(isin.country_code).to eq('IE')
       expect(isin.nsin).to eq('00B296YR7')
       expect(isin.check_digit).to be_nil
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(isin.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full ISIN number' do
-        expect(isin.restore!).to eq('IE00B296YR77')
-        expect(isin.full_number).to eq('IE00B296YR77')
-      end
     end
   end
 
@@ -95,15 +69,6 @@ RSpec.describe SecId::ISIN do
   end
 
   describe '.valid?' do
-    context 'when ISIN is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid?('US03783315')).to be(false)
-        expect(described_class.valid?('US037833104')).to be(false)
-        expect(described_class.valid?('US0378331004')).to be(false) # invalid check-digit
-        expect(described_class.valid?('US03783315123')).to be(false)
-      end
-    end
-
     context 'when ISIN is valid' do
       it 'returns true' do
         %w[
@@ -120,13 +85,6 @@ RSpec.describe SecId::ISIN do
   end
 
   describe '.restore!' do
-    context 'when ISIN is incorrect' do
-      it 'raises an error' do
-        expect { described_class.restore!('US03783315') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('US03783315123') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when ISIN is valid' do
       it 'restores check-digit and returns full ISIN number' do
         expect(described_class.restore!('AU0000XVGZA')).to eq('AU0000XVGZA3')
@@ -138,33 +96,7 @@ RSpec.describe SecId::ISIN do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when ISIN is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid_format?('US03783315')).to be(false)
-        expect(described_class.valid_format?('US03783315123')).to be(false)
-      end
-    end
-
-    context 'when ISIN is valid or missing check-digit' do
-      it 'returns true' do
-        expect(described_class.valid_format?('AU0000XVGZA')).to be(true)
-        expect(described_class.valid_format?('AU0000VXGZA7')).to be(true)
-        expect(described_class.valid_format?('GB000263494')).to be(true)
-        expect(described_class.valid_format?('US037833104')).to be(true)
-        expect(described_class.valid_format?('US0378331004')).to be(true)
-      end
-    end
-  end
-
   describe '.check_digit' do
-    context 'when ISIN is incorrect' do
-      it 'raises an error' do
-        expect { described_class.check_digit('US03783315') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('US03783315123') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when ISIN is valid' do
       it 'calculates and returns the check-digit' do
         expect(described_class.check_digit('AU0000XVGZA')).to eq(3)
