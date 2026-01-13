@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [4.3.0] - 2025-01-13
+
 ### Added
 
 - LEI support (Legal Entity Identifier, ISO 17442)
