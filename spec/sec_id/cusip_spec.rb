@@ -6,6 +6,15 @@ RSpec.describe SecId::CUSIP do
 
   it_behaves_like 'handles edge case inputs'
 
+  # Core check-digit identifier behavior
+  it_behaves_like 'a check-digit identifier',
+                  valid_id: '68389X105',
+                  valid_id_without_check: '68389X10',
+                  restored_id: '68389X105',
+                  invalid_format_id: '5949181',
+                  invalid_check_digit_id: '68389X100',
+                  expected_check_digit: 5
+
   context 'when CUSIP is valid' do
     let(:cusip_number) { '68389X105' }
 
@@ -14,19 +23,6 @@ RSpec.describe SecId::CUSIP do
       expect(cusip.cusip6).to eq('68389X')
       expect(cusip.issue).to eq('10')
       expect(cusip.check_digit).to eq(5)
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(cusip.valid?).to be(true)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full CUSIP number' do
-        expect(cusip.restore!).to eq(cusip_number)
-        expect(cusip.full_number).to eq(cusip_number)
-      end
     end
   end
 
@@ -39,32 +35,11 @@ RSpec.describe SecId::CUSIP do
       expect(cusip.issue).to eq('50')
       expect(cusip.check_digit).to be_nil
     end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(cusip.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full CUSIP number' do
-        expect(cusip.restore!).to eq('38259P508')
-        expect(cusip.full_number).to eq('38259P508')
-      end
-    end
   end
 
   describe '.valid?' do
-    context 'when CUSIP is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid?('5949181')).to be(false)
-        expect(described_class.valid?('594918105')).to be(false) # invalid check-digit
-        expect(described_class.valid?('5949181045')).to be(false)
-      end
-    end
-
     context 'when CUSIP is valid' do
-      it 'returns true' do
+      it 'returns true for various valid CUSIPs' do
         %w[
           594918104 38259P508 037833100 17275R102 68389X105 986191302
         ].each do |cusip_number|
@@ -111,15 +86,8 @@ RSpec.describe SecId::CUSIP do
   end
 
   describe '.restore!' do
-    context 'when CUSIP is incorrect' do
-      it 'raises an error' do
-        expect { described_class.restore!('68389X1') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('68389X1055') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when CUSIP is valid' do
-      it 'restores check-digit and returns full CUSIP number' do
+      it 'restores check-digit for various CUSIPs' do
         expect(described_class.restore!('03783310')).to eq('037833100')
         expect(described_class.restore!('17275R10')).to eq('17275R102')
         expect(described_class.restore!('38259P50')).to eq('38259P508')
@@ -130,15 +98,8 @@ RSpec.describe SecId::CUSIP do
   end
 
   describe '.valid_format?' do
-    context 'when CUSIP is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid_format?('0378331')).to be(false)
-        expect(described_class.valid_format?('0378331009')).to be(false)
-      end
-    end
-
     context 'when CUSIP is valid or missing check-digit' do
-      it 'returns true' do
+      it 'returns true for various valid formats' do
         expect(described_class.valid_format?('38259P50')).to be(true)
         expect(described_class.valid_format?('38259P508')).to be(true)
         expect(described_class.valid_format?('68389X10')).to be(true)
@@ -149,15 +110,8 @@ RSpec.describe SecId::CUSIP do
   end
 
   describe '.check_digit' do
-    context 'when CUSIP is incorrect' do
-      it 'raises an error' do
-        expect { described_class.check_digit('9861913') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('9861913025') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when CUSIP is valid' do
-      it 'calculates and returns the check-digit' do
+      it 'calculates check-digit for various CUSIPs' do
         expect(described_class.check_digit('03783310')).to eq(0)
         expect(described_class.check_digit('17275R10')).to eq(2)
         expect(described_class.check_digit('38259P50')).to eq(8)

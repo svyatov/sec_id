@@ -6,6 +6,15 @@ RSpec.describe SecId::IBAN do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Core check-digit identifier behavior
+  it_behaves_like 'a check-digit identifier',
+                  valid_id: 'DE89370400440532013000',
+                  valid_id_without_check: 'DE370400440532013000',
+                  restored_id: 'DE89370400440532013000',
+                  invalid_format_id: 'INVALID',
+                  invalid_check_digit_id: 'DE99370400440532013000',
+                  expected_check_digit: 89
+
   context 'when IBAN is valid (Germany)' do
     let(:iban_number) { 'DE89370400440532013000' }
 
@@ -21,19 +30,6 @@ RSpec.describe SecId::IBAN do
       expect(iban.account_number).to eq('0532013000')
       expect(iban.branch_code).to be_nil
       expect(iban.national_check).to be_nil
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(iban.valid?).to be(true)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full IBAN' do
-        expect(iban.restore!).to eq(iban_number)
-        expect(iban.full_number).to eq(iban_number)
-      end
     end
 
     describe '#to_s' do
@@ -225,29 +221,6 @@ RSpec.describe SecId::IBAN do
     end
   end
 
-  context 'when IBAN has invalid check-digit' do
-    let(:iban_number) { 'DE99370400440532013000' }
-
-    it 'parses IBAN correctly' do
-      expect(iban.country_code).to eq('DE')
-      expect(iban.check_digit).to eq(99)
-      expect(iban.bban).to eq('370400440532013000')
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(iban.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns corrected IBAN' do
-        expect(iban.restore!).to eq('DE89370400440532013000')
-        expect(iban.full_number).to eq('DE89370400440532013000')
-      end
-    end
-  end
-
   context 'when IBAN is missing check-digit' do
     let(:iban_number) { 'DE370400440532013000' }
 
@@ -255,19 +228,6 @@ RSpec.describe SecId::IBAN do
       expect(iban.country_code).to eq('DE')
       expect(iban.bban).to eq('370400440532013000')
       expect(iban.check_digit).to be_nil
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(iban.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full IBAN' do
-        expect(iban.restore!).to eq('DE89370400440532013000')
-        expect(iban.full_number).to eq('DE89370400440532013000')
-      end
     end
   end
 
@@ -279,18 +239,6 @@ RSpec.describe SecId::IBAN do
       expect(iban.bban).to be_nil
       expect(iban.check_digit).to be_nil
       expect(iban.identifier).to be_nil
-    end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(iban.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'raises an error' do
-        expect { iban.restore! }.to raise_error(SecId::InvalidFormatError)
-      end
     end
   end
 
@@ -396,15 +344,6 @@ RSpec.describe SecId::IBAN do
   end
 
   describe '.valid?' do
-    context 'when IBAN is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid?('INVALID')).to be(false)
-        expect(described_class.valid?('DE370400440532013000')).to be(false) # missing check-digit
-        expect(described_class.valid?('DE99370400440532013000')).to be(false) # wrong check-digit
-        expect(described_class.valid?('DE8937040044053201')).to be(false) # too short BBAN
-      end
-    end
-
     context 'when IBAN is valid' do
       # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
       it 'returns true for real-world examples from various countries' do
@@ -430,33 +369,18 @@ RSpec.describe SecId::IBAN do
   end
 
   describe '.valid_format?' do
-    context 'when IBAN format is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid_format?('INVALID')).to be(false)
-        expect(described_class.valid_format?('DE8937040044053201')).to be(false) # too short BBAN
-        expect(described_class.valid_format?('DE89370400440532013000!')).to be(false) # invalid char
-      end
-    end
-
     context 'when IBAN format is valid (with or without check-digit)' do
       it 'returns true' do
         expect(described_class.valid_format?('DE89370400440532013000')).to be(true)
-        expect(described_class.valid_format?('DE370400440532013000')).to be(true) # missing check-digit
-        expect(described_class.valid_format?('DE99370400440532013000')).to be(true) # wrong check-digit but valid format
+        expect(described_class.valid_format?('DE370400440532013000')).to be(true)
+        expect(described_class.valid_format?('DE99370400440532013000')).to be(true)
       end
     end
   end
 
   describe '.restore!' do
-    context 'when IBAN format is incorrect' do
-      it 'raises an error' do
-        expect { described_class.restore!('INVALID') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('DE8937040044053201') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when IBAN format is valid' do
-      it 'restores check-digit and returns full IBAN' do
+      it 'restores check-digit for various IBANs' do
         expect(described_class.restore!('DE370400440532013000')).to eq('DE89370400440532013000')
         expect(described_class.restore!('DE99370400440532013000')).to eq('DE89370400440532013000')
         expect(described_class.restore!('NLABNA0417164300')).to eq('NL91ABNA0417164300')
@@ -466,15 +390,8 @@ RSpec.describe SecId::IBAN do
   end
 
   describe '.check_digit' do
-    context 'when IBAN format is incorrect' do
-      it 'raises an error' do
-        expect { described_class.check_digit('INVALID') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('DE8937040044053201') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when IBAN format is valid' do
-      it 'calculates and returns the check-digit' do
+      it 'calculates check-digit for various IBANs' do
         expect(described_class.check_digit('DE370400440532013000')).to eq(89)
         expect(described_class.check_digit('DE89370400440532013000')).to eq(89)
         expect(described_class.check_digit('GBNWBK60161331926819')).to eq(29)

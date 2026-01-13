@@ -6,6 +6,15 @@ RSpec.describe SecId::FIGI do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Core check-digit identifier behavior
+  it_behaves_like 'a check-digit identifier',
+                  valid_id: 'BBG000H4FSM0',
+                  valid_id_without_check: 'BBG000H4FSM',
+                  restored_id: 'BBG000H4FSM0',
+                  invalid_format_id: 'G000BLNQ16',
+                  invalid_check_digit_id: 'BBG000H4FSM5',
+                  expected_check_digit: 0
+
   context 'when FIGI is valid' do
     let(:figi_number) { 'BBG000H4FSM0' }
 
@@ -14,19 +23,6 @@ RSpec.describe SecId::FIGI do
       expect(figi.prefix).to eq('BB')
       expect(figi.random_part).to eq('000H4FSM')
       expect(figi.check_digit).to eq(0)
-    end
-
-    describe '#valid?' do
-      it 'returns true' do
-        expect(figi.valid?).to be(true)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full FIGI number' do
-        expect(figi.restore!).to eq(figi_number)
-        expect(figi.full_number).to eq(figi_number)
-      end
     end
   end
 
@@ -62,18 +58,6 @@ RSpec.describe SecId::FIGI do
       expect(figi.random_part).to be_nil
       expect(figi.check_digit).to be_nil
     end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(figi.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'raises an error' do
-        expect { figi.restore! }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
   end
 
   context 'when FIGI number is missing check-digit' do
@@ -85,33 +69,11 @@ RSpec.describe SecId::FIGI do
       expect(figi.random_part).to eq('000BLNQ1')
       expect(figi.check_digit).to be_nil
     end
-
-    describe '#valid?' do
-      it 'returns false' do
-        expect(figi.valid?).to be(false)
-      end
-    end
-
-    describe '#restore!' do
-      it 'restores check-digit and returns full FIGI number' do
-        expect(figi.restore!).to eq('BBG000BLNQ16')
-        expect(figi.full_number).to eq('BBG000BLNQ16')
-      end
-    end
   end
 
   describe '.valid?' do
-    context 'when FIGI is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid?('US03783315')).to be(false)
-        expect(described_class.valid?('US037833104')).to be(false)
-        expect(described_class.valid?('US0378331004')).to be(false) # invalid check-digit
-        expect(described_class.valid?('US03783315123')).to be(false)
-      end
-    end
-
     context 'when FIGI is valid' do
-      it 'returns true' do
+      it 'returns true for various valid FIGIs' do
         %w[KKG000000M81 BBG008B8STT7 BBG00QRVW6J5 BBG001S6RDX9 BBG000CJYWS6].each do |figi_number|
           expect(described_class.valid?(figi_number)).to be(true)
         end
@@ -120,16 +82,8 @@ RSpec.describe SecId::FIGI do
   end
 
   describe '.restore!' do
-    context 'when FIGI is incorrect' do
-      it 'raises an error' do
-        expect { described_class.restore!('BBG000HY4H') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('BBG000HY4HWX') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.restore!('BBG000HY4HW90') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when FIGI is valid' do
-      it 'restores check-digit and returns full FIGI number' do
+      it 'restores check-digit for various FIGIs' do
         expect(described_class.restore!('BBG000HY4HW')).to eq('BBG000HY4HW9')
         expect(described_class.restore!('BBG000HY4HW9')).to eq('BBG000HY4HW9')
         expect(described_class.restore!('BBG000BCK0D')).to eq('BBG000BCK0D3')
@@ -150,17 +104,8 @@ RSpec.describe SecId::FIGI do
       end
     end
 
-    context 'when FIGI is incorrect' do
-      it 'returns false' do
-        expect(described_class.valid_format?('BBG000HY4H')).to be(false)
-        expect(described_class.valid_format?('BB 000HY4HW')).to be(false)
-        expect(described_class.valid_format?('BBG000HY4HWX')).to be(false)
-        expect(described_class.valid_format?('BBG000HY4HW90')).to be(false)
-      end
-    end
-
     context 'when FIGI is valid or missing check-digit' do
-      it 'returns true' do
+      it 'returns true for various valid formats' do
         expect(described_class.valid_format?('BBG000HY4HW')).to be(true)
         expect(described_class.valid_format?('BBG000HY4HW9')).to be(true)
         expect(described_class.valid_format?('BBG000BCK0D')).to be(true)
@@ -171,16 +116,8 @@ RSpec.describe SecId::FIGI do
   end
 
   describe '.check_digit' do
-    context 'when FIGI is incorrect' do
-      it 'raises an error' do
-        expect { described_class.check_digit('BBG000HY4H') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('BBG000HY4HWX') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.check_digit('BBG000HY4HW90') }.to raise_error(SecId::InvalidFormatError)
-      end
-    end
-
     context 'when FIGI is valid' do
-      it 'calculates and returns the check-digit' do
+      it 'calculates check-digit for various FIGIs' do
         expect(described_class.check_digit('BBG000HY4HW')).to eq(9)
         expect(described_class.check_digit('BBG000HY4HW9')).to eq(9)
         expect(described_class.check_digit('BBG000BCK0D')).to eq(3)
