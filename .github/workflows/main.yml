@@ -19,7 +19,7 @@ jobs:
     name: Ruby ${{ matrix.ruby_version }}
     strategy:
       matrix:
-        ruby_version: [ruby-head, '3.4', '3.3', '3.2', '3.1']
+        ruby_version: [ruby-head, '4.0', '3.4', '3.3', '3.2', '3.1']
 
     env:
       COVERAGE: true
@@ -42,4 +42,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: svyatov/sec_id
       # Only upload coverage for the latest stable Ruby version
-      if: ${{ matrix.ruby_version == '3.4' }}
+      if: ${{ matrix.ruby_version == '4.0' }}
