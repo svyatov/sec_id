@@ -3,20 +3,51 @@
 require_relative 'iban/country_rules'
 
 module SecId
-  # https://en.wikipedia.org/wiki/International_Bank_Account_Number
+  # International Bank Account Number (IBAN) - an international standard for identifying
+  # bank accounts across national borders (ISO 13616).
+  #
+  # Format: 2-letter country code + 2-digit check digits + BBAN (Basic Bank Account Number, 11-30 chars)
+  # Note: Unlike other SecId identifiers, the check digits are in positions 3-4, not at the end.
+  #
+  # @see https://en.wikipedia.org/wiki/International_Bank_Account_Number
+  # @see https://www.iban.com/structure
+  #
+  # @example Validate an IBAN
+  #   SecId::IBAN.valid?('DE89370400440532013000')  #=> true
+  #
+  # @example Restore check digits
+  #   SecId::IBAN.restore!('DE00370400440532013000')  #=> 'DE89370400440532013000'
   class IBAN < Base
     include IBANCountryRules
 
-    # IBAN format: 2-letter country code + 2-digit check digits + BBAN (11-30 chars)
-    # Note: Check digits are in positions 3-4, unlike other SecId identifiers where check digit is at the end
-    # The regex captures the full IBAN without check digit positioning logic - we handle that in initialize
+    # Regular expression for parsing IBAN components.
+    # Note: Check digit positioning is handled in initialize, not in the regex.
     ID_REGEX = /\A
       (?<country_code>[A-Z]{2})
       (?<rest>[A-Z0-9]{13,32})
     \z/x
 
-    attr_reader :country_code, :bban, :bank_code, :branch_code, :account_number, :national_check
+    # @return [String, nil] the ISO 3166-1 alpha-2 country code
+    attr_reader :country_code
 
+    # @return [String, nil] the Basic Bank Account Number (country-specific format)
+    attr_reader :bban
+
+    # @return [String, nil] the bank code (extracted from BBAN if country rules define it)
+    attr_reader :bank_code
+
+    # @return [String, nil] the branch code (extracted from BBAN if country rules define it)
+    attr_reader :branch_code
+
+    # @return [String, nil] the account number (extracted from BBAN if country rules define it)
+    attr_reader :account_number
+
+    # @return [String, nil] the national check digit (extracted from BBAN if country rules define it)
+    attr_reader :national_check
+
+    # Creates a new IBAN instance.
+    #
+    # @param iban [String] the IBAN string to parse
     def initialize(iban)
       iban_parts = parse(iban)
       @country_code = iban_parts[:country_code]
@@ -30,20 +61,27 @@ module SecId
       extract_bban_components if valid_format?
     end
 
+    # Calculates the check digits using ISO 7064 MOD-97 algorithm.
+    #
+    # @return [Integer] the calculated 2-digit check value (1-98)
+    # @raise [InvalidFormatError] if the IBAN format is invalid
     def calculate_check_digit
-      unless valid_format?
-        raise InvalidFormatError, "IBAN '#{full_number}' is invalid and check-digit cannot be calculated!"
-      end
-
+      validate_format_for_calculation!
       mod97(numeric_string_for_check)
     end
 
+    # Validates the IBAN format including BBAN country-specific rules.
+    #
+    # @return [Boolean] true if the format is valid
     def valid_format?
       return false unless identifier
 
       valid_bban_format?
     end
 
+    # Validates the BBAN format according to country-specific rules.
+    #
+    # @return [Boolean] true if the BBAN format is valid
     def valid_bban_format?
       return false unless bban
 
@@ -53,14 +91,23 @@ module SecId
       bban.length == rule[:length] && bban.match?(rule[:format])
     end
 
+    # Returns the country-specific BBAN validation rule.
+    #
+    # @return [Hash, nil] the validation rule or nil if country is unknown
     def country_rule
       COUNTRY_RULES[country_code]
     end
 
+    # Checks if the country code is recognized.
+    #
+    # @return [Boolean] true if the country has validation rules defined
     def known_country?
       COUNTRY_RULES.key?(country_code) || LENGTH_ONLY_COUNTRIES.key?(country_code)
     end
 
+    # Returns the string representation with zero-padded check digits.
+    #
+    # @return [String] the full IBAN string
     def to_s
       return full_number unless check_digit
 

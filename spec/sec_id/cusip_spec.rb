@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe SecId::CUSIP do
+  # Edge cases - applicable to all identifiers
   let(:cusip) { described_class.new(cusip_number) }
+
+  it_behaves_like 'handles edge case inputs'
 
   context 'when CUSIP is valid' do
     let(:cusip_number) { '68389X105' }

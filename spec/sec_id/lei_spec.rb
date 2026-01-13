@@ -3,6 +3,9 @@
 RSpec.describe SecId::LEI do
   let(:lei) { described_class.new(lei_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
   context 'when LEI is valid' do
     let(:lei_number) { '5493006MHB84DD0ZWV18' }
 

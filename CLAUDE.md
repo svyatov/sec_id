@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build and Test Commands
 
-- **Run all tests**: `rake spec` or `bundle exec rspec`
+- **Run all tests**: `bundle exec rake spec` or `bundle exec rspec`
 - **Run single test file**: `bundle exec rspec spec/sec_id/isin_spec.rb`
 - **Run specific test**: `bundle exec rspec spec/sec_id/isin_spec.rb:42`
-- **Run linter**: `rake rubocop` or `bundle exec rubocop`
-- **Auto-fix lint issues**: `bundle exec rubocop -a`
-- **Run both lint and tests**: `rake` (default task)
+- **Run linter**: `bundle exec rake rubocop` or `bundle exec rubocop`
+- **Safe auto-fix lint issues**: `bundle exec rubocop -a`
+- **Auto-fix ALL lint issues (potentially unsafe)**: `bundle exec rubocop -A`
+- **Run both lint and tests**: `bundle exec rake` (default task)
 - **Run tests with coverage**: `COVERAGE=1 bundle exec rspec`
-- **Install dependencies**: `bin/setup` or `bundle install`
+- **Install dependencies**: `bin/setup`
 - **Interactive console**: `bin/console`
 
 ## Architecture
@@ -51,10 +52,38 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)
 
+## Documentation Style
+
+All classes and methods must have YARD documentation. Follow these conventions:
+
+- Always leave a **blank line** between the main description and `@` attributes (params, return, etc.)
+- Document all public methods with description, params, and return types
+- Document all private methods with params and return types, add description for complex logic
+- Include `@example` blocks for non-obvious usage patterns
+- Use `@raise` to document exceptions
+
+```ruby
+# Good - blank line before @param
+# Calculates the check digit for this identifier.
+#
+# @param value [String] the value to calculate
+# @return [Integer] the calculated check digit
+def calculate_check_digit(value)
+end
+
+# Bad - no blank line
+# Calculates the check digit for this identifier.
+# @param value [String] the value to calculate
+# @return [Integer] the calculated check digit
+def calculate_check_digit(value)
+end
+```
+
 ## Pre-Commit Checklist
 
 Before committing changes, always verify these files are updated to accurately reflect the changes:
 
+- **CLAUDE.md** - Update this file
 - **README.md** - Update usage examples, Table of Contents, and supported standards list
 - **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change
 - **sec_id.gemspec** - Update `description` if adding/removing supported standards

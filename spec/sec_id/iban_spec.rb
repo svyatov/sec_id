@@ -3,6 +3,9 @@
 RSpec.describe SecId::IBAN do
   let(:iban) { described_class.new(iban_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
   context 'when IBAN is valid (Germany)' do
     let(:iban_number) { 'DE89370400440532013000' }
 

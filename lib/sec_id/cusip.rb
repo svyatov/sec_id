@@ -1,8 +1,21 @@
 # frozen_string_literal: true
 
 module SecId
-  # https://en.wikipedia.org/wiki/CUSIP
+  # Committee on Uniform Securities Identification Procedures (CUSIP) - a 9-character
+  # alphanumeric code that identifies North American securities.
+  #
+  # Format: 6-character issuer code (CUSIP-6) + 2-character issue number + 1-digit check digit
+  #
+  # @see https://en.wikipedia.org/wiki/CUSIP
+  #
+  # @example Validate a CUSIP
+  #   SecId::CUSIP.valid?('037833100')  #=> true
+  #
+  # @example Convert to ISIN
+  #   cusip = SecId::CUSIP.new('037833100')
+  #   cusip.to_isin('US')  #=> #<SecId::ISIN>
   class CUSIP < Base
+    # Regular expression for parsing CUSIP components.
     ID_REGEX = /\A
       (?<identifier>
         (?<cusip6>[A-Z0-9]{5}[A-Z0-9*@#])
@@ -10,8 +23,15 @@ module SecId
       (?<check_digit>\d)?
     \z/x
 
-    attr_reader :cusip6, :issue
+    # @return [String, nil] the 6-character issuer code
+    attr_reader :cusip6
 
+    # @return [String, nil] the 2-character issue number
+    attr_reader :issue
+
+    # Creates a new CUSIP instance.
+    #
+    # @param cusip [String] the CUSIP string to parse
     def initialize(cusip)
       cusip_parts = parse cusip
       @identifier = cusip_parts[:identifier]
@@ -20,14 +40,20 @@ module SecId
       @check_digit = cusip_parts[:check_digit]&.to_i
     end
 
+    # Calculates the check digit using a modified Luhn algorithm.
+    #
+    # @return [Integer] the calculated check digit (0-9)
+    # @raise [InvalidFormatError] if the CUSIP format is invalid
     def calculate_check_digit
-      unless valid_format?
-        raise InvalidFormatError, "CUSIP '#{full_number}' is invalid and check-digit cannot be calculated!"
-      end
-
+      validate_format_for_calculation!
       mod10(modified_luhn_sum)
     end
 
+    # Converts this CUSIP to an ISIN for a given country code.
+    #
+    # @param country_code [String] the ISO 3166-1 alpha-2 country code (must be CGS country)
+    # @return [ISIN] a new ISIN instance
+    # @raise [InvalidFormatError] if the country code is not a CGS country
     def to_isin(country_code)
       unless ISIN::CGS_COUNTRY_CODES.include?(country_code)
         raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
@@ -39,7 +65,10 @@ module SecId
       isin
     end
 
-    # CUSIP International Numbering System
+    # Checks if this is a CINS (CUSIP International Numbering System) identifier.
+    # CINS identifiers start with a letter rather than a digit.
+    #
+    # @return [Boolean] true if this is a CINS identifier
     def cins?
       cusip6[0] < '0' || cusip6[0] > '9'
     end

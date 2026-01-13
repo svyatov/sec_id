@@ -3,6 +3,9 @@
 RSpec.describe SecId::OCC do
   let(:occ) { described_class.new(occ_symbol) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
   context 'when OCC symbol is in canonical form' do
     let(:occ_symbol) { 'EQX   260116C00005500' }
 

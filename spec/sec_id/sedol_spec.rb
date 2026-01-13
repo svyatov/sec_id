@@ -3,6 +3,9 @@
 RSpec.describe SecId::SEDOL do
   let(:sedol) { described_class.new(sedol_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
   context 'when SEDOL is valid' do
     let(:sedol_number) { 'B19GKT4' }
 

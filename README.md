@@ -47,7 +47,7 @@ gem install sec_id
 
 All identifier classes provide `valid?` and `valid_format?` methods at both class and instance levels.
 
-**Check-digit based identifiers** (ISIN, CUSIP, SEDOL, FIGI) also provide:
+**Check-digit based identifiers** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore!` - restores check-digit and returns the full number
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
 

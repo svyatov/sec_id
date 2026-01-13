@@ -1,8 +1,21 @@
 # frozen_string_literal: true
 
 module SecId
-  # https://en.wikipedia.org/wiki/Legal_Entity_Identifier
+  # Legal Entity Identifier (LEI) - a 20-character alphanumeric code that
+  # uniquely identifies legal entities participating in financial transactions.
+  #
+  # Format: 4-character LOU ID + 2-character reserved + 12-character entity ID + 2-digit check digit
+  #
+  # @see https://en.wikipedia.org/wiki/Legal_Entity_Identifier
+  # @see https://www.gleif.org/en/about-lei/iso-17442-the-lei-code-structure
+  #
+  # @example Validate a LEI
+  #   SecId::LEI.valid?('529900T8BM49AURSDO55')  #=> true
+  #
+  # @example Calculate check digit
+  #   SecId::LEI.check_digit('529900T8BM49AURSDO')  #=> 55
   class LEI < Base
+    # Regular expression for parsing LEI components.
     ID_REGEX = /\A
       (?<identifier>
         (?<lou_id>[0-9A-Z]{4})
@@ -11,8 +24,18 @@ module SecId
       (?<check_digit>\d{2})?
     \z/x
 
-    attr_reader :lou_id, :reserved, :entity_id
+    # @return [String, nil] the 4-character Local Operating Unit (LOU) identifier
+    attr_reader :lou_id
 
+    # @return [String, nil] the 2-character reserved field (typically '00')
+    attr_reader :reserved
+
+    # @return [String, nil] the 12-character entity-specific identifier
+    attr_reader :entity_id
+
+    # Creates a new LEI instance.
+    #
+    # @param lei [String] the LEI string to parse
     def initialize(lei)
       lei_parts = parse lei
       @identifier = lei_parts[:identifier]
@@ -22,14 +45,18 @@ module SecId
       @check_digit = lei_parts[:check_digit]&.to_i
     end
 
+    # Calculates the check digit using ISO 7064 MOD-97 algorithm.
+    #
+    # @return [Integer] the calculated 2-digit check digit (1-98)
+    # @raise [InvalidFormatError] if the LEI format is invalid
     def calculate_check_digit
-      unless valid_format?
-        raise InvalidFormatError, "LEI '#{full_number}' is invalid and check-digit cannot be calculated!"
-      end
-
+      validate_format_for_calculation!
       mod97("#{numeric_identifier}00")
     end
 
+    # Returns the string representation with zero-padded check digit.
+    #
+    # @return [String] the full LEI string
     def to_s
       return full_number unless check_digit
 

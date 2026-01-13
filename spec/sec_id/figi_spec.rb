@@ -3,6 +3,9 @@
 RSpec.describe SecId::FIGI do
   let(:figi) { described_class.new(figi_number) }
 
+  # Edge cases - applicable to all identifiers
+  it_behaves_like 'handles edge case inputs'
+
   context 'when FIGI is valid' do
     let(:figi_number) { 'BBG000H4FSM0' }
 
