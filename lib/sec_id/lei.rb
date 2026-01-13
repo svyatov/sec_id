@@ -33,8 +33,6 @@ module SecId
     # @return [String, nil] the 12-character entity-specific identifier
     attr_reader :entity_id
 
-    # Creates a new LEI instance.
-    #
     # @param lei [String] the LEI string to parse
     def initialize(lei)
       lei_parts = parse lei
@@ -45,8 +43,6 @@ module SecId
       @check_digit = lei_parts[:check_digit]&.to_i
     end
 
-    # Calculates the check digit using ISO 7064 MOD-97 algorithm.
-    #
     # @return [Integer] the calculated 2-digit check digit (1-98)
     # @raise [InvalidFormatError] if the LEI format is invalid
     def calculate_check_digit
@@ -54,9 +50,7 @@ module SecId
       mod97("#{numeric_identifier}00")
     end
 
-    # Returns the string representation with zero-padded check digit.
-    #
-    # @return [String] the full LEI string
+    # @return [String]
     def to_s
       return full_number unless check_digit
 
@@ -65,8 +59,6 @@ module SecId
 
     private
 
-    # Converts the identifier to a numeric string for MOD-97 calculation.
-    #
     # @return [String] the numeric string representation
     def numeric_identifier
       identifier.each_char.map { |char| char_to_digit(char) }.join

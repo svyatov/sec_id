@@ -25,8 +25,6 @@ module SecId
     # Weights applied to each character position in the check digit calculation.
     CHARACTER_WEIGHTS = [1, 3, 1, 7, 3, 9].freeze
 
-    # Creates a new SEDOL instance.
-    #
     # @param sedol [String] the SEDOL string to parse
     def initialize(sedol)
       sedol_parts = parse sedol
@@ -34,8 +32,6 @@ module SecId
       @check_digit = sedol_parts[:check_digit]&.to_i
     end
 
-    # Calculates the check digit using weighted sum algorithm.
-    #
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the SEDOL format is invalid
     def calculate_check_digit
@@ -45,8 +41,7 @@ module SecId
 
     private
 
-    # Calculates the weighted sum of identifier digits.
-    # NOTE: I know this isn't the most idiomatic Ruby code, but it's the fastest one.
+    # NOTE: Not idiomatic Ruby, but optimized for performance.
     #
     # @return [Integer] the weighted sum
     def weighted_sum
@@ -61,8 +56,6 @@ module SecId
       sum
     end
 
-    # Returns the identifier characters converted to digit values.
-    #
     # @return [Array<Integer>] array of digit values
     def id_digits
       @id_digits ||= identifier.each_char.map(&method(:char_to_digit))

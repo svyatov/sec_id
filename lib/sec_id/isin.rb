@@ -37,8 +37,6 @@ module SecId
     # @return [String, nil] the National Securities Identifying Number (9 characters)
     attr_reader :nsin
 
-    # Creates a new ISIN instance.
-    #
     # @param isin [String] the ISIN string to parse
     def initialize(isin)
       isin_parts = parse isin
@@ -48,8 +46,6 @@ module SecId
       @check_digit = isin_parts[:check_digit]&.to_i
     end
 
-    # Calculates the check digit using the Luhn algorithm.
-    #
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the ISIN format is invalid
     def calculate_check_digit
@@ -57,15 +53,6 @@ module SecId
       mod10(luhn_sum)
     end
 
-    # Checks if this ISIN uses CUSIP Global Services for NSIN assignment.
-    #
-    # @return [Boolean] true if the country code is a CGS country
-    def cgs?
-      CGS_COUNTRY_CODES.include?(country_code)
-    end
-
-    # Converts this ISIN to a CUSIP (for CGS country codes only).
-    #
     # @return [CUSIP] a new CUSIP instance
     # @raise [InvalidFormatError] if the country code is not a CGS country
     def to_cusip
@@ -74,10 +61,13 @@ module SecId
       CUSIP.new(nsin)
     end
 
+    # @return [Boolean] true if the country code is a CGS country
+    def cgs?
+      CGS_COUNTRY_CODES.include?(country_code)
+    end
+
     private
 
-    # Calculates the Luhn algorithm sum for check digit validation.
-    #
     # @return [Integer] the Luhn sum
     # @see https://en.wikipedia.org/wiki/Luhn_algorithm
     def luhn_sum
@@ -88,8 +78,6 @@ module SecId
       end
     end
 
-    # Returns the identifier digits in reverse order, with letters expanded to digit pairs.
-    #
     # @return [Array<Integer>] the reversed digit array
     def reversed_id_digits
       identifier.each_char.flat_map(&method(:char_to_digits)).reverse!

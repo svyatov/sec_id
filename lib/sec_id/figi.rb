@@ -36,8 +36,6 @@ module SecId
     # @return [String, nil] the 8-character random part
     attr_reader :random_part
 
-    # Creates a new FIGI instance.
-    #
     # @param figi [String] the FIGI string to parse
     def initialize(figi)
       figi_parts = parse figi
@@ -47,15 +45,11 @@ module SecId
       @check_digit = figi_parts[:check_digit]&.to_i
     end
 
-    # Validates the format including restricted prefix check.
-    #
-    # @return [Boolean] true if format is valid and prefix is not restricted
+    # @return [Boolean]
     def valid_format?
       !identifier.nil? && !RESTRICTED_PREFIXES.include?(prefix)
     end
 
-    # Calculates the check digit using a modified Luhn algorithm.
-    #
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the FIGI format is invalid
     def calculate_check_digit

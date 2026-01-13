@@ -52,6 +52,44 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)
 
+### Method Ordering (Stepdown Rule)
+
+Follow the "Stepdown Rule" from Clean Code: methods should be ordered so that callers appear before callees. Code should read top-to-bottom like a newspaper article—high-level concepts first, implementation details below.
+
+```ruby
+# Good - caller before callee, reads top-to-bottom
+def validate
+  check_format
+  check_digit_valid?
+end
+
+def check_format
+  parse_components
+end
+
+def check_digit_valid?
+  # ...
+end
+
+def parse_components
+  # ...
+end
+
+# Bad - callees appear before callers
+def parse_components
+  # ...
+end
+
+def check_format
+  parse_components
+end
+
+def validate
+  check_format
+  check_digit_valid?
+end
+```
+
 ## Documentation Style
 
 All classes and methods must have YARD documentation. Follow these conventions:
@@ -61,6 +99,7 @@ All classes and methods must have YARD documentation. Follow these conventions:
 - Document all private methods with params and return types, add description for complex logic
 - Include `@example` blocks for non-obvious usage patterns
 - Use `@raise` to document exceptions
+- **Omit descriptions that just repeat the code** - if the method name and signature make it obvious, only include `@param`, `@return`, and `@raise` tags without a description
 
 ```ruby
 # Good - blank line before @param

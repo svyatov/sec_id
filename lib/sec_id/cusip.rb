@@ -29,8 +29,6 @@ module SecId
     # @return [String, nil] the 2-character issue number
     attr_reader :issue
 
-    # Creates a new CUSIP instance.
-    #
     # @param cusip [String] the CUSIP string to parse
     def initialize(cusip)
       cusip_parts = parse cusip
@@ -40,8 +38,6 @@ module SecId
       @check_digit = cusip_parts[:check_digit]&.to_i
     end
 
-    # Calculates the check digit using a modified Luhn algorithm.
-    #
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the CUSIP format is invalid
     def calculate_check_digit
@@ -49,8 +45,6 @@ module SecId
       mod10(modified_luhn_sum)
     end
 
-    # Converts this CUSIP to an ISIN for a given country code.
-    #
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (must be CGS country)
     # @return [ISIN] a new ISIN instance
     # @raise [InvalidFormatError] if the country code is not a CGS country
@@ -65,18 +59,13 @@ module SecId
       isin
     end
 
-    # Checks if this is a CINS (CUSIP International Numbering System) identifier.
-    # CINS identifiers start with a letter rather than a digit.
-    #
-    # @return [Boolean] true if this is a CINS identifier
+    # @return [Boolean] true if first character is a letter (CINS identifier)
     def cins?
       cusip6[0] < '0' || cusip6[0] > '9'
     end
 
     private
 
-    # Calculates the modified Luhn algorithm sum for check digit validation.
-    #
     # @return [Integer] the modified Luhn sum
     # @see https://en.wikipedia.org/wiki/Luhn_algorithm
     def modified_luhn_sum
@@ -86,8 +75,6 @@ module SecId
       end
     end
 
-    # Returns the identifier digits in reverse order.
-    #
     # @return [Array<Integer>] the reversed digit array
     def reversed_id_digits
       identifier.each_char.map(&method(:char_to_digit)).reverse!

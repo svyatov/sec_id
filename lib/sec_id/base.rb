@@ -75,18 +75,14 @@ module SecId
     attr_reader :check_digit
 
     class << self
-      # Validates an identifier string.
-      #
       # @param id [String] the identifier to validate
-      # @return [Boolean] true if the identifier is valid
+      # @return [Boolean]
       def valid?(id)
         new(id).valid?
       end
 
-      # Validates the format of an identifier string.
-      #
       # @param id [String] the identifier to check
-      # @return [Boolean] true if the format is valid
+      # @return [Boolean]
       def valid_format?(id)
         new(id).valid_format?
       end
@@ -100,8 +96,6 @@ module SecId
         new(id_without_check_digit).restore!
       end
 
-      # Calculates and returns the check digit for an identifier.
-      #
       # @param id [String] the identifier to calculate check digit for
       # @return [Integer] the calculated check digit
       # @raise [InvalidFormatError] if the identifier format is invalid
@@ -110,7 +104,6 @@ module SecId
       end
     end
 
-    # Initializes a new identifier instance.
     # Subclasses must override this method.
     #
     # @param _sec_id_number [String] the identifier string to parse
@@ -119,18 +112,14 @@ module SecId
       raise NotImplementedError
     end
 
-    # Returns whether this identifier type uses check digits.
-    # Override in subclasses (like CIK, OCC) to return false for identifiers without check digits.
+    # Override in subclasses to return false for identifiers without check digits.
     #
-    # @return [Boolean] true if this identifier type has a check digit
+    # @return [Boolean]
     def has_check_digit?
       true
     end
 
-    # Validates the identifier by checking format and (if applicable) check digit.
-    # For identifiers without check digits, only validates format.
-    #
-    # @return [Boolean] true if the identifier is valid
+    # @return [Boolean]
     def valid?
       return valid_format? unless has_check_digit?
       return false unless valid_format?
@@ -138,16 +127,13 @@ module SecId
       check_digit == calculate_check_digit
     end
 
-    # Validates the identifier format using the ID_REGEX pattern.
     # Override in subclasses for additional format validation.
     #
-    # @return [Boolean] true if the identifier matches the expected format
+    # @return [Boolean]
     def valid_format?
       !identifier.nil?
     end
 
-    # Restores (calculates) the check digit and updates the instance.
-    #
     # @return [String] the full identifier with correct check digit
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore!
@@ -155,8 +141,7 @@ module SecId
       @full_number = to_s
     end
 
-    # Calculates and returns the check digit.
-    # Subclasses must override this method for identifiers with check digits.
+    # Subclasses must override this method.
     #
     # @return [Integer] the calculated check digit
     # @raise [NotImplementedError] always raised in base class
@@ -165,9 +150,7 @@ module SecId
       raise NotImplementedError
     end
 
-    # Returns the string representation of the identifier.
-    #
-    # @return [String] the full identifier string
+    # @return [String]
     def to_s
       "#{identifier}#{check_digit}"
     end
@@ -175,9 +158,6 @@ module SecId
 
     private
 
-    # Raises InvalidFormatError if the identifier format is invalid.
-    # Use this at the beginning of calculate_check_digit implementations.
-    #
     # @raise [InvalidFormatError] if valid_format? returns false
     # @return [void]
     def validate_format_for_calculation!
@@ -186,61 +166,45 @@ module SecId
       raise InvalidFormatError, "#{self.class.name} '#{full_number}' is invalid and check-digit cannot be calculated!"
     end
 
-    # Returns the identifier digits for check-digit calculation.
-    # Only needed for SEDOL which has a different digit weighting scheme.
-    #
+    # @param sec_id_number [String, #to_s] the identifier to parse
+    # @param upcase [Boolean] whether to upcase the input
+    # @return [MatchData, Hash] the regex match data or empty hash if no match
+    def parse(sec_id_number, upcase: true)
+      @full_number = sec_id_number.to_s.strip
+      @full_number.upcase! if upcase
+      @full_number.match(self.class::ID_REGEX) || {}
+    end
+
     # @return [Array<Integer>] array of digit values
     # @raise [NotImplementedError] always raised in base class
     def id_digits
       raise NotImplementedError
     end
 
-    # Parses the identifier string and returns regex match data.
-    # Normalizes input by converting to string, stripping whitespace, and uppercasing.
-    #
-    # @param sec_id_number [String, #to_s] the identifier to parse
-    # @return [MatchData, Hash] the regex match data or empty hash if no match
-    def parse(sec_id_number)
-      @full_number = sec_id_number.to_s.strip.upcase
-      @full_number.match(self.class::ID_REGEX) || {}
-    end
-
-    # Converts a character to its multi-digit representation for Luhn algorithm.
-    #
     # @param char [String] single character to convert
     # @return [Integer, Array<Integer>] single digit or array of digits
     def char_to_digits(char)
       SecId::CHAR_TO_DIGITS.fetch(char)
     end
 
-    # Converts a character to its single-digit value (0-38).
-    #
     # @param char [String] single character to convert
-    # @return [Integer] numeric value
+    # @return [Integer] numeric value (0-38)
     def char_to_digit(char)
       SecId::CHAR_TO_DIGIT.fetch(char)
     end
 
-    # Calculates Luhn mod-10 check digit from a sum.
-    #
     # @param sum [Integer] the sum to calculate check digit from
     # @return [Integer] check digit (0-9)
     def mod10(sum)
       (10 - (sum % 10)) % 10
     end
 
-    # Splits a two-digit number and returns sum of its digits.
-    # Used in modified Luhn algorithm for CUSIP/FIGI.
-    #
-    # @param number [Integer] number to split (typically 0-38 after doubling)
+    # @param number [Integer] number to split
     # @return [Integer] sum of tens and units digits
     def div10mod10(number)
       (number / 10) + (number % 10)
     end
 
-    # Calculates ISO 7064 MOD-97 check digits.
-    # Used by LEI and IBAN standards.
-    #
     # @param numeric_string [String] numeric string representation
     # @return [Integer] check digit value (1-98)
     def mod97(numeric_string)

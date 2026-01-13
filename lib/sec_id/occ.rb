@@ -35,88 +35,7 @@ module SecId
     # @return [String, nil] the option type ('C' for call, 'P' for put)
     attr_reader :type
 
-    # Creates a new OCC instance.
-    #
-    # @param symbol [String] the OCC symbol string to parse
-    def initialize(symbol)
-      symbol_parts = parse(symbol)
-      @initial = symbol_parts[:initial]
-      @underlying = symbol_parts[:underlying]
-      @date_str = symbol_parts[:date]
-      @type = symbol_parts[:type]
-      @strike_mills = symbol_parts[:strike_mills]
-      # Set identifier for Base compatibility
-      @identifier = @initial
-    end
-
-    # OCC does not have a check digit.
-    #
-    # @return [Boolean] always false for OCC
-    def has_check_digit?
-      false
-    end
-
-    # Parses the date string into a Date object.
-    #
-    # @return [Date, nil] the parsed date or nil if invalid
-    def date
-      return @date if @date
-
-      @date = Date.strptime(date_str, '%y%m%d') if date_str
-    rescue Date::Error
-      nil
-    end
-    alias date_obj date
-
-    # Returns the strike price in dollars.
-    #
-    # @return [Float] the strike price
-    def strike
-      @strike ||= @strike_mills.to_i / 1000.0
-    end
-
-    # OCC is valid if format matches AND date is parseable.
-    #
-    # @return [Boolean] true if the OCC symbol is valid
-    def valid?
-      valid_format? && !date.nil?
-    end
-
-    def valid_format?
-      !@initial.nil?
-    end
-
-    # Normalizes the OCC symbol to canonical format.
-    #
-    # @return [String] the normalized OCC symbol
-    # @raise [InvalidFormatError] if the OCC symbol is invalid
-    def normalize!
-      raise InvalidFormatError, "OCC '#{full_number}' is invalid and cannot be normalized!" unless valid?
-
-      @strike_mills.length > 8 && @strike_mills = format('%08d', @strike_mills.to_i)
-      @initial.length < 6 && @initial = underlying.ljust(6, "\s")
-
-      @full_number = "#{@initial}#{date_str}#{type}#{@strike_mills}"
-    end
-
-    # Returns the string representation of the OCC symbol.
-    #
-    # @return [String] the OCC symbol string
-    def to_s
-      full_number
-    end
-    alias to_str to_s
-
-    # Alias for backward compatibility.
-    #
-    # @return [String] the full OCC symbol
-    def full_symbol
-      full_number
-    end
-
     class << self
-      # Normalizes an OCC symbol to canonical format.
-      #
       # @param id [String] the OCC symbol to normalize
       # @return [String] the normalized OCC symbol
       # @raise [InvalidFormatError] if the OCC symbol is invalid
@@ -150,16 +69,64 @@ module SecId
       end
     end
 
-    private
+    # @param symbol [String] the OCC symbol string to parse
+    def initialize(symbol)
+      symbol_parts = parse(symbol, upcase: false)
+      @initial = symbol_parts[:initial]
+      @underlying = symbol_parts[:underlying]
+      @date_str = symbol_parts[:date]
+      @type = symbol_parts[:type]
+      @strike_mills = symbol_parts[:strike_mills]
+      # Set identifier for Base compatibility
+      @identifier = @initial
+    end
 
-    # Parses the OCC symbol string.
-    # Overrides base to skip upcase (OCC symbols are already properly cased).
-    #
-    # @param symbol [String] the OCC symbol to parse
-    # @return [MatchData, Hash] the regex match data or empty hash
-    def parse(symbol)
-      @full_number = symbol.to_s.strip
-      @full_number.match(ID_REGEX) || {}
+    # @return [Boolean] always false
+    def has_check_digit?
+      false
+    end
+
+    # @return [String] the normalized OCC symbol
+    # @raise [InvalidFormatError] if the OCC symbol is invalid
+    def normalize!
+      raise InvalidFormatError, "OCC '#{full_number}' is invalid and cannot be normalized!" unless valid?
+
+      @strike_mills = format('%08d', @strike_mills.to_i) if @strike_mills.length > 8
+      @initial = underlying.ljust(6, "\s") if @initial.length < 6
+
+      @full_number = "#{@initial}#{date_str}#{type}#{@strike_mills}"
+    end
+
+    # @return [Boolean]
+    def valid?
+      valid_format? && !date.nil?
+    end
+
+    # @return [Date, nil] the parsed date or nil if invalid
+    def date
+      return @date if @date
+
+      @date = Date.strptime(date_str, '%y%m%d') if date_str
+    rescue Date::Error
+      nil
+    end
+    alias date_obj date
+
+    # @return [Float] strike price in dollars
+    def strike
+      @strike ||= @strike_mills.to_i / 1000.0
+    end
+
+    # @return [String]
+    def to_s
+      full_number
+    end
+    alias to_str to_s
+
+    # @deprecated Use {#full_number} instead
+    # @return [String]
+    def full_symbol
+      full_number
     end
   end
 end

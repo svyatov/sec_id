@@ -23,8 +23,6 @@ module SecId
     attr_reader :padding
 
     class << self
-      # Normalizes a CIK to 10-digit padded format.
-      #
       # @param id [String, Integer] the CIK to normalize
       # @return [String] the 10-digit padded CIK
       # @raise [InvalidFormatError] if the CIK format is invalid
@@ -33,8 +31,6 @@ module SecId
       end
     end
 
-    # Creates a new CIK instance.
-    #
     # @param cik [String, Integer] the CIK to parse
     def initialize(cik)
       cik_parts = parse(cik)
@@ -42,22 +38,11 @@ module SecId
       @identifier = cik_parts[:identifier]
     end
 
-    # CIK does not have a check digit.
-    #
-    # @return [Boolean] always false for CIK
+    # @return [Boolean] always false
     def has_check_digit?
       false
     end
 
-    # Validates the CIK format.
-    #
-    # @return [Boolean] true if the format is valid
-    def valid_format?
-      !identifier.nil?
-    end
-
-    # Normalizes the CIK to 10-digit format with leading zeros.
-    #
     # @return [String] the normalized 10-digit CIK
     # @raise [InvalidFormatError] if the CIK format is invalid
     def normalize!
@@ -67,9 +52,12 @@ module SecId
       @full_number = @identifier.rjust(10, '0')
     end
 
-    # Returns the string representation of the CIK.
-    #
-    # @return [String] the CIK string
+    # @return [Boolean]
+    def valid_format?
+      !identifier.nil?
+    end
+
+    # @return [String]
     def to_s
       full_number
     end
@@ -77,9 +65,6 @@ module SecId
 
     private
 
-    # Parses the CIK string.
-    # Overrides base to skip upcase (CIK is numeric only).
-    #
     # @param cik_number [String, Integer] the CIK to parse
     # @return [MatchData, Hash] the regex match data or empty hash
     def parse(cik_number)

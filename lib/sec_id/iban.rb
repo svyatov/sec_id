@@ -45,8 +45,6 @@ module SecId
     # @return [String, nil] the national check digit (extracted from BBAN if country rules define it)
     attr_reader :national_check
 
-    # Creates a new IBAN instance.
-    #
     # @param iban [String] the IBAN string to parse
     def initialize(iban)
       iban_parts = parse(iban)
@@ -61,8 +59,6 @@ module SecId
       extract_bban_components if valid_format?
     end
 
-    # Calculates the check digits using ISO 7064 MOD-97 algorithm.
-    #
     # @return [Integer] the calculated 2-digit check value (1-98)
     # @raise [InvalidFormatError] if the IBAN format is invalid
     def calculate_check_digit
@@ -70,18 +66,14 @@ module SecId
       mod97(numeric_string_for_check)
     end
 
-    # Validates the IBAN format including BBAN country-specific rules.
-    #
-    # @return [Boolean] true if the format is valid
+    # @return [Boolean]
     def valid_format?
       return false unless identifier
 
       valid_bban_format?
     end
 
-    # Validates the BBAN format according to country-specific rules.
-    #
-    # @return [Boolean] true if the BBAN format is valid
+    # @return [Boolean]
     def valid_bban_format?
       return false unless bban
 
@@ -91,23 +83,17 @@ module SecId
       bban.length == rule[:length] && bban.match?(rule[:format])
     end
 
-    # Returns the country-specific BBAN validation rule.
-    #
     # @return [Hash, nil] the validation rule or nil if country is unknown
     def country_rule
       COUNTRY_RULES[country_code]
     end
 
-    # Checks if the country code is recognized.
-    #
-    # @return [Boolean] true if the country has validation rules defined
+    # @return [Boolean]
     def known_country?
       COUNTRY_RULES.key?(country_code) || LENGTH_ONLY_COUNTRIES.key?(country_code)
     end
 
-    # Returns the string representation with zero-padded check digits.
-    #
-    # @return [String] the full IBAN string
+    # @return [String]
     def to_s
       return full_number unless check_digit
 
@@ -116,8 +102,6 @@ module SecId
 
     private
 
-    # Extracts check digits and BBAN from the rest of the IBAN string.
-    #
     # @param rest [String] the IBAN string after country code
     # @return [void]
     def extract_check_digit_and_bban(rest)
@@ -132,11 +116,14 @@ module SecId
       end
     end
 
-    # Determines if the first two characters are check digits.
-    #
+    # @return [Integer, nil] the expected BBAN length or nil if unknown
+    def expected_bban_length_for_country
+      COUNTRY_RULES.dig(country_code, :length) || LENGTH_ONLY_COUNTRIES[country_code]
+    end
+
     # @param rest [String] the IBAN string after country code
     # @param expected_bban_length [Integer, nil] the expected BBAN length for the country
-    # @return [Boolean] true if check digits are present
+    # @return [Boolean]
     def check_digits?(rest, expected_bban_length)
       return false unless rest[0, 2].match?(/\A\d{2}\z/)
       return true unless expected_bban_length
@@ -145,25 +132,6 @@ module SecId
       rest.length == expected_bban_length + 2 || rest.length != expected_bban_length
     end
 
-    # Returns the expected BBAN length for the country code.
-    #
-    # @return [Integer, nil] the expected BBAN length or nil if unknown
-    def expected_bban_length_for_country
-      COUNTRY_RULES.dig(country_code, :length) || LENGTH_ONLY_COUNTRIES[country_code]
-    end
-
-    # Validates BBAN length for countries with length-only rules.
-    #
-    # @return [Boolean] true if BBAN length is valid or country has no length rule
-    def valid_bban_length_only?
-      expected_length = LENGTH_ONLY_COUNTRIES[country_code]
-      return true unless expected_length
-
-      bban.length == expected_length
-    end
-
-    # Extracts BBAN components based on country-specific rules.
-    #
     # @return [void]
     def extract_bban_components
       rule = country_rule
@@ -174,9 +142,14 @@ module SecId
       end
     end
 
-    # Converts the identifier to a numeric string for MOD-97 calculation.
-    # Format: BBAN + country_code + "00" with letters converted to digits.
-    #
+    # @return [Boolean]
+    def valid_bban_length_only?
+      expected_length = LENGTH_ONLY_COUNTRIES[country_code]
+      return true unless expected_length
+
+      bban.length == expected_length
+    end
+
     # @return [String] the numeric string representation
     def numeric_string_for_check
       "#{bban}#{country_code}00".each_char.map { |char| char_to_digit(char) }.join
