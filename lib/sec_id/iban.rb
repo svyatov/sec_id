@@ -116,6 +116,10 @@ module SecId
 
     private
 
+    # Extracts check digits and BBAN from the rest of the IBAN string.
+    #
+    # @param rest [String] the IBAN string after country code
+    # @return [void]
     def extract_check_digit_and_bban(rest)
       expected = expected_bban_length_for_country
 
@@ -128,6 +132,11 @@ module SecId
       end
     end
 
+    # Determines if the first two characters are check digits.
+    #
+    # @param rest [String] the IBAN string after country code
+    # @param expected_bban_length [Integer, nil] the expected BBAN length for the country
+    # @return [Boolean] true if check digits are present
     def check_digits?(rest, expected_bban_length)
       return false unless rest[0, 2].match?(/\A\d{2}\z/)
       return true unless expected_bban_length
@@ -136,10 +145,16 @@ module SecId
       rest.length == expected_bban_length + 2 || rest.length != expected_bban_length
     end
 
+    # Returns the expected BBAN length for the country code.
+    #
+    # @return [Integer, nil] the expected BBAN length or nil if unknown
     def expected_bban_length_for_country
       COUNTRY_RULES.dig(country_code, :length) || LENGTH_ONLY_COUNTRIES[country_code]
     end
 
+    # Validates BBAN length for countries with length-only rules.
+    #
+    # @return [Boolean] true if BBAN length is valid or country has no length rule
     def valid_bban_length_only?
       expected_length = LENGTH_ONLY_COUNTRIES[country_code]
       return true unless expected_length
@@ -147,6 +162,9 @@ module SecId
       bban.length == expected_length
     end
 
+    # Extracts BBAN components based on country-specific rules.
+    #
+    # @return [void]
     def extract_bban_components
       rule = country_rule
       return unless rule&.key?(:components)
@@ -156,7 +174,10 @@ module SecId
       end
     end
 
-    # For MOD-97 check: BBAN + country_code + "00" -> convert letters to digits
+    # Converts the identifier to a numeric string for MOD-97 calculation.
+    # Format: BBAN + country_code + "00" with letters converted to digits.
+    #
+    # @return [String] the numeric string representation
     def numeric_string_for_check
       "#{bban}#{country_code}00".each_char.map { |char| char_to_digit(char) }.join
     end

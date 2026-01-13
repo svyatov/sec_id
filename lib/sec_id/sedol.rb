@@ -45,7 +45,10 @@ module SecId
 
     private
 
-    # NOTE: I know this isn't the most idiomatic Ruby code, but it's the fastest one
+    # Calculates the weighted sum of identifier digits.
+    # NOTE: I know this isn't the most idiomatic Ruby code, but it's the fastest one.
+    #
+    # @return [Integer] the weighted sum
     def weighted_sum
       index = 0
       sum = 0
@@ -58,6 +61,9 @@ module SecId
       sum
     end
 
+    # Returns the identifier characters converted to digit values.
+    #
+    # @return [Array<Integer>] array of digit values
     def id_digits
       @id_digits ||= identifier.each_char.map(&method(:char_to_digit))
     end

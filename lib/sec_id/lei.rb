@@ -65,6 +65,9 @@ module SecId
 
     private
 
+    # Converts the identifier to a numeric string for MOD-97 calculation.
+    #
+    # @return [String] the numeric string representation
     def numeric_identifier
       identifier.each_char.map { |char| char_to_digit(char) }.join
     end

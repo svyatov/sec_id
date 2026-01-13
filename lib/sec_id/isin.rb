@@ -76,7 +76,10 @@ module SecId
 
     private
 
-    # https://en.wikipedia.org/wiki/Luhn_algorithm
+    # Calculates the Luhn algorithm sum for check digit validation.
+    #
+    # @return [Integer] the Luhn sum
+    # @see https://en.wikipedia.org/wiki/Luhn_algorithm
     def luhn_sum
       reversed_id_digits.each_slice(2).reduce(0) do |sum, (even, odd)|
         double_even = (even || 0) * 2
@@ -85,6 +88,9 @@ module SecId
       end
     end
 
+    # Returns the identifier digits in reverse order, with letters expanded to digit pairs.
+    #
+    # @return [Array<Integer>] the reversed digit array
     def reversed_id_digits
       identifier.each_char.flat_map(&method(:char_to_digits)).reverse!
     end
