@@ -15,10 +15,12 @@
 
 - Refactored CIK and OCC to inherit from Base class with `has_check_digit?` hook for cleaner architecture
 - Added `validate_format_for_calculation!` helper method to Base class to reduce code duplication
-- Added comprehensive YARD documentation to Base class
+- Added comprehensive YARD documentation to all classes (public and private methods)
+- Applied Stepdown Rule to method ordering throughout codebase
 - Created shared RSpec examples for edge cases (nil, empty, whitespace inputs)
 - Created shared RSpec examples for check-digit and normalization identifiers
-- Improved test maintainability with 466 tests covering all identifier types
+- Applied shared examples to all identifier specs, removing ~350 lines of duplicate test code
+- Improved test maintainability with 579 tests covering all identifier types
 
 ## [4.2.0] - 2025-01-12
 
