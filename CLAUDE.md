@@ -126,3 +126,15 @@ Before committing changes, always verify these files are updated to accurately r
 - **README.md** - Update usage examples, Table of Contents, and supported standards list
 - **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change
 - **sec_id.gemspec** - Update `description` if adding/removing supported standards
+
+## Releasing a New Version
+
+1. Update `lib/sec_id/version.rb` with the new version number
+2. Update `CHANGELOG.md`: change `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` and add new empty `[Unreleased]` section
+3. Update `README.md` installation version if needed (e.g., `~> 4.3` to `~> 4.4`)
+4. Commit changes: `git commit -am "Bump version to X.Y.Z"`
+5. Release: `bundle exec rake release` - this will:
+   - Build the gem
+   - Create and push the git tag
+   - Push the gem to RubyGems.org (requires OTP if MFA enabled)
+6. Create GitHub release at https://github.com/svyatov/sec_id/releases with notes from CHANGELOG
