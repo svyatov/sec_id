@@ -5,7 +5,9 @@ require 'date'
 module SecId
   # OCC Option Symbol - standardized option symbol format used by Option Clearing Corporation.
   # Format: 6-char underlying (padded) + 6-char date (YYMMDD) + type (C/P) + 8-digit strike (in mills).
-  # OCC does not have a check digit, but validates that the date is parseable.
+  #
+  # @note OCC identifiers have no check digit. The {#has_check_digit?} method returns false
+  #   and validation includes both format and date parseability checks.
   #
   # @see https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol
   # @see https://web.archive.org/web/20120507220143/http://www.theocc.com/components/docs/initiatives/symbology/symbology_initiative_v1_8.pdf
@@ -17,6 +19,8 @@ module SecId
   #   occ = SecId::OCC.build(underlying: 'AAPL', date: '2021-09-17', type: 'C', strike: 150.0)
   #   occ.to_s  #=> 'AAPL  210917C00150000'
   class OCC < Base
+    include Normalizable
+
     # Regular expression for parsing OCC symbol components.
     ID_REGEX = /\A
       (?<initial>
@@ -35,14 +39,10 @@ module SecId
     # @return [String, nil] the option type ('C' for call, 'P' for put)
     attr_reader :type
 
-    class << self
-      # @param id [String] the OCC symbol to normalize
-      # @return [String] the normalized OCC symbol
-      # @raise [InvalidFormatError] if the OCC symbol is invalid
-      def normalize!(id)
-        new(id).normalize!
-      end
+    # @return [String, nil] the strike price in mills (thousandths of a dollar, represented as an 8-digit string)
+    attr_reader :strike_mills
 
+    class << self
       # Builds an OCC symbol from components.
       #
       # @param underlying [String] the underlying symbol (1-6 chars)
@@ -52,33 +52,52 @@ module SecId
       # @return [OCC] a new OCC instance
       # @raise [ArgumentError] if strike format is invalid
       def build(underlying:, date:, type:, strike:)
-        initial = underlying.to_s.ljust(6, "\s")
-        date = Date.parse(date.to_s) unless date.is_a?(Date)
+        date_obj = date.is_a?(Date) ? date : Date.parse(date)
+        strike_mills = normalize_strike_mills(strike)
 
+        new(compose_symbol(underlying, date_obj.strftime('%y%m%d'), type, strike_mills))
+      end
+
+      # Composes an OCC symbol string from its components.
+      #
+      # @param underlying [String] the underlying symbol
+      # @param date_str [String] the date in YYMMDD format
+      # @param type [String] 'C' or 'P'
+      # @param strike_mills [String, Integer] the strike in mills
+      # @return [String] the composed OCC symbol
+      def compose_symbol(underlying, date_str, type, strike_mills)
+        padded_underlying = underlying.to_s.ljust(6, "\s")
+        padded_strike = format('%08d', strike_mills.to_i)
+
+        "#{padded_underlying}#{date_str}#{type}#{padded_strike}"
+      end
+
+      private
+
+      # @param strike [Numeric, String] strike price or 8-char mills string
+      # @return [String] 8-character strike mills string
+      # @raise [ArgumentError] if strike format is invalid
+      def normalize_strike_mills(strike)
         case strike
         when Numeric
-          strike_mills = format('%08d', (strike * 1000).to_i)
-        when /\A\d{8}\z/
-          strike_mills = strike
+          format('%08d', (strike * 1000).to_i)
+        when String && /\A\d{8}\z/
+          strike
         else
           raise ArgumentError, 'Strike must be numeric or an 8-char string!'
         end
-
-        symbol = "#{initial}#{date.strftime('%y%m%d')}#{type}#{strike_mills}"
-        new(symbol)
       end
     end
 
     # @param symbol [String] the OCC symbol string to parse
     def initialize(symbol)
       symbol_parts = parse(symbol, upcase: false)
-      @initial = symbol_parts[:initial]
+      @identifier = symbol_parts[:initial]
       @underlying = symbol_parts[:underlying]
       @date_str = symbol_parts[:date]
       @type = symbol_parts[:type]
       @strike_mills = symbol_parts[:strike_mills]
-      # Set identifier for Base compatibility
-      @identifier = @initial
+      @check_digit = nil
     end
 
     # @return [Boolean] always false
@@ -86,35 +105,34 @@ module SecId
       false
     end
 
+    # Normalizes the OCC symbol to standard format with 6-char padded underlying and 8-digit strike.
+    #
     # @return [String] the normalized OCC symbol
     # @raise [InvalidFormatError] if the OCC symbol is invalid
     def normalize!
       raise InvalidFormatError, "OCC '#{full_number}' is invalid and cannot be normalized!" unless valid?
 
-      @strike_mills = format('%08d', @strike_mills.to_i) if @strike_mills.length > 8
-      @initial = underlying.ljust(6, "\s") if @initial.length < 6
-
-      @full_number = "#{@initial}#{date_str}#{type}#{@strike_mills}"
+      @full_number = self.class.compose_symbol(underlying, date_str, type, strike_mills)
     end
 
     # @return [Boolean]
     def valid?
-      valid_format? && !date.nil?
+      valid_format? && !date.nil? # date must be parseable
     end
 
     # @return [Date, nil] the parsed date or nil if invalid
     def date
-      return @date if @date
+      return nil unless date_str
 
-      @date = Date.strptime(date_str, '%y%m%d') if date_str
-    rescue Date::Error
+      @date ||= Date.strptime(date_str, '%y%m%d')
+    rescue ArgumentError
       nil
     end
     alias date_obj date
 
     # @return [Float] strike price in dollars
     def strike
-      @strike ||= @strike_mills.to_i / 1000.0
+      @strike ||= strike_mills.to_i / 1000.0
     end
 
     # @return [String]
