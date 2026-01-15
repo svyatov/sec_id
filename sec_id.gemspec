@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Validate securities identification numbers with ease!'
   spec.description   = 'Validate, calculate check digits, and parse components of securities identifiers. ' \
-                       'Supports ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CIK, and OCC standards.'
+                       'Supports ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CIK, OCC, and WKN standards.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 

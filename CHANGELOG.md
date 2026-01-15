@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- WKN support (Wertpapierkennnummer - German securities identifier)
+
 ## [4.3.0] - 2025-01-13
 
 ### Added
