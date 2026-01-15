@@ -15,6 +15,7 @@
   - [IBAN](#iban) - International Bank Account Number
   - [CIK](#cik) - Central Index Key
   - [OCC](#occ) - Options Clearing Corporation Symbol
+  - [Valoren](#valoren) - Swiss Security Number
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -257,6 +258,30 @@ occ.full_symbol   # => 'X 250620C00050000'
 occ.valid?        # => true
 occ.normalize!    # => 'X     250620C00050000'
 occ.full_symbol   # => 'X     250620C00050000'
+```
+
+### Valoren
+
+> [Valoren](https://en.wikipedia.org/wiki/Valoren_number) - a numeric identifier for securities in Switzerland, Liechtenstein, and Belgium.
+
+```ruby
+# class level
+SecId::Valoren.valid?('3886335')        # => true
+SecId::Valoren.valid?('24476758')       # => true
+SecId::Valoren.valid?('35514757')       # => true
+SecId::Valoren.valid?('97429325')       # => true
+SecId::Valoren.valid_format?('3886335') # => true
+SecId::Valoren.normalize!('3886335')    # => '003886335'
+
+# instance level
+valoren = SecId::Valoren.new('3886335')
+valoren.full_number   # => '3886335'
+valoren.padding       # => ''
+valoren.identifier    # => '3886335'
+valoren.valid?        # => true
+valoren.valid_format? # => true
+valoren.normalize!    # => '003886335'
+valoren.to_s          # => '003886335'
 ```
 
 ## Development
