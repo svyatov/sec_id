@@ -15,6 +15,7 @@
   - [IBAN](#iban) - International Bank Account Number
   - [CIK](#cik) - Central Index Key
   - [OCC](#occ) - Options Clearing Corporation Symbol
+  - [WKN](#wkn) - Wertpapierkennnummer
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -258,6 +259,27 @@ occ.valid?        # => true
 occ.normalize!    # => 'X     250620C00050000'
 occ.full_symbol   # => 'X     250620C00050000'
 ```
+
+### WKN
+
+> [Wertpapierkennnummer](https://en.wikipedia.org/wiki/Wertpapierkennnummer) - a 6-character alphanumeric code used to identify securities in Germany.
+
+```ruby
+# class level
+SecId::WKN.valid?('514000')        # => true
+SecId::WKN.valid?('CBK100')        # => true
+SecId::WKN.valid_format?('514000') # => true
+
+# instance level
+wkn = SecId::WKN.new('514000')
+wkn.full_number   # => '514000'
+wkn.identifier    # => '514000'
+wkn.valid?        # => true
+wkn.valid_format? # => true
+wkn.to_s          # => '514000'
+```
+
+WKN excludes letters I and O to avoid confusion with digits 1 and 0.
 
 ## Development
 
