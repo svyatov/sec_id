@@ -16,6 +16,7 @@
   - [CIK](#cik) - Central Index Key
   - [OCC](#occ) - Options Clearing Corporation Symbol
   - [WKN](#wkn) - Wertpapierkennnummer
+  - [Valoren](#valoren) - Swiss Security Number
 - [Development](#development)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -282,6 +283,30 @@ wkn.to_s          # => '514000'
 ```
 
 WKN excludes letters I and O to avoid confusion with digits 1 and 0.
+
+### Valoren
+
+> [Valoren](https://en.wikipedia.org/wiki/Valoren_number) - a numeric identifier for securities in Switzerland, Liechtenstein, and Belgium.
+
+```ruby
+# class level
+SecId::Valoren.valid?('3886335')        # => true
+SecId::Valoren.valid?('24476758')       # => true
+SecId::Valoren.valid?('35514757')       # => true
+SecId::Valoren.valid?('97429325')       # => true
+SecId::Valoren.valid_format?('3886335') # => true
+SecId::Valoren.normalize!('3886335')    # => '003886335'
+
+# instance level
+valoren = SecId::Valoren.new('3886335')
+valoren.full_number   # => '3886335'
+valoren.padding       # => ''
+valoren.identifier    # => '3886335'
+valoren.valid?        # => true
+valoren.valid_format? # => true
+valoren.normalize!    # => '003886335'
+valoren.to_s          # => '003886335'
+```
 
 ## Development
 
