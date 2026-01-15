@@ -25,9 +25,9 @@ module SecId
     # Country codes that use CUSIP Global Services (CGS) for NSIN assignment.
     CGS_COUNTRY_CODES = Set.new(
       %w[
-        US CA AG AI AN AR AS AW BB BL BM BO BQ BR BS BZ CL CO CR CW DM DO EC FM
-        GD GS GU GY HN HT JM KN KY LC MF MH MP MX NI PA PE PH PR PW PY SR SV SX
-        TT UM UY VC VE VG VI YT
+        US CA AG AI AN AR AS AW BB BL BM BO BQ BS BZ CL CO CR CW DM DO EC FM GD
+        GS GU GY HN HT JM KN KY LC MF MH MP MX NI PA PE PH PR PW PY SR SV SX TT
+        UM UY VC VE VG VI YT
       ]
     ).freeze
 
