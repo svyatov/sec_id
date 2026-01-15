@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Valoren support (Swiss Security Number)
+
 ## [4.3.0] - 2025-01-13
 
 ### Added
