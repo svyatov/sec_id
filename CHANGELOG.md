@@ -1,5 +1,10 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
 
 ### Added
@@ -17,12 +22,9 @@
 - LEI support (Legal Entity Identifier, ISO 17442)
 - IBAN support (International Bank Account Number, ISO 13616) with EU/EEA country validation
 
-### Updated
+### Changed
 
 - Improved README: better formatting, navigation, and clear API distinction between check-digit and normalization identifiers
-
-### Internal
-
 - Refactored CIK and OCC to inherit from Base class with `has_check_digit?` hook for cleaner architecture
 - Added `Normalizable` module for consistent `normalize!` class method across identifiers
 - Added `validate_format_for_calculation!` helper method to Base class to reduce code duplication
@@ -39,17 +41,17 @@
 
 - OCC support ([@wtn](https://github.com/wtn), [#93](https://github.com/svyatov/sec_id/pull/93))
 
-### Fixed
-
-- CUSIP#cins? usage example in README ([@wtn](https://github.com/wtn), [#91](https://github.com/svyatov/sec_id/pull/91))
-
-### Updated
+### Changed
 
 - Separate CIK from Base for cleaner architecture ([@wtn](https://github.com/wtn), [#92](https://github.com/svyatov/sec_id/pull/92))
 - Use rubocop-rspec plugin ([@wtn](https://github.com/wtn), [#90](https://github.com/svyatov/sec_id/pull/90))
 - Replace CodeClimate with Codecov
 - Add permissions to CI workflow
 - Clean up gemspec: update description and simplify files list
+
+### Fixed
+
+- CUSIP#cins? usage example in README ([@wtn](https://github.com/wtn), [#91](https://github.com/svyatov/sec_id/pull/91))
 
 ## [4.1.0] - 2024-09-23
 
@@ -60,19 +62,16 @@
 - Convert between CUSIPs and ISINs ([@wtn](https://github.com/wtn), [#86](https://github.com/svyatov/sec_id/pull/86), [#88](https://github.com/svyatov/sec_id/pull/88))
 - CINS check method for CUSIPs ([@wtn](https://github.com/wtn), [#87](https://github.com/svyatov/sec_id/pull/87))
 
-### Updated
+### Changed
 
 - Small internal refactorings
 
 ## [4.0.0] - 2024-07-09
 
-### Breaking changes
+### Changed
 
-- Minimum required Ruby version is 3.1 now
-- Default repository branch renamed to `main`
-
-### Updated
-
+- **BREAKING:** Minimum required Ruby version is 3.1 now
+- **BREAKING:** Default repository branch renamed to `main`
 - Small internal refactorings
 - TravisCI -> GitHub Actions
 - Dropped tests for Ruby below 3.1
@@ -80,12 +79,9 @@
 
 ## [3.0.0] - 2020-03-10
 
-### Breaking changes
+### Changed
 
-- Minimum required Ruby version is 2.5 now
-
-### Updated
-
+- **BREAKING:** Minimum required Ruby version is 2.5 now
 - Small internal refactorings
 - TravisCI config updated: dropped Ruby 2.3 and 2.4, added Ruby 2.7
 - Rubocop's Ruby target version changed to 2.5
@@ -96,11 +92,9 @@
 
 - SEDOL numbers support: `SecId::SEDOL`
 
-### Updated
+### Changed
 
-- **Breaking change**
-
-    API for accessing full number is unified across all classes:
+- **BREAKING:** API for accessing full number is unified across all classes:
 
     ```
     SecId::ISIN#full_number  # previously SecId::ISIN#isin
@@ -119,7 +113,7 @@
 - CUSIP numbers support: `SecId::CUSIP`
 - CHANGELOG.md file added
 
-### Updated
+### Changed
 
 - Char to digit conversion now uses precalculated tables instead of dynamic calculation for speed
 

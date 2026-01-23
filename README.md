@@ -18,6 +18,7 @@
   - [WKN](#wkn) - Wertpapierkennnummer
 - [Development](#development)
 - [Contributing](#contributing)
+- [Versioning](#versioning)
 - [License](#license)
 
 ## Supported Ruby Versions
@@ -293,6 +294,10 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 Bug reports and pull requests are welcome on
 GitHub at https://github.com/svyatov/sec_id.
+
+## Versioning
+
+This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html), documents changes per [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and uses [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## License
 

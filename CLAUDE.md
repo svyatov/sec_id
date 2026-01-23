@@ -90,6 +90,61 @@ def validate
 end
 ```
 
+## Commit Message Convention
+
+This project follows [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
+
+Format: `<type>[optional scope]: <description>`
+
+### Types
+
+| Type | Description | Version bump |
+|------|-------------|--------------|
+| `feat` | New feature | MINOR |
+| `fix` | Bug fix | PATCH |
+| `docs` | Documentation only | — |
+| `style` | Formatting, whitespace | — |
+| `refactor` | Code change (no feature/fix) | — |
+| `perf` | Performance improvement | — |
+| `test` | Adding/fixing tests | — |
+| `build` | Build system or dependencies | — |
+| `ci` | CI configuration | — |
+| `chore` | Maintenance tasks | — |
+
+### Breaking Changes
+
+Use `!` after type or add `BREAKING CHANGE:` footer. Breaking changes trigger a MAJOR version bump.
+
+### Examples
+
+```
+feat: add WKN support
+fix: correct CUSIP check-digit for alphanumeric input
+docs: update README with LEI usage examples
+refactor: extract shared Normalizable module
+feat!: rename full_number to identifier across all classes
+chore: bump version to 4.4.0
+```
+
+## Changelog Format
+
+This project follows [Keep a Changelog v1.1.0](https://keepachangelog.com/en/1.1.0/).
+
+Allowed categories in **required order**:
+
+1. **Added** — new features
+2. **Changed** — changes to existing functionality
+3. **Deprecated** — soon-to-be removed features
+4. **Removed** — removed features
+5. **Fixed** — bug fixes
+6. **Security** — vulnerability fixes
+
+Rules:
+- Categories must appear in the order listed above within each release section
+- Each category must appear **at most once** per release section — always append to an existing category rather than creating a duplicate
+- Do NOT use non-standard categories like "Updated", "Internal", or "Breaking changes"
+- Breaking changes should be prefixed with **BREAKING:** within the relevant category (typically Changed or Removed)
+
 ## Documentation Style
 
 All classes and methods must have YARD documentation. Follow these conventions:
@@ -124,15 +179,20 @@ Before committing changes, always verify these files are updated to accurately r
 
 - **CLAUDE.md** - Update this file
 - **README.md** - Update usage examples, Table of Contents, and supported standards list
-- **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change
+- **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change (use only standard Keep a Changelog categories — see Changelog Format section above)
 - **sec_id.gemspec** - Update `description` if adding/removing supported standards
 
 ## Releasing a New Version
 
+This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html):
+- **MAJOR** — breaking changes (incompatible API changes)
+- **MINOR** — new features (backwards-compatible)
+- **PATCH** — bug fixes (backwards-compatible)
+
 1. Update `lib/sec_id/version.rb` with the new version number
 2. Update `CHANGELOG.md`: change `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` and add new empty `[Unreleased]` section
 3. Update `README.md` installation version if needed (e.g., `~> 4.3` to `~> 4.4`)
-4. Commit changes: `git commit -am "Bump version to X.Y.Z"`
+4. Commit changes: `git commit -am "chore: bump version to X.Y.Z"`
 5. Release: `bundle exec rake release` - this will:
    - Build the gem
    - Create and push the git tag
