@@ -1,4 +1,4 @@
-# SecId [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI) [![License](https://img.shields.io/github/license/svyatov/sec_id)](LICENSE.txt)
+# SecId [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
 
 > Validate securities identification numbers with ease!
 
@@ -18,6 +18,7 @@
   - [WKN](#wkn) - Wertpapierkennnummer
 - [Development](#development)
 - [Contributing](#contributing)
+- [Changelog](#changelog)
 - [Versioning](#versioning)
 - [License](#license)
 
@@ -285,19 +286,27 @@ WKN excludes letters I and O to avoid confusion with digits 1 and 0.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.
-Then, run `rake spec` to run the tests. You can also run `bin/console`
+Then, run `bundle exec rake` to run the tests. You can also run `bin/console`
 for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on
-GitHub at https://github.com/svyatov/sec_id.
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Make your changes and run tests (`bundle exec rake`)
+4. Commit using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format (`git commit -m 'feat: add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new Pull Request
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes, following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
 ## Versioning
 
-This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html), documents changes per [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and uses [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
+This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
 
 ## License
 
