@@ -66,6 +66,15 @@ RSpec.describe SecId::ISIN do
         expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
       end
     end
+
+    context 'when BR country code' do
+      let(:isin_number) { 'BRBBASACNOR3' }
+
+      it 'is not a CGS country and raises an error' do
+        expect(isin.cgs?).to be(false)
+        expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
   end
 
   describe '.valid?' do

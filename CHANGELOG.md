@@ -4,7 +4,11 @@
 
 ### Added
 
-- WKN support (Wertpapierkennnummer - German securities identifier)
+- WKN support (Wertpapierkennnummer - German securities identifier) ([@wtn](https://github.com/wtn), [#108](https://github.com/svyatov/sec_id/pull/108))
+
+### Fixed
+
+- Removed BR (Brazil) from CGS country codes — Brazil never used CINS numbers and Brazilian ISINs cannot be converted to CUSIP ([@wtn](https://github.com/wtn), [#110](https://github.com/svyatov/sec_id/pull/110))
 
 ## [4.3.0] - 2025-01-13
 
