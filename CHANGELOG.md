@@ -10,7 +10,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- CFI (Classification of Financial Instruments) support with category/group validation and equity-specific predicates
+- FISN (Financial Instrument Short Name) support per ISO 18774 ([#112](https://github.com/svyatov/sec_id/pull/112))
+- CFI (Classification of Financial Instruments) support with category/group validation and equity-specific predicates ([#111](https://github.com/svyatov/sec_id/pull/111))
 - Valoren support (Swiss Security Number) ([@wtn](https://github.com/wtn), [#109](https://github.com/svyatov/sec_id/pull/109))
 - WKN support (Wertpapierkennnummer - German securities identifier) ([@wtn](https://github.com/wtn), [#108](https://github.com/svyatov/sec_id/pull/108))
 

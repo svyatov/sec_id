@@ -15,6 +15,7 @@ require 'sec_id/occ'
 require 'sec_id/wkn'
 require 'sec_id/valoren'
 require 'sec_id/cfi'
+require 'sec_id/fisn'
 
 module SecId
   Error = Class.new(StandardError)

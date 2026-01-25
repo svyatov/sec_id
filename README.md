@@ -18,6 +18,7 @@
   - [WKN](#wkn) - Wertpapierkennnummer
   - [Valoren](#valoren) - Swiss Security Number
   - [CFI](#cfi) - Classification of Financial Instruments
+  - [FISN](#fisn) - Financial Instrument Short Name
 - [Development](#development)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -339,6 +340,29 @@ cfi.registered?    # => true
 ```
 
 CFI validates the category code (position 1) against 14 valid values and the group code (position 2) against valid values for that category. Attribute positions 3-6 accept any letter A-Z, with X meaning "not applicable".
+
+### FISN
+
+> [Financial Instrument Short Name](https://en.wikipedia.org/wiki/ISO_18774) - a human-readable short name for financial instruments per ISO 18774.
+
+```ruby
+# class level
+SecId::FISN.valid?('APPLE INC/SH')        # => true
+SecId::FISN.valid?('apple inc/sh')        # => true (normalized to uppercase)
+SecId::FISN.valid_format?('APPLE INC/SH') # => true
+
+# instance level
+fisn = SecId::FISN.new('APPLE INC/SH')
+fisn.full_number   # => 'APPLE INC/SH'
+fisn.identifier    # => 'APPLE INC/SH'
+fisn.issuer        # => 'APPLE INC'
+fisn.description   # => 'SH'
+fisn.valid?        # => true
+fisn.valid_format? # => true
+fisn.to_s          # => 'APPLE INC/SH'
+```
+
+FISN format: `Issuer Name/Abbreviated Instrument Description` with issuer (1-15 chars) and description (1-19 chars) separated by a forward slash. Character set: uppercase A-Z, digits 0-9, and space.
 
 ## Development
 
