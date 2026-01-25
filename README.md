@@ -9,6 +9,7 @@
 - [Supported Standards and Usage](#supported-standards-and-usage)
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
+  - [CEI](#cei) - CUSIP Entity Identifier
   - [SEDOL](#sedol) - Stock Exchange Daily Official List
   - [FIGI](#figi) - Financial Instrument Global Identifier
   - [LEI](#lei) - Legal Entity Identifier
@@ -107,6 +108,30 @@ cusip.restore!              # => '594918104'
 cusip.calculate_check_digit # => 4
 cusip.to_isin('US')         # => #<SecId::ISIN>
 cusip.cins?                 # => false
+```
+
+### CEI
+
+> [CUSIP Entity Identifier](https://www.cusip.com/identifiers.html) - a 10-character alphanumeric code that identifies legal entities in the syndicated loan market.
+
+```ruby
+# class level
+SecId::CEI.valid?('A0BCDEFGH1')       # => true
+SecId::CEI.valid_format?('A0BCDEFGH') # => true
+SecId::CEI.restore!('A0BCDEFGH')      # => 'A0BCDEFGH1'
+SecId::CEI.check_digit('A0BCDEFGH')   # => 1
+
+# instance level
+cei = SecId::CEI.new('A0BCDEFGH1')
+cei.full_number           # => 'A0BCDEFGH1'
+cei.prefix                # => 'A'
+cei.numeric               # => '0'
+cei.entity_id             # => 'BCDEFGH'
+cei.check_digit           # => 1
+cei.valid?                # => true
+cei.valid_format?         # => true
+cei.restore!              # => 'A0BCDEFGH1'
+cei.calculate_check_digit # => 1
 ```
 
 ### SEDOL

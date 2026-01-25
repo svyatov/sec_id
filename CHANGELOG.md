@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- CEI (CUSIP Entity Identifier) support for syndicated loan market entity identification ([#113](https://github.com/svyatov/sec_id/pull/113))
 - FISN (Financial Instrument Short Name) support per ISO 18774 ([#112](https://github.com/svyatov/sec_id/pull/112))
 - CFI (Classification of Financial Instruments) support with category/group validation and equity-specific predicates ([#111](https://github.com/svyatov/sec_id/pull/111))
 - Valoren support (Swiss Security Number) ([@wtn](https://github.com/wtn), [#109](https://github.com/svyatov/sec_id/pull/109))
