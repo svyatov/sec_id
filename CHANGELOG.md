@@ -10,7 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- Cross-identifier conversions: SEDOL, WKN, and Valoren `to_isin` methods with country code validation; ISIN `to_sedol`, `to_wkn`, `to_valoren` methods with predicate helpers (`sedol?`, `wkn?`, `valoren?`)
+- Cross-identifier conversions: SEDOL, WKN, and Valoren `to_isin` methods with country code validation; ISIN `to_sedol`, `to_wkn`, `to_valoren` methods with predicate helpers (`sedol?`, `wkn?`, `valoren?`) ([#115](https://github.com/svyatov/sec_id/pull/115))
 - ISIN `nsin_type` and `to_nsin` methods for country-aware NSIN extraction ([#114](https://github.com/svyatov/sec_id/pull/114))
 - CEI (CUSIP Entity Identifier) support for syndicated loan market entity identification ([#113](https://github.com/svyatov/sec_id/pull/113))
 - FISN (Financial Instrument Short Name) support per ISO 18774 ([#112](https://github.com/svyatov/sec_id/pull/112))
