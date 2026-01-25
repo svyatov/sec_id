@@ -13,6 +13,7 @@ require 'sec_id/iban'
 require 'sec_id/cik'
 require 'sec_id/occ'
 require 'sec_id/wkn'
+require 'sec_id/valoren'
 
 module SecId
   Error = Class.new(StandardError)
