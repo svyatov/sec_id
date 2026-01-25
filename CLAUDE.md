@@ -50,6 +50,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 - `SecId::Error` - Base error class
 - `SecId::InvalidFormatError` - Raised when check-digit calculation fails on invalid format
+- **Important:** No class deriving from `Base` should ever raise `NotImplementedError`. If this error is raised, it indicates a logic issue that needs to be fixed in the base class or subclass implementation.
 
 ## Code Style
 

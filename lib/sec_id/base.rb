@@ -97,7 +97,7 @@ module SecId
       end
 
       # @param id [String] the identifier to calculate check digit for
-      # @return [Integer] the calculated check digit
+      # @return [Integer, nil] the calculated check digit, or nil if identifier has no check digit
       # @raise [InvalidFormatError] if the identifier format is invalid
       def check_digit(id)
         new(id).calculate_check_digit
@@ -141,13 +141,16 @@ module SecId
       @full_number = to_s
     end
 
-    # Subclasses must override this method.
+    # Subclasses with check digits must override this method.
+    # Returns nil for identifiers without check digits.
     #
-    # @return [Integer] the calculated check digit
-    # @raise [NotImplementedError] always raised in base class
+    # @return [Integer, nil] the calculated check digit, or nil if identifier has no check digit
+    # @raise [NotImplementedError] if has_check_digit? is true but subclass didn't override
     # @raise [InvalidFormatError] if the identifier format is invalid (in subclasses)
     def calculate_check_digit
-      raise NotImplementedError
+      raise NotImplementedError if has_check_digit?
+
+      nil
     end
 
     # @return [String]

@@ -75,6 +75,16 @@ RSpec.describe SecId::ISIN do
         expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
       end
     end
+
+    context 'when round-trip conversion (ISIN -> CUSIP -> ISIN)' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'preserves ISIN value' do
+        cusip = isin.to_cusip
+        isin2 = cusip.to_isin('US')
+        expect(isin.full_number).to eq(isin2.full_number)
+      end
+    end
   end
 
   describe '#nsin_type' do

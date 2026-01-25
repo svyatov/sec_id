@@ -7,6 +7,17 @@ RSpec.describe SecId::CFI do
   it_behaves_like 'handles edge case inputs'
 
   describe 'valid CFI parsing' do
+    context 'when CFI is mixed case' do
+      let(:cfi_code) { 'EsXxXx' }
+
+      it 'normalizes to uppercase' do
+        expect(cfi.identifier).to eq('ESXXXX')
+        expect(cfi.category_code).to eq('E')
+        expect(cfi.group_code).to eq('S')
+        expect(cfi.attr1).to eq('X')
+      end
+    end
+
     context 'when CFI is minimal equity (ESXXXX)' do
       let(:cfi_code) { 'ESXXXX' }
 
@@ -256,6 +267,25 @@ RSpec.describe SecId::CFI do
 
     it 'returns the normalized (uppercased) full number' do
       expect(cfi.full_number).to eq('ESVUFR')
+    end
+  end
+
+  describe 'X attribute handling in predicates' do
+    context 'when all attributes are X (not applicable)' do
+      let(:cfi_code) { 'ESXXXX' }
+
+      it { expect(cfi.equity?).to be(true) }
+      it { expect(cfi.voting?).to be(false) }
+      it { expect(cfi.non_voting?).to be(false) }
+      it { expect(cfi.restricted_voting?).to be(false) }
+      it { expect(cfi.enhanced_voting?).to be(false) }
+      it { expect(cfi.restrictions?).to be(false) }
+      it { expect(cfi.no_restrictions?).to be(false) }
+      it { expect(cfi.fully_paid?).to be(false) }
+      it { expect(cfi.nil_paid?).to be(false) }
+      it { expect(cfi.partly_paid?).to be(false) }
+      it { expect(cfi.bearer?).to be(false) }
+      it { expect(cfi.registered?).to be(false) }
     end
   end
 end
