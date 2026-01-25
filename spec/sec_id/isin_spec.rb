@@ -203,6 +203,156 @@ RSpec.describe SecId::ISIN do
     end
   end
 
+  describe '#sedol?' do
+    context 'when GB ISIN' do
+      let(:isin_number) { 'GB00B02H2F76' }
+
+      it 'returns true' do
+        expect(isin.sedol?).to be(true)
+      end
+    end
+
+    context 'when IE ISIN' do
+      let(:isin_number) { 'IE00B296YR77' }
+
+      it 'returns true' do
+        expect(isin.sedol?).to be(true)
+      end
+    end
+
+    context 'when US ISIN' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'returns false' do
+        expect(isin.sedol?).to be(false)
+      end
+    end
+  end
+
+  describe '#wkn?' do
+    context 'when DE ISIN' do
+      let(:isin_number) { 'DE0007164600' }
+
+      it 'returns true' do
+        expect(isin.wkn?).to be(true)
+      end
+    end
+
+    context 'when US ISIN' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'returns false' do
+        expect(isin.wkn?).to be(false)
+      end
+    end
+  end
+
+  describe '#valoren?' do
+    context 'when CH ISIN' do
+      let(:isin_number) { 'CH0012221716' }
+
+      it 'returns true' do
+        expect(isin.valoren?).to be(true)
+      end
+    end
+
+    context 'when LI ISIN' do
+      let(:isin_number) { 'LI0000000000' }
+
+      it 'returns true' do
+        expect(isin.valoren?).to be(true)
+      end
+    end
+
+    context 'when US ISIN' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'returns false' do
+        expect(isin.valoren?).to be(false)
+      end
+    end
+  end
+
+  describe '#to_sedol' do
+    context 'when GB ISIN' do
+      let(:isin_number) { 'GB00B02H2F76' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B02H2F7')
+      end
+    end
+
+    context 'when IE ISIN' do
+      let(:isin_number) { 'IE00B296YR77' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B296YR7')
+      end
+    end
+
+    context 'when non-SEDOL country code' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'raises InvalidFormatError' do
+        expect { isin.to_sedol }.to raise_error(SecId::InvalidFormatError, "'US' is not a SEDOL country code!")
+      end
+    end
+  end
+
+  describe '#to_wkn' do
+    context 'when DE ISIN' do
+      let(:isin_number) { 'DE0007164600' }
+
+      it 'returns a WKN instance' do
+        result = isin.to_wkn
+        expect(result).to be_a(SecId::WKN)
+        expect(result.full_number).to eq('716460')
+      end
+    end
+
+    context 'when non-WKN country code' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'raises InvalidFormatError' do
+        expect { isin.to_wkn }.to raise_error(SecId::InvalidFormatError, "'US' is not a WKN country code!")
+      end
+    end
+  end
+
+  describe '#to_valoren' do
+    context 'when CH ISIN' do
+      let(:isin_number) { 'CH0012221716' }
+
+      it 'returns a Valoren instance' do
+        result = isin.to_valoren
+        expect(result).to be_a(SecId::Valoren)
+        expect(result.identifier).to eq('1222171')
+      end
+    end
+
+    context 'when LI ISIN' do
+      let(:isin_number) { 'LI0038863358' }
+
+      it 'returns a Valoren instance' do
+        result = isin.to_valoren
+        expect(result).to be_a(SecId::Valoren)
+        expect(result.identifier).to eq('3886335')
+      end
+    end
+
+    context 'when non-Valoren country code' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'raises InvalidFormatError' do
+        expect { isin.to_valoren }.to raise_error(SecId::InvalidFormatError, "'US' is not a Valoren country code!")
+      end
+    end
+  end
+
   describe '.valid?' do
     context 'when ISIN is valid' do
       it 'returns true' do

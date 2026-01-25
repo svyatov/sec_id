@@ -79,6 +79,45 @@ module SecId
       CGS_COUNTRY_CODES.include?(country_code)
     end
 
+    # @return [Boolean] true if the country code uses SEDOL
+    def sedol?
+      %w[GB IE].include?(country_code)
+    end
+
+    # @return [Boolean] true if the country code uses WKN
+    def wkn?
+      country_code == 'DE'
+    end
+
+    # @return [Boolean] true if the country code uses Valoren
+    def valoren?
+      %w[CH LI].include?(country_code)
+    end
+
+    # @return [SEDOL] a new SEDOL instance
+    # @raise [InvalidFormatError] if the country code is not GB or IE
+    def to_sedol
+      raise InvalidFormatError, "'#{country_code}' is not a SEDOL country code!" unless sedol?
+
+      SEDOL.new(nsin[2..])
+    end
+
+    # @return [WKN] a new WKN instance
+    # @raise [InvalidFormatError] if the country code is not DE
+    def to_wkn
+      raise InvalidFormatError, "'#{country_code}' is not a WKN country code!" unless wkn?
+
+      WKN.new(nsin[3..])
+    end
+
+    # @return [Valoren] a new Valoren instance
+    # @raise [InvalidFormatError] if the country code is not CH or LI
+    def to_valoren
+      raise InvalidFormatError, "'#{country_code}' is not a Valoren country code!" unless valoren?
+
+      Valoren.new(nsin)
+    end
+
     # Returns the type of NSIN embedded in this ISIN.
     #
     # @return [Symbol] :cusip, :sedol, :wkn, :valoren, or :generic

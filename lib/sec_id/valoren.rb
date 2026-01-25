@@ -36,6 +36,23 @@ module SecId
       @check_digit = nil
     end
 
+    # Valid country codes for Valoren to ISIN conversion.
+    ISIN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
+
+    # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'CH')
+    # @return [ISIN] a new ISIN instance with calculated check digit
+    # @raise [InvalidFormatError] if the country code is not CH or LI
+    def to_isin(country_code = 'CH')
+      unless ISIN_COUNTRY_CODES.include?(country_code)
+        raise InvalidFormatError, "'#{country_code}' is not a valid Valoren country code!"
+      end
+
+      normalize!
+      isin = ISIN.new(country_code + full_number)
+      isin.restore!
+      isin
+    end
+
     # @return [Boolean] always false
     def has_check_digit?
       false
