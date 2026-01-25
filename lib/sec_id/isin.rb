@@ -31,6 +31,19 @@ module SecId
       ]
     ).freeze
 
+    # Maps country codes to their NSIN identifier types.
+    # Countries not in this map return :generic (CGS countries handled via {#cgs?}).
+    NSIN_COUNTRY_TYPES = {
+      # SEDOL countries (UK and Ireland)
+      'GB' => :sedol,
+      'IE' => :sedol,
+      # WKN country (Germany)
+      'DE' => :wkn,
+      # Valoren countries (Switzerland and Liechtenstein)
+      'CH' => :valoren,
+      'LI' => :valoren
+    }.freeze
+
     # @return [String, nil] the ISO 3166-1 alpha-2 country code
     attr_reader :country_code
 
@@ -64,6 +77,31 @@ module SecId
     # @return [Boolean] true if the country code is a CGS country
     def cgs?
       CGS_COUNTRY_CODES.include?(country_code)
+    end
+
+    # Returns the type of NSIN embedded in this ISIN.
+    #
+    # @return [Symbol] :cusip, :sedol, :wkn, :valoren, or :generic
+    def nsin_type
+      return :cusip if cgs?
+
+      NSIN_COUNTRY_TYPES.fetch(country_code, :generic)
+    end
+
+    # Extracts the national identifier from this ISIN.
+    #
+    # @return [CUSIP, SEDOL, WKN, Valoren, String] the extracted identifier
+    # @raise [InvalidFormatError] if ISIN format is invalid
+    def to_nsin
+      raise InvalidFormatError, 'Invalid ISIN format' unless valid_format?
+
+      case nsin_type
+      when :cusip   then to_cusip
+      when :sedol   then SEDOL.new(nsin[2..])
+      when :wkn     then WKN.new(nsin[3..])
+      when :valoren then Valoren.new(nsin)
+      else nsin # :generic - return raw string
+      end
     end
 
     private

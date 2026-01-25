@@ -77,6 +77,132 @@ RSpec.describe SecId::ISIN do
     end
   end
 
+  describe '#nsin_type' do
+    context 'when US ISIN' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'returns :cusip' do
+        expect(isin.nsin_type).to eq(:cusip)
+      end
+    end
+
+    context 'when CA ISIN' do
+      let(:isin_number) { 'CA9861913023' }
+
+      it 'returns :cusip' do
+        expect(isin.nsin_type).to eq(:cusip)
+      end
+    end
+
+    context 'when GB ISIN' do
+      let(:isin_number) { 'GB00B02H2F76' }
+
+      it 'returns :sedol' do
+        expect(isin.nsin_type).to eq(:sedol)
+      end
+    end
+
+    context 'when IE ISIN' do
+      let(:isin_number) { 'IE00B296YR77' }
+
+      it 'returns :sedol' do
+        expect(isin.nsin_type).to eq(:sedol)
+      end
+    end
+
+    context 'when DE ISIN' do
+      let(:isin_number) { 'DE0007164600' }
+
+      it 'returns :wkn' do
+        expect(isin.nsin_type).to eq(:wkn)
+      end
+    end
+
+    context 'when CH ISIN' do
+      let(:isin_number) { 'CH0012221716' }
+
+      it 'returns :valoren' do
+        expect(isin.nsin_type).to eq(:valoren)
+      end
+    end
+
+    context 'when LI ISIN' do
+      let(:isin_number) { 'LI0000000000' }
+
+      it 'returns :valoren' do
+        expect(isin.nsin_type).to eq(:valoren)
+      end
+    end
+
+    context 'when FR ISIN' do
+      let(:isin_number) { 'FR0000120271' }
+
+      it 'returns :generic' do
+        expect(isin.nsin_type).to eq(:generic)
+      end
+    end
+  end
+
+  describe '#to_nsin' do
+    context 'when US ISIN' do
+      let(:isin_number) { 'US0378331005' }
+
+      it 'returns CUSIP instance with correct value' do
+        result = isin.to_nsin
+        expect(result).to be_a(SecId::CUSIP)
+        expect(result.full_number).to eq('037833100')
+      end
+    end
+
+    context 'when GB ISIN' do
+      let(:isin_number) { 'GB00B02H2F76' }
+
+      it 'returns SEDOL instance with correct value' do
+        result = isin.to_nsin
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B02H2F7')
+      end
+    end
+
+    context 'when DE ISIN' do
+      let(:isin_number) { 'DE0007164600' }
+
+      it 'returns WKN instance with correct value' do
+        result = isin.to_nsin
+        expect(result).to be_a(SecId::WKN)
+        expect(result.full_number).to eq('716460')
+      end
+    end
+
+    context 'when CH ISIN' do
+      let(:isin_number) { 'CH0012221716' }
+
+      it 'returns Valoren instance with correct value' do
+        result = isin.to_nsin
+        expect(result).to be_a(SecId::Valoren)
+        expect(result.identifier).to eq('1222171')
+      end
+    end
+
+    context 'when FR ISIN' do
+      let(:isin_number) { 'FR0000120271' }
+
+      it 'returns raw NSIN string' do
+        result = isin.to_nsin
+        expect(result).to be_a(String)
+        expect(result).to eq('000012027')
+      end
+    end
+
+    context 'when invalid format' do
+      let(:isin_number) { '00B296YR77' }
+
+      it 'raises InvalidFormatError' do
+        expect { isin.to_nsin }.to raise_error(SecId::InvalidFormatError, 'Invalid ISIN format')
+      end
+    end
+  end
+
   describe '.valid?' do
     context 'when ISIN is valid' do
       it 'returns true' do
