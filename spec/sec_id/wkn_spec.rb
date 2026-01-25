@@ -40,6 +40,32 @@ RSpec.describe SecId::WKN do
     end
   end
 
+  context 'when WKN is mixed case' do
+    let(:wkn_number) { 'Cbk100' }
+
+    it 'normalizes to uppercase' do
+      expect(wkn.identifier).to eq('CBK100')
+    end
+  end
+
+  context 'when WKN is all zeros' do
+    let(:wkn_number) { '000000' }
+
+    it 'parses correctly and is valid' do
+      expect(wkn.identifier).to eq('000000')
+      expect(wkn.valid?).to be(true)
+    end
+  end
+
+  context 'when WKN is all nines' do
+    let(:wkn_number) { '999999' }
+
+    it 'parses correctly and is valid' do
+      expect(wkn.identifier).to eq('999999')
+      expect(wkn.valid?).to be(true)
+    end
+  end
+
   describe '.valid?' do
     context 'when WKN is valid' do
       it 'returns true for various valid WKNs' do
@@ -66,6 +92,16 @@ RSpec.describe SecId::WKN do
       it 'returns false for invalid characters' do
         expect(described_class.valid?('514-00')).to be(false)
         expect(described_class.valid?('51400@')).to be(false)
+      end
+
+      it 'returns false for internal whitespace' do
+        expect(described_class.valid?('514 00')).to be(false)
+      end
+
+      it 'allows leading/trailing whitespace (stripped by parser)' do
+        expect(described_class.valid?(' 514000')).to be(true)
+        expect(described_class.valid?('514000 ')).to be(true)
+        expect(described_class.valid?(' 514000 ')).to be(true)
       end
     end
   end

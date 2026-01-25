@@ -84,6 +84,66 @@ RSpec.describe SecId::FISN do
         expect(fisn.description.length).to eq(19)
       end
     end
+
+    context 'when issuer is exactly 14 chars (just under max)' do
+      let(:fisn_code) { 'ABCDEFGHIJKLMN/SH' }
+
+      it 'parses correctly and is valid' do
+        expect(fisn.issuer).to eq('ABCDEFGHIJKLMN')
+        expect(fisn.issuer.length).to eq(14)
+        expect(fisn.valid?).to be(true)
+      end
+    end
+
+    context 'when description is exactly 18 chars (just under max)' do
+      let(:fisn_code) { 'A/ABCDEFGHIJKLMNOPQR' }
+
+      it 'parses correctly and is valid' do
+        expect(fisn.description).to eq('ABCDEFGHIJKLMNOPQR')
+        expect(fisn.description.length).to eq(18)
+        expect(fisn.valid?).to be(true)
+      end
+    end
+
+    context 'when issuer is pure numeric' do
+      let(:fisn_code) { '123456/BOND' }
+
+      it 'parses correctly and is valid' do
+        expect(fisn.issuer).to eq('123456')
+        expect(fisn.description).to eq('BOND')
+        expect(fisn.valid?).to be(true)
+      end
+    end
+
+    context 'when description is pure numeric' do
+      let(:fisn_code) { 'APPLE/123456' }
+
+      it 'parses correctly and is valid' do
+        expect(fisn.issuer).to eq('APPLE')
+        expect(fisn.description).to eq('123456')
+        expect(fisn.valid?).to be(true)
+      end
+    end
+
+    context 'when FISN is all-numeric' do
+      let(:fisn_code) { '123/456' }
+
+      it 'parses correctly and is valid' do
+        expect(fisn.issuer).to eq('123')
+        expect(fisn.description).to eq('456')
+        expect(fisn.valid?).to be(true)
+      end
+    end
+
+    context 'when FISN has multiple consecutive spaces' do
+      let(:fisn_code) { 'APPLE  INC/SH' }
+
+      it 'parses correctly preserving spaces' do
+        expect(fisn.issuer).to eq('APPLE  INC')
+        expect(fisn.description).to eq('SH')
+        expect(fisn.valid?).to be(true)
+      end
+    end
   end
 
   describe '.valid?' do
@@ -131,8 +191,16 @@ RSpec.describe SecId::FISN do
         expect(described_class.valid?('ABCDEFGHIJKLMNOP/SH')).to be(false)
       end
 
+      it 'returns false for issuer exactly 16 chars (just over max)' do
+        expect(described_class.valid?('ABCDEFGHIJKLMNOP/X')).to be(false)
+      end
+
       it 'returns false for description too long (>19 chars)' do
         expect(described_class.valid?('A/ABCDEFGHIJKLMNOPQRST')).to be(false)
+      end
+
+      it 'returns false for description exactly 20 chars (just over max)' do
+        expect(described_class.valid?('A/ABCDEFGHIJKLMNOPQRS1')).to be(false)
       end
 
       it 'returns false for invalid characters' do
@@ -144,6 +212,22 @@ RSpec.describe SecId::FISN do
 
       it 'returns false for multiple slashes' do
         expect(described_class.valid?('APPLE/INC/SH')).to be(false)
+      end
+
+      it 'allows leading space in issuer (space is valid character)' do
+        expect(described_class.valid?(' APPLE/SH')).to be(true)
+      end
+
+      it 'allows trailing space in issuer' do
+        expect(described_class.valid?('APPLE /SH')).to be(true)
+      end
+
+      it 'allows leading space in description (space is valid character)' do
+        expect(described_class.valid?('APPLE/ SH')).to be(true)
+      end
+
+      it 'allows trailing space in description' do
+        expect(described_class.valid?('APPLE/SH ')).to be(true)
       end
     end
   end

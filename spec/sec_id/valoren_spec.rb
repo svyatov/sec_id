@@ -71,6 +71,11 @@ RSpec.describe SecId::Valoren do
         expect(described_class.valid?('0000')).to be(false)
         expect(described_class.valid?('0123456789')).to be(false)
       end
+
+      it 'returns false for all-zeros (must start with 1-9)' do
+        expect(described_class.valid?('000000000')).to be(false)
+        expect(described_class.valid?('00000')).to be(false)
+      end
     end
 
     context 'when Valoren is valid' do
@@ -83,6 +88,14 @@ RSpec.describe SecId::Valoren do
         ].each do |valoren_number|
           expect(described_class.valid?(valoren_number)).to be(true)
         end
+      end
+
+      it 'returns true for minimum 5-digit Valoren' do
+        expect(described_class.valid?('12345')).to be(true)
+      end
+
+      it 'returns true for 5-digit Valoren with leading zeros (9 digits total)' do
+        expect(described_class.valid?('000012345')).to be(true)
       end
     end
   end
