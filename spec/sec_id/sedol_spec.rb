@@ -80,4 +80,51 @@ RSpec.describe SecId::SEDOL do
       end
     end
   end
+
+  describe '#to_isin' do
+    context 'when SEDOL is valid' do
+      let(:sedol_number) { 'B02H2F7' }
+
+      it 'returns an ISIN instance for default GB country code' do
+        result = sedol.to_isin
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('GB00B02H2F76')
+        expect(result.country_code).to eq('GB')
+      end
+
+      it 'returns an ISIN instance for IE country code' do
+        result = sedol.to_isin('IE')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('IE00B02H2F76')
+        expect(result.country_code).to eq('IE')
+      end
+
+      it 'raises InvalidFormatError for invalid country code' do
+        expect { sedol.to_isin('US') }.to raise_error(
+          SecId::InvalidFormatError, "'US' is not a valid SEDOL country code!"
+        )
+      end
+    end
+
+    context 'when SEDOL is missing check digit' do
+      let(:sedol_number) { 'B02H2F' }
+
+      it 'restores check digit and returns valid ISIN' do
+        result = sedol.to_isin
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('GB00B02H2F76')
+        expect(sedol.full_number).to eq('B02H2F7')
+      end
+    end
+
+    context 'when round-trip conversion' do
+      let(:sedol_number) { 'B02H2F7' }
+
+      it 'preserves SEDOL value' do
+        isin = sedol.to_isin
+        sedol2 = isin.to_sedol
+        expect(sedol.full_number).to eq(sedol2.full_number)
+      end
+    end
+  end
 end

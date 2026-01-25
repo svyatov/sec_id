@@ -32,6 +32,23 @@ module SecId
       @check_digit = sedol_parts[:check_digit]&.to_i
     end
 
+    # Valid country codes for SEDOL to ISIN conversion.
+    ISIN_COUNTRY_CODES = Set.new(%w[GB IE]).freeze
+
+    # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'GB')
+    # @return [ISIN] a new ISIN instance with calculated check digit
+    # @raise [InvalidFormatError] if the country code is not GB or IE
+    def to_isin(country_code = 'GB')
+      unless ISIN_COUNTRY_CODES.include?(country_code)
+        raise InvalidFormatError, "'#{country_code}' is not a valid SEDOL country code!"
+      end
+
+      restore!
+      isin = ISIN.new("#{country_code}00#{full_number}")
+      isin.restore!
+      isin
+    end
+
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the SEDOL format is invalid
     def calculate_check_digit

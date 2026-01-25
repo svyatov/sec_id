@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI).
+This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN).
 
 ### Class Hierarchy
 
@@ -38,7 +38,13 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 ### Conversion Methods
 
 - `ISIN#to_cusip` - Convert ISIN to CUSIP (for CGS country codes only)
+- `ISIN#to_sedol` - Convert ISIN to SEDOL (for GB/IE country codes)
+- `ISIN#to_wkn` - Convert ISIN to WKN (for DE country code)
+- `ISIN#to_valoren` - Convert ISIN to Valoren (for CH/LI country codes)
 - `CUSIP#to_isin(country_code)` - Convert CUSIP to ISIN
+- `SEDOL#to_isin(country_code = 'GB')` - Convert SEDOL to ISIN (supports GB, IE)
+- `WKN#to_isin(country_code = 'DE')` - Convert WKN to ISIN
+- `Valoren#to_isin(country_code = 'CH')` - Convert Valoren to ISIN (supports CH, LI)
 
 ### Error Handling
 

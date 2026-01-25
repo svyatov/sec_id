@@ -95,6 +95,14 @@ SecId::ISIN.new('CH0012221716').nsin_type  # => :valoren
 SecId::ISIN.new('CH0012221716').to_nsin    # => #<SecId::Valoren>
 SecId::ISIN.new('FR0000120271').nsin_type  # => :generic
 SecId::ISIN.new('FR0000120271').to_nsin    # => '000012027' (raw NSIN string)
+
+# Type-specific conversion methods with validation
+SecId::ISIN.new('GB00B02H2F76').sedol?     # => true
+SecId::ISIN.new('GB00B02H2F76').to_sedol   # => #<SecId::SEDOL>
+SecId::ISIN.new('DE0007164600').wkn?       # => true
+SecId::ISIN.new('DE0007164600').to_wkn     # => #<SecId::WKN>
+SecId::ISIN.new('CH0012221716').valoren?   # => true
+SecId::ISIN.new('CH0012221716').to_valoren # => #<SecId::Valoren>
 ```
 
 ### CUSIP
@@ -165,6 +173,8 @@ sedol.valid?                # => true
 sedol.valid_format?         # => true
 sedol.restore!              # => 'B0Z52W5'
 sedol.calculate_check_digit # => 5
+sedol.to_isin               # => #<SecId::ISIN> (GB ISIN by default)
+sedol.to_isin('IE')         # => #<SecId::ISIN> (IE ISIN)
 ```
 
 ### FIGI
@@ -319,6 +329,7 @@ wkn.identifier    # => '514000'
 wkn.valid?        # => true
 wkn.valid_format? # => true
 wkn.to_s          # => '514000'
+wkn.to_isin       # => #<SecId::ISIN> (DE ISIN)
 ```
 
 WKN excludes letters I and O to avoid confusion with digits 1 and 0.
@@ -345,6 +356,8 @@ valoren.valid?        # => true
 valoren.valid_format? # => true
 valoren.normalize!    # => '003886335'
 valoren.to_s          # => '003886335'
+valoren.to_isin       # => #<SecId::ISIN> (CH ISIN by default)
+valoren.to_isin('LI') # => #<SecId::ISIN> (LI ISIN)
 ```
 
 ### CFI

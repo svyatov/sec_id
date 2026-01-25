@@ -126,4 +126,51 @@ RSpec.describe SecId::Valoren do
       end
     end
   end
+
+  describe '#to_isin' do
+    context 'when Valoren is valid' do
+      let(:valoren_number) { '1222171' }
+
+      it 'returns an ISIN instance for default CH country code' do
+        result = valoren.to_isin
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('CH0012221716')
+        expect(result.country_code).to eq('CH')
+      end
+
+      it 'returns an ISIN instance for LI country code' do
+        result = valoren.to_isin('LI')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('LI0012221714')
+        expect(result.country_code).to eq('LI')
+      end
+
+      it 'raises InvalidFormatError for invalid country code' do
+        expect { valoren.to_isin('US') }.to raise_error(
+          SecId::InvalidFormatError, "'US' is not a valid Valoren country code!"
+        )
+      end
+    end
+
+    context 'when Valoren is missing leading zeros' do
+      let(:valoren_number) { '3886335' }
+
+      it 'normalizes and returns valid ISIN' do
+        result = valoren.to_isin
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('CH0038863350')
+        expect(valoren.full_number).to eq('003886335')
+      end
+    end
+
+    context 'when round-trip conversion' do
+      let(:valoren_number) { '1222171' }
+
+      it 'preserves Valoren value' do
+        isin = valoren.to_isin
+        valoren2 = isin.to_valoren
+        expect(valoren.identifier).to eq(valoren2.identifier)
+      end
+    end
+  end
 end

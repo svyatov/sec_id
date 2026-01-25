@@ -26,6 +26,19 @@ module SecId
       @check_digit = nil
     end
 
+    # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'DE')
+    # @return [ISIN] a new ISIN instance with calculated check digit
+    # @raise [InvalidFormatError] if the country code is not DE
+    # @raise [InvalidFormatError] if the WKN format is invalid
+    def to_isin(country_code = 'DE')
+      raise InvalidFormatError, "'#{country_code}' is not a valid WKN country code!" unless country_code == 'DE'
+      raise InvalidFormatError, "WKN '#{full_number}' is invalid!" unless valid_format?
+
+      isin = ISIN.new("#{country_code}000#{identifier}")
+      isin.restore!
+      isin
+    end
+
     # @return [Boolean] always false
     def has_check_digit?
       false
