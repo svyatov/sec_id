@@ -83,6 +83,18 @@ isin.valid_format?         # => true
 isin.restore!              # => 'US5949181045'
 isin.calculate_check_digit # => 5
 isin.to_cusip              # => #<SecId::CUSIP>
+isin.nsin_type             # => :cusip
+isin.to_nsin               # => #<SecId::CUSIP>
+
+# NSIN extraction for different countries
+SecId::ISIN.new('GB00B02H2F76').nsin_type  # => :sedol
+SecId::ISIN.new('GB00B02H2F76').to_nsin    # => #<SecId::SEDOL>
+SecId::ISIN.new('DE0007164600').nsin_type  # => :wkn
+SecId::ISIN.new('DE0007164600').to_nsin    # => #<SecId::WKN>
+SecId::ISIN.new('CH0012221716').nsin_type  # => :valoren
+SecId::ISIN.new('CH0012221716').to_nsin    # => #<SecId::Valoren>
+SecId::ISIN.new('FR0000120271').nsin_type  # => :generic
+SecId::ISIN.new('FR0000120271').to_nsin    # => '000012027' (raw NSIN string)
 ```
 
 ### CUSIP
