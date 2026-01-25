@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, SEDOL, FIGI, LEI, CIK, OCC).
+This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI).
 
 ### Class Hierarchy
 

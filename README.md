@@ -17,6 +17,7 @@
   - [OCC](#occ) - Options Clearing Corporation Symbol
   - [WKN](#wkn) - Wertpapierkennnummer
   - [Valoren](#valoren) - Swiss Security Number
+  - [CFI](#cfi) - Classification of Financial Instruments
 - [Development](#development)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -307,6 +308,37 @@ valoren.valid_format? # => true
 valoren.normalize!    # => '003886335'
 valoren.to_s          # => '003886335'
 ```
+
+### CFI
+
+> [Classification of Financial Instruments](https://en.wikipedia.org/wiki/ISO_10962) - a 6-character alphabetic code that classifies financial instruments per ISO 10962.
+
+```ruby
+# class level
+SecId::CFI.valid?('ESXXXX')        # => true
+SecId::CFI.valid?('ESVUFR')        # => true
+SecId::CFI.valid_format?('ESXXXX') # => true
+
+# instance level
+cfi = SecId::CFI.new('ESVUFR')
+cfi.full_number    # => 'ESVUFR'
+cfi.identifier     # => 'ESVUFR'
+cfi.category_code  # => 'E'
+cfi.group_code     # => 'S'
+cfi.category       # => :equity
+cfi.group          # => :common_shares
+cfi.valid?         # => true
+cfi.valid_format?  # => true
+
+# Equity-specific predicates
+cfi.equity?        # => true
+cfi.voting?        # => true
+cfi.restrictions?  # => false
+cfi.fully_paid?    # => true
+cfi.registered?    # => true
+```
+
+CFI validates the category code (position 1) against 14 valid values and the group code (position 2) against valid values for that category. Attribute positions 3-6 accept any letter A-Z, with X meaning "not applicable".
 
 ## Development
 
