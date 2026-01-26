@@ -179,8 +179,6 @@ module SecId
     # @return [String, nil] attribute 4 (position 6)
     attr_reader :attr4
 
-    has_check_digit false
-
     # @param cfi [String] the CFI string to parse
     def initialize(cfi)
       cfi_parts = parse(cfi)
@@ -191,7 +189,6 @@ module SecId
       @attr2 = cfi_parts[:attr2]
       @attr3 = cfi_parts[:attr3]
       @attr4 = cfi_parts[:attr4]
-      @check_digit = nil
     end
 
     # Validates format including category and group codes.

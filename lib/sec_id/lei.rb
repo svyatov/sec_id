@@ -15,6 +15,8 @@ module SecId
   # @example Calculate check digit
   #   SecId::LEI.check_digit('529900T8BM49AURSDO')  #=> 55
   class LEI < Base
+    include Checkable
+
     # Regular expression for parsing LEI components.
     ID_REGEX = /\A
       (?<identifier>
@@ -61,7 +63,7 @@ module SecId
 
     # @return [String] the numeric string representation
     def numeric_identifier
-      identifier.each_char.map { |char| char_to_digit(char) }.join
+      identifier.each_char.map { |char| CHAR_TO_DIGIT.fetch(char) }.join
     end
   end
 end

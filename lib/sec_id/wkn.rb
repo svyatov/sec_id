@@ -13,8 +13,6 @@ module SecId
   #   SecId::WKN.valid?('514000')  #=> true
   #   SecId::WKN.valid?('CBK100')  #=> true
   class WKN < Base
-    has_check_digit false
-
     # Regular expression for parsing WKN components.
     # Excludes letters I and O to avoid confusion with 1 and 0.
     ID_REGEX = /\A
@@ -25,7 +23,6 @@ module SecId
     def initialize(wkn)
       wkn_parts = parse(wkn)
       @identifier = wkn_parts[:identifier]
-      @check_digit = nil
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'DE')

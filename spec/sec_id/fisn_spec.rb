@@ -18,11 +18,6 @@ RSpec.describe SecId::FISN do
         expect(fisn.issuer).to eq('APPLE INC')
         expect(fisn.description).to eq('SH')
       end
-
-      it 'has no check digit' do
-        expect(fisn.has_check_digit?).to be(false)
-        expect(fisn.check_digit).to be_nil
-      end
     end
 
     context 'when FISN has numeric characters' do

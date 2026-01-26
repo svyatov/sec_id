@@ -15,6 +15,8 @@ module SecId
   # @example Calculate check digit
   #   SecId::SEDOL.check_digit('B19GKT')  #=> 4
   class SEDOL < Base
+    include Checkable
+
     # Regular expression for parsing SEDOL components.
     # Excludes vowels (A, E, I, O, U) from valid characters.
     ID_REGEX = /\A

@@ -22,22 +22,37 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 ### Class Hierarchy
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `valid_format?`, `restore!`, `check_digit`/`calculate_check_digit`
+- Core API: `valid?`, `valid_format?`
 - Class-level convenience methods that delegate to instance methods
-- Character-to-digit conversion maps (`CHAR_TO_DIGITS`, `CHAR_TO_DIGIT`) for check-digit algorithms
-- Helper methods: `mod10`, `div10mod10`, `mod97`, `parse`
-- DSL method `has_check_digit` for declaring identifier check-digit behavior
+- `parse` helper method for extracting identifier components
+
+Classes with check digits include the `Checkable` concern, which adds:
+- `valid?` override that validates check digit
+- `restore!`, `check_digit`, `calculate_check_digit` methods
+- Character-to-digit conversion maps and Luhn algorithm variants
+- Class-level `restore!` and `check_digit` methods
 
 ### Concerns (`lib/sec_id/concerns/`)
 
-#### CheckDigitAlgorithms (`check_digit_algorithms.rb`)
+#### Checkable (`checkable.rb`)
 
-Provides shared Luhn algorithm variants:
+Provides check-digit validation and calculation for identifiers with check digits. Include this in classes that have a check digit (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI).
+
+Constants:
+- `CHAR_TO_DIGITS` - Multi-digit mapping for ISIN (letters expand to two digits)
+- `CHAR_TO_DIGIT` - Single-digit mapping (A=10, B=11, ..., Z=35)
+
+Luhn algorithm variants:
 - `luhn_sum_double_add_double(digits)` - Used by CUSIP and CEI
 - `luhn_sum_indexed(digits)` - Used by FIGI
 - `luhn_sum_standard(digits)` - Used by ISIN
 - `reversed_digits_single(id)` - Converts identifier to reversed digit array (single-digit mapping)
 - `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
+
+Helper methods:
+- `mod10`, `div10mod10`, `mod97` - Check digit calculation helpers
+- `char_to_digit`, `char_to_digits` - Character conversion helpers
+- `validate_format_for_calculation!` - Raises error if format invalid
 
 #### Normalizable (`normalizable.rb`)
 
@@ -48,9 +63,15 @@ Provides `normalize!` class method delegation for identifiers that support norma
 Each identifier type (`lib/sec_id/*.rb`) implements:
 - `ID_REGEX` constant with named capture groups for parsing
 - `initialize` that calls `parse` and extracts components
-- `calculate_check_digit` with standard-specific algorithm (usually Luhn variant)
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
-- `has_check_digit value: false` for identifiers without check digits (CIK, OCC, WKN, Valoren, CFI, FISN)
+
+**Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI):
+- Include `Checkable` concern
+- Implement `calculate_check_digit` with standard-specific algorithm
+
+**Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN):
+- Do not include `Checkable`
+- Validation based solely on format
 
 ### Conversion Methods
 
@@ -67,7 +88,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 - `SecId::Error` - Base error class
 - `SecId::InvalidFormatError` - Raised when check-digit calculation fails on invalid format
-- **Important:** No class deriving from `Base` should ever raise `NotImplementedError`. If this error is raised, it indicates a logic issue that needs to be fixed in the base class or subclass implementation.
+- **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
 
 ## Code Style
 

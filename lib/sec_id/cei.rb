@@ -11,6 +11,8 @@ module SecId
   # @example Validate a CEI
   #   SecId::CEI.valid?('A0BCDEFGH1')  #=> true
   class CEI < Base
+    include Checkable
+
     # Regular expression for parsing CEI components.
     ID_REGEX = /\A
       (?<identifier>

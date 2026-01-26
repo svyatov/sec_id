@@ -15,6 +15,8 @@ module SecId
   #   cusip = SecId::CUSIP.new('037833100')
   #   cusip.to_isin('US')  #=> #<SecId::ISIN>
   class CUSIP < Base
+    include Checkable
+
     # Regular expression for parsing CUSIP components.
     ID_REGEX = /\A
       (?<identifier>

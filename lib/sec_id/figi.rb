@@ -17,6 +17,8 @@ module SecId
   # @example Restore check digit
   #   SecId::FIGI.restore!('BBG000BLNQ1')  #=> 'BBG000BLNQ16'
   class FIGI < Base
+    include Checkable
+
     # Regular expression for parsing FIGI components.
     # The third character must be 'G'. Excludes vowels from valid characters.
     ID_REGEX = /\A

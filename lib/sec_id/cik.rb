@@ -18,8 +18,6 @@ module SecId
   class CIK < Base
     include Normalizable
 
-    has_check_digit false
-
     # Regular expression for parsing CIK components.
     ID_REGEX = /\A
       (?=\d{1,10}\z)(?<padding>0*)(?<identifier>[1-9]\d{0,9})
@@ -33,7 +31,6 @@ module SecId
       cik_parts = parse(cik)
       @padding = cik_parts[:padding]
       @identifier = cik_parts[:identifier]
-      @check_digit = nil
     end
 
     # Normalizes the CIK to a 10-digit zero-padded format.

@@ -20,9 +20,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
-- Extracted shared Luhn algorithm variants into `CheckDigitAlgorithms` concern for DRY check-digit calculations across CUSIP, CEI, FIGI, and ISIN
+- Replaced `has_check_digit` DSL with explicit `Checkable` concern that consolidates all check-digit logic (constants, Luhn algorithms, validation, restoration)
+- Simplified `Base` class to core validation and parsing; check-digit classes now `include Checkable`
+- Non-check-digit classes (CIK, OCC, WKN, Valoren, CFI, FISN) no longer need any special declaration
 - Moved `Normalizable` module to `lib/sec_id/concerns/` for consistency with other concerns
-- Added `has_check_digit` DSL to Base class for declaring identifier check-digit behavior, replacing boilerplate `has_check_digit?` method overrides
 - Optimized hot paths by replacing `&method(:char_to_digit)` with inline blocks to avoid Method object allocation
 - Added frozen Set constants for ISIN country code lookups (`SEDOL_COUNTRY_CODES`, `VALOREN_COUNTRY_CODES`)
 

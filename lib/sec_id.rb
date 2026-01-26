@@ -3,7 +3,7 @@
 require 'set'
 require 'sec_id/version'
 require 'sec_id/concerns/normalizable'
-require 'sec_id/concerns/check_digit_algorithms'
+require 'sec_id/concerns/checkable'
 require 'sec_id/base'
 require 'sec_id/isin'
 require 'sec_id/cusip'

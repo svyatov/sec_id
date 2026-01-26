@@ -20,8 +20,6 @@ module SecId
   class Valoren < Base
     include Normalizable
 
-    has_check_digit false
-
     # Regular expression for parsing Valoren components.
     ID_REGEX = /\A
       (?=\d{5,9}\z)(?<padding>0*)(?<identifier>[1-9]\d{4,8})
@@ -38,7 +36,6 @@ module SecId
       valoren_parts = parse(valoren)
       @padding = valoren_parts[:padding]
       @identifier = valoren_parts[:identifier]
-      @check_digit = nil
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'CH')

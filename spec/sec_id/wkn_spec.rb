@@ -11,15 +11,10 @@ RSpec.describe SecId::WKN do
 
     it 'parses WKN correctly' do
       expect(wkn.identifier).to eq('514000')
-      expect(wkn.check_digit).to be_nil
     end
 
     it 'returns the full number' do
       expect(wkn.full_number).to eq('514000')
-    end
-
-    it 'has no check digit' do
-      expect(wkn.has_check_digit?).to be(false)
     end
   end
 
@@ -28,7 +23,6 @@ RSpec.describe SecId::WKN do
 
     it 'parses WKN correctly' do
       expect(wkn.identifier).to eq('CBK100')
-      expect(wkn.check_digit).to be_nil
     end
   end
 

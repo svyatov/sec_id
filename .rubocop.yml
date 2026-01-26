@@ -50,3 +50,8 @@ RSpec/MultipleExpectations:
 
 RSpec/ExampleLength:
   Max: 10
+
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    Checkable: concerns/checkable
+    Normalizable: concerns/normalizable

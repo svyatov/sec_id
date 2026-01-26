@@ -14,6 +14,8 @@ module SecId
   # @example Restore check digit
   #   SecId::ISIN.restore!('US594918104')  #=> 'US5949181045'
   class ISIN < Base
+    include Checkable
+
     # Regular expression for parsing ISIN components.
     ID_REGEX = /\A
       (?<identifier>
