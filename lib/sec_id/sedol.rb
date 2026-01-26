@@ -35,11 +35,11 @@ module SecId
     end
 
     # Valid country codes for SEDOL to ISIN conversion.
-    ISIN_COUNTRY_CODES = Set.new(%w[GB IE]).freeze
+    ISIN_COUNTRY_CODES = Set.new(%w[GB IE GG IM JE FK]).freeze
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'GB')
     # @return [ISIN] a new ISIN instance with calculated check digit
-    # @raise [InvalidFormatError] if the country code is not GB or IE
+    # @raise [InvalidFormatError] if the country code is not valid for SEDOL
     def to_isin(country_code = 'GB')
       unless ISIN_COUNTRY_CODES.include?(country_code)
         raise InvalidFormatError, "'#{country_code}' is not a valid SEDOL country code!"
