@@ -14,6 +14,8 @@ module SecId
   # @example Restore check digit
   #   SecId::ISIN.restore!('US594918104')  #=> 'US5949181045'
   class ISIN < Base
+    include Checkable
+
     # Regular expression for parsing ISIN components.
     ID_REGEX = /\A
       (?<identifier>
@@ -44,6 +46,12 @@ module SecId
       'LI' => :valoren
     }.freeze
 
+    # Country codes that use SEDOL as their national identifier.
+    SEDOL_COUNTRY_CODES = Set.new(%w[GB IE]).freeze
+
+    # Country codes that use Valoren as their national identifier.
+    VALOREN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
+
     # @return [String, nil] the ISO 3166-1 alpha-2 country code
     attr_reader :country_code
 
@@ -63,7 +71,7 @@ module SecId
     # @raise [InvalidFormatError] if the ISIN format is invalid
     def calculate_check_digit
       validate_format_for_calculation!
-      mod10(luhn_sum)
+      mod10(luhn_sum_standard(reversed_digits_multi(identifier)))
     end
 
     # @return [CUSIP] a new CUSIP instance
@@ -81,7 +89,7 @@ module SecId
 
     # @return [Boolean] true if the country code uses SEDOL
     def sedol?
-      %w[GB IE].include?(country_code)
+      SEDOL_COUNTRY_CODES.include?(country_code)
     end
 
     # @return [Boolean] true if the country code uses WKN
@@ -91,7 +99,7 @@ module SecId
 
     # @return [Boolean] true if the country code uses Valoren
     def valoren?
-      %w[CH LI].include?(country_code)
+      VALOREN_COUNTRY_CODES.include?(country_code)
     end
 
     # @return [SEDOL] a new SEDOL instance
@@ -141,23 +149,6 @@ module SecId
       when :valoren then Valoren.new(nsin)
       else nsin # :generic - return raw string
       end
-    end
-
-    private
-
-    # @return [Integer] the Luhn sum
-    # @see https://en.wikipedia.org/wiki/Luhn_algorithm
-    def luhn_sum
-      reversed_id_digits.each_slice(2).reduce(0) do |sum, (even, odd)|
-        double_even = (even || 0) * 2
-        double_even -= 9 if double_even > 9
-        sum + double_even + (odd || 0)
-      end
-    end
-
-    # @return [Array<Integer>] the reversed digit array
-    def reversed_id_digits
-      identifier.each_char.flat_map(&method(:char_to_digits)).reverse!
     end
   end
 end

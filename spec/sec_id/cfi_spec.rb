@@ -41,11 +41,6 @@ RSpec.describe SecId::CFI do
         expect(cfi.category).to eq(:equity)
         expect(cfi.group).to eq(:common_shares)
       end
-
-      it 'has no check digit' do
-        expect(cfi.has_check_digit?).to be(false)
-        expect(cfi.check_digit).to be_nil
-      end
     end
 
     context 'when CFI has full equity attributes (ESVUFR)' do

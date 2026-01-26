@@ -17,6 +17,8 @@ module SecId
   # @example Restore check digit
   #   SecId::FIGI.restore!('BBG000BLNQ1')  #=> 'BBG000BLNQ16'
   class FIGI < Base
+    include Checkable
+
     # Regular expression for parsing FIGI components.
     # The third character must be 'G'. Excludes vowels from valid characters.
     ID_REGEX = /\A
@@ -54,24 +56,7 @@ module SecId
     # @raise [InvalidFormatError] if the FIGI format is invalid
     def calculate_check_digit
       validate_format_for_calculation!
-      mod10(modified_luhn_sum)
-    end
-
-    private
-
-    # https://en.wikipedia.org/wiki/Luhn_algorithm
-    #
-    # @return [Integer] the modified Luhn sum
-    def modified_luhn_sum
-      reversed_id_digits.each_with_index.reduce(0) do |sum, (digit, index)|
-        digit *= 2 if index.odd?
-        sum + div10mod10(digit)
-      end
-    end
-
-    # @return [Array<Integer>] the identifier digits in reverse order
-    def reversed_id_digits
-      identifier.each_char.map(&method(:char_to_digit)).reverse!
+      mod10(luhn_sum_indexed(reversed_digits_single(identifier)))
     end
   end
 end

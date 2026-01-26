@@ -42,12 +42,6 @@ module SecId
       @identifier = fisn_parts[:identifier]
       @issuer = fisn_parts[:issuer]
       @description = fisn_parts[:description]
-      @check_digit = nil
-    end
-
-    # @return [Boolean] always false - FISN has no check digit
-    def has_check_digit?
-      false
     end
 
     # @return [String]

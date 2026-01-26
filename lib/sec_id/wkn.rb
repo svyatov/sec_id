@@ -23,7 +23,6 @@ module SecId
     def initialize(wkn)
       wkn_parts = parse(wkn)
       @identifier = wkn_parts[:identifier]
-      @check_digit = nil
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'DE')
@@ -37,11 +36,6 @@ module SecId
       isin = ISIN.new("#{country_code}000#{identifier}")
       isin.restore!
       isin
-    end
-
-    # @return [Boolean] always false
-    def has_check_digit?
-      false
     end
   end
 end

@@ -18,6 +18,7 @@ module SecId
   # @example Restore check digits
   #   SecId::IBAN.restore!('DE00370400440532013000')  #=> 'DE89370400440532013000'
   class IBAN < Base
+    include Checkable
     include IBANCountryRules
 
     # Regular expression for parsing IBAN components.
@@ -152,7 +153,7 @@ module SecId
 
     # @return [String] the numeric string representation
     def numeric_string_for_check
-      "#{bban}#{country_code}00".each_char.map { |char| char_to_digit(char) }.join
+      "#{bban}#{country_code}00".each_char.map { |char| CHAR_TO_DIGIT.fetch(char) }.join
     end
   end
 end

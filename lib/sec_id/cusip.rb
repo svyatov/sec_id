@@ -15,6 +15,8 @@ module SecId
   #   cusip = SecId::CUSIP.new('037833100')
   #   cusip.to_isin('US')  #=> #<SecId::ISIN>
   class CUSIP < Base
+    include Checkable
+
     # Regular expression for parsing CUSIP components.
     ID_REGEX = /\A
       (?<identifier>
@@ -42,7 +44,7 @@ module SecId
     # @raise [InvalidFormatError] if the CUSIP format is invalid
     def calculate_check_digit
       validate_format_for_calculation!
-      mod10(modified_luhn_sum)
+      mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (must be CGS country)
@@ -62,22 +64,6 @@ module SecId
     # @return [Boolean] true if first character is a letter (CINS identifier)
     def cins?
       cusip6[0] < '0' || cusip6[0] > '9'
-    end
-
-    private
-
-    # @return [Integer] the modified Luhn sum
-    # @see https://en.wikipedia.org/wiki/Luhn_algorithm
-    def modified_luhn_sum
-      reversed_id_digits.each_slice(2).reduce(0) do |sum, (even, odd)|
-        double_even = (even || 0) * 2
-        sum + div10mod10(double_even) + div10mod10(odd || 0)
-      end
-    end
-
-    # @return [Array<Integer>] the reversed digit array
-    def reversed_id_digits
-      identifier.each_char.map(&method(:char_to_digit)).reverse!
     end
   end
 end

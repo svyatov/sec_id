@@ -31,12 +31,6 @@ module SecId
       cik_parts = parse(cik)
       @padding = cik_parts[:padding]
       @identifier = cik_parts[:identifier]
-      @check_digit = nil
-    end
-
-    # @return [Boolean] always false
-    def has_check_digit?
-      false
     end
 
     # Normalizes the CIK to a 10-digit zero-padded format.
