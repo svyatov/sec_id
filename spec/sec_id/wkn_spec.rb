@@ -16,6 +16,12 @@ RSpec.describe SecId::WKN do
     it 'returns the full number' do
       expect(wkn.full_number).to eq('514000')
     end
+
+    describe '#to_s' do
+      it 'returns the identifier' do
+        expect(wkn.to_s).to eq('514000')
+      end
+    end
   end
 
   context 'when WKN is alphanumeric' do

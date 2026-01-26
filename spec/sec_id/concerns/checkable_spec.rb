@@ -19,6 +19,19 @@ module CheckableSpecHelper
       mod10(identifier.chars.sum { |c| c.ord - 'A'.ord })
     end
   end
+
+  # Test class that doesn't implement calculate_check_digit
+  class IncompleteClass < SecId::Base
+    include SecId::Checkable
+
+    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d)?\z/
+
+    def initialize(id) # rubocop:disable Lint/MissingSuper
+      parts = parse(id)
+      @identifier = parts[:identifier]
+      @check_digit = parts[:check_digit]&.to_i
+    end
+  end
 end
 
 RSpec.describe SecId::Checkable do
@@ -98,6 +111,13 @@ RSpec.describe SecId::Checkable do
       it 'raises InvalidFormatError' do
         instance = test_class.new('INVALID')
         expect { instance.calculate_check_digit }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
+
+    context 'when subclass does not implement calculate_check_digit' do
+      it 'raises NotImplementedError' do
+        instance = CheckableSpecHelper::IncompleteClass.new('ABC')
+        expect { instance.calculate_check_digit }.to raise_error(NotImplementedError)
       end
     end
   end
