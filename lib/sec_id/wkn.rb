@@ -13,6 +13,8 @@ module SecId
   #   SecId::WKN.valid?('514000')  #=> true
   #   SecId::WKN.valid?('CBK100')  #=> true
   class WKN < Base
+    has_check_digit false
+
     # Regular expression for parsing WKN components.
     # Excludes letters I and O to avoid confusion with 1 and 0.
     ID_REGEX = /\A
@@ -37,11 +39,6 @@ module SecId
       isin = ISIN.new("#{country_code}000#{identifier}")
       isin.restore!
       isin
-    end
-
-    # @return [Boolean] always false
-    def has_check_digit?
-      false
     end
   end
 end

@@ -26,6 +26,22 @@ All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which 
 - Class-level convenience methods that delegate to instance methods
 - Character-to-digit conversion maps (`CHAR_TO_DIGITS`, `CHAR_TO_DIGIT`) for check-digit algorithms
 - Helper methods: `mod10`, `div10mod10`, `mod97`, `parse`
+- DSL method `has_check_digit` for declaring identifier check-digit behavior
+
+### Concerns (`lib/sec_id/concerns/`)
+
+#### CheckDigitAlgorithms (`check_digit_algorithms.rb`)
+
+Provides shared Luhn algorithm variants:
+- `luhn_sum_double_add_double(digits)` - Used by CUSIP and CEI
+- `luhn_sum_indexed(digits)` - Used by FIGI
+- `luhn_sum_standard(digits)` - Used by ISIN
+- `reversed_digits_single(id)` - Converts identifier to reversed digit array (single-digit mapping)
+- `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
+
+#### Normalizable (`normalizable.rb`)
+
+Provides `normalize!` class method delegation for identifiers that support normalization (CIK, OCC, Valoren)
 
 ### Identifier Classes
 
@@ -34,6 +50,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - `initialize` that calls `parse` and extracts components
 - `calculate_check_digit` with standard-specific algorithm (usually Luhn variant)
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
+- `has_check_digit value: false` for identifiers without check digits (CIK, OCC, WKN, Valoren, CFI, FISN)
 
 ### Conversion Methods
 

@@ -36,6 +36,8 @@ module SecId
     # @return [String, nil] the abbreviated instrument description (after the slash)
     attr_reader :description
 
+    has_check_digit false
+
     # @param fisn [String] the FISN string to parse
     def initialize(fisn)
       fisn_parts = parse(fisn)
@@ -43,11 +45,6 @@ module SecId
       @issuer = fisn_parts[:issuer]
       @description = fisn_parts[:description]
       @check_digit = nil
-    end
-
-    # @return [Boolean] always false - FISN has no check digit
-    def has_check_digit?
-      false
     end
 
     # @return [String]

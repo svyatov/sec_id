@@ -75,7 +75,7 @@ module SecId
 
     # @return [Array<Integer>] array of digit values
     def id_digits
-      @id_digits ||= identifier.each_char.map(&method(:char_to_digit))
+      @id_digits ||= identifier.each_char.map { |c| CHAR_TO_DIGIT.fetch(c) }
     end
   end
 end

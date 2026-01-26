@@ -60,11 +60,11 @@ module SecId
   #
   # @example Implementing a non-check-digit identifier
   #   class SimpleId < Base
-  #     def has_check_digit?
-  #       false
-  #     end
+  #     has_check_digit false
   #   end
   class Base
+    include CheckDigitAlgorithms
+
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_number
 
@@ -75,6 +75,20 @@ module SecId
     attr_reader :check_digit
 
     class << self
+      # Defines whether this identifier type has a check digit.
+      # Use this DSL method in subclasses to declare the identifier has no check digit.
+      #
+      # @param value [Boolean] whether this identifier type has a check digit (default: true)
+      # @return [void]
+      #
+      # @example Declaring an identifier without a check digit
+      #   class SimpleId < Base
+      #     has_check_digit false
+      #   end
+      def has_check_digit(value = true) # rubocop:disable Style/OptionalBooleanParameter
+        define_method(:has_check_digit?) { value }
+      end
+
       # @param id [String] the identifier to validate
       # @return [Boolean]
       def valid?(id)
@@ -112,12 +126,9 @@ module SecId
       raise NotImplementedError
     end
 
-    # Override in subclasses to return false for identifiers without check digits.
-    #
-    # @return [Boolean]
-    def has_check_digit?
-      true
-    end
+    # Default: identifier has a check digit.
+    # Override in subclasses with `has_check_digit false` for identifiers without check digits.
+    has_check_digit
 
     # @return [Boolean]
     def valid?

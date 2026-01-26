@@ -20,10 +20,15 @@ module SecId
   class Valoren < Base
     include Normalizable
 
+    has_check_digit false
+
     # Regular expression for parsing Valoren components.
     ID_REGEX = /\A
       (?=\d{5,9}\z)(?<padding>0*)(?<identifier>[1-9]\d{4,8})
     \z/x
+
+    # Valid country codes for Valoren to ISIN conversion.
+    ISIN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
 
     # @return [String, nil] the leading zeros in the Valoren
     attr_reader :padding
@@ -35,9 +40,6 @@ module SecId
       @identifier = valoren_parts[:identifier]
       @check_digit = nil
     end
-
-    # Valid country codes for Valoren to ISIN conversion.
-    ISIN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'CH')
     # @return [ISIN] a new ISIN instance with calculated check digit
@@ -51,11 +53,6 @@ module SecId
       isin = ISIN.new(country_code + full_number)
       isin.restore!
       isin
-    end
-
-    # @return [Boolean] always false
-    def has_check_digit?
-      false
     end
 
     # Normalizes the Valoren to a 9-digit zero-padded format.

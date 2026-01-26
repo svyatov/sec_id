@@ -18,6 +18,14 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - Valoren support (Swiss Security Number) ([@wtn](https://github.com/wtn), [#109](https://github.com/svyatov/sec_id/pull/109))
 - WKN support (Wertpapierkennnummer - German securities identifier) ([@wtn](https://github.com/wtn), [#108](https://github.com/svyatov/sec_id/pull/108))
 
+### Changed
+
+- Extracted shared Luhn algorithm variants into `CheckDigitAlgorithms` concern for DRY check-digit calculations across CUSIP, CEI, FIGI, and ISIN
+- Moved `Normalizable` module to `lib/sec_id/concerns/` for consistency with other concerns
+- Added `has_check_digit` DSL to Base class for declaring identifier check-digit behavior, replacing boilerplate `has_check_digit?` method overrides
+- Optimized hot paths by replacing `&method(:char_to_digit)` with inline blocks to avoid Method object allocation
+- Added frozen Set constants for ISIN country code lookups (`SEDOL_COUNTRY_CODES`, `VALOREN_COUNTRY_CODES`)
+
 ### Fixed
 
 - Removed BR (Brazil) from CGS country codes — Brazil never used CINS numbers and Brazilian ISINs cannot be converted to CUSIP ([@wtn](https://github.com/wtn), [#110](https://github.com/svyatov/sec_id/pull/110))

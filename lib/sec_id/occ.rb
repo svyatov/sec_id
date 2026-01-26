@@ -42,6 +42,8 @@ module SecId
     # @return [String, nil] the strike price in mills (thousandths of a dollar, represented as an 8-digit string)
     attr_reader :strike_mills
 
+    has_check_digit false
+
     class << self
       # Builds an OCC symbol from components.
       #
@@ -98,11 +100,6 @@ module SecId
       @type = symbol_parts[:type]
       @strike_mills = symbol_parts[:strike_mills]
       @check_digit = nil
-    end
-
-    # @return [Boolean] always false
-    def has_check_digit?
-      false
     end
 
     # Normalizes the OCC symbol to standard format with 6-char padded underlying and 8-digit strike.

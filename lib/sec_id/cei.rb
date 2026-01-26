@@ -43,25 +43,7 @@ module SecId
     # @raise [InvalidFormatError] if the CEI format is invalid
     def calculate_check_digit
       validate_format_for_calculation!
-      mod10(modified_luhn_sum)
-    end
-
-    private
-
-    # Same algorithm as CUSIP (Modulus 10 Double Add Double).
-    #
-    # @return [Integer] the modified Luhn sum
-    # @see https://en.wikipedia.org/wiki/Luhn_algorithm
-    def modified_luhn_sum
-      reversed_id_digits.each_slice(2).reduce(0) do |sum, (even, odd)|
-        double_even = (even || 0) * 2
-        sum + div10mod10(double_even) + div10mod10(odd || 0)
-      end
-    end
-
-    # @return [Array<Integer>] the reversed digit array
-    def reversed_id_digits
-      identifier.each_char.map(&method(:char_to_digit)).reverse!
+      mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
   end
 end
