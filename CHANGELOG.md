@@ -29,6 +29,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Fixed
 
+- Allow Crown Dependencies (GG, IM, JE) and Overseas Territories (FK) in SEDOL/ISIN conversions ([@wtn](https://github.com/wtn), [#117](https://github.com/svyatov/sec_id/pull/117))
 - Removed BR (Brazil) from CGS country codes — Brazil never used CINS numbers and Brazilian ISINs cannot be converted to CUSIP ([@wtn](https://github.com/wtn), [#110](https://github.com/svyatov/sec_id/pull/110))
 
 ## [4.3.0] - 2025-01-13

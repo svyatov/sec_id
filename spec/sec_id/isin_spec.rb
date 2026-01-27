@@ -304,6 +304,46 @@ RSpec.describe SecId::ISIN do
       end
     end
 
+    context 'when IM ISIN' do
+      let(:isin_number) { 'IM00B7S9G985' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B7S9G98')
+      end
+    end
+
+    context 'when JE ISIN' do
+      let(:isin_number) { 'JE00B4T3BW64' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B4T3BW6')
+      end
+    end
+
+    context 'when GG ISIN' do
+      let(:isin_number) { 'GG00BJVDZ946' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('BJVDZ94')
+      end
+    end
+
+    context 'when FK ISIN' do
+      let(:isin_number) { 'FK00B030JM18' }
+
+      it 'returns a SEDOL instance' do
+        result = isin.to_sedol
+        expect(result).to be_a(SecId::SEDOL)
+        expect(result.full_number).to eq('B030JM1')
+      end
+    end
+
     context 'when non-SEDOL country code' do
       let(:isin_number) { 'US0378331005' }
 

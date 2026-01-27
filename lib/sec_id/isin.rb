@@ -36,9 +36,13 @@ module SecId
     # Maps country codes to their NSIN identifier types.
     # Countries not in this map return :generic (CGS countries handled via {#cgs?}).
     NSIN_COUNTRY_TYPES = {
-      # SEDOL countries (UK and Ireland)
+      # SEDOL countries (UK, Ireland, Crown Dependencies, and Overseas Territories)
       'GB' => :sedol,
       'IE' => :sedol,
+      'GG' => :sedol,
+      'IM' => :sedol,
+      'JE' => :sedol,
+      'FK' => :sedol,
       # WKN country (Germany)
       'DE' => :wkn,
       # Valoren countries (Switzerland and Liechtenstein)
@@ -47,7 +51,7 @@ module SecId
     }.freeze
 
     # Country codes that use SEDOL as their national identifier.
-    SEDOL_COUNTRY_CODES = Set.new(%w[GB IE]).freeze
+    SEDOL_COUNTRY_CODES = Set.new(%w[GB IE IM JE GG FK]).freeze
 
     # Country codes that use Valoren as their national identifier.
     VALOREN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
@@ -103,7 +107,7 @@ module SecId
     end
 
     # @return [SEDOL] a new SEDOL instance
-    # @raise [InvalidFormatError] if the country code is not GB or IE
+    # @raise [InvalidFormatError] if the country code is not valid for SEDOL
     def to_sedol
       raise InvalidFormatError, "'#{country_code}' is not a SEDOL country code!" unless sedol?
 
