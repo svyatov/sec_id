@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [4.4.0] - 2026-01-29
+
 ### Added
 
 - Cross-identifier conversions: SEDOL, WKN, and Valoren `to_isin` methods with country code validation; ISIN `to_sedol`, `to_wkn`, `to_valoren` methods with predicate helpers (`sedol?`, `wkn?`, `valoren?`) ([#115](https://github.com/svyatov/sec_id/pull/115))
