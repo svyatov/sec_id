@@ -106,6 +106,50 @@ RSpec.describe SecId::SEDOL do
       end
     end
 
+    context 'when IM country code' do
+      let(:sedol_number) { 'B7S9G98' }
+
+      it 'returns an ISIN instance for IM country code' do
+        result = sedol.to_isin('IM')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('IM00B7S9G985')
+        expect(result.country_code).to eq('IM')
+      end
+    end
+
+    context 'when JE country code' do
+      let(:sedol_number) { 'B4T3BW6' }
+
+      it 'returns an ISIN instance for JE country code' do
+        result = sedol.to_isin('JE')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('JE00B4T3BW64')
+        expect(result.country_code).to eq('JE')
+      end
+    end
+
+    context 'when GG country code' do
+      let(:sedol_number) { 'BPFJTF4' }
+
+      it 'returns an ISIN instance for GG country code' do
+        result = sedol.to_isin('GG')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('GG00BPFJTF46')
+        expect(result.country_code).to eq('GG')
+      end
+    end
+
+    context 'when FK country code' do
+      let(:sedol_number) { 'B030JM1' }
+
+      it 'returns an ISIN instance for FK country code' do
+        result = sedol.to_isin('FK')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('FK00B030JM18')
+        expect(result.country_code).to eq('FK')
+      end
+    end
+
     context 'when SEDOL is missing check digit' do
       let(:sedol_number) { 'B02H2F' }
 

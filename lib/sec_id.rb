@@ -20,6 +20,6 @@ require 'sec_id/cfi'
 require 'sec_id/fisn'
 
 module SecId
-  Error = Class.new(StandardError)
-  InvalidFormatError = Class.new(Error)
+  class Error < StandardError; end
+  class InvalidFormatError < Error; end
 end
