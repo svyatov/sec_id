@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [4.4.1] - 2026-02-05
+
 ### Fixed
 
 - `CUSIP#to_isin` and `SEDOL#to_isin` no longer mutate source instance when check digit is missing ([#127](https://github.com/svyatov/sec_id/issues/127))
