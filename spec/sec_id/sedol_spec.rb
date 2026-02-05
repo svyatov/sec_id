@@ -6,6 +6,13 @@ RSpec.describe SecId::SEDOL do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Stock Exchange Daily Official List',
+                  id_length: 7,
+                  has_check_digit: true,
+                  has_normalization: false
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'B19GKT4',

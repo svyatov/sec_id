@@ -17,6 +17,10 @@ module SecId
   class SEDOL < Base
     include Checkable
 
+    FULL_NAME = 'Stock Exchange Daily Official List'
+    ID_LENGTH = 7
+    EXAMPLE = 'B0YBKJ7'
+
     # Regular expression for parsing SEDOL components.
     # Excludes vowels (A, E, I, O, U) from valid characters.
     ID_REGEX = /\A

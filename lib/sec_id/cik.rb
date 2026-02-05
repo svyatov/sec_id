@@ -4,8 +4,7 @@ module SecId
   # Central Index Key (CIK) - SEC identifier for entities filing with the SEC.
   # A 1-10 digit number that uniquely identifies entities in SEC systems.
   #
-  # @note CIK identifiers have no check digit. The {#has_check_digit?} method
-  #   returns false and validation is based solely on format.
+  # @note CIK identifiers have no check digit and validation is based solely on format.
   #
   # @see https://en.wikipedia.org/wiki/Central_Index_Key
   #
@@ -17,6 +16,10 @@ module SecId
   #   SecId::CIK.normalize!('1521365')  #=> '0001521365'
   class CIK < Base
     include Normalizable
+
+    FULL_NAME = 'Central Index Key'
+    ID_LENGTH = (1..10)
+    EXAMPLE = '0001521365'
 
     # Regular expression for parsing CIK components.
     ID_REGEX = /\A

@@ -5,6 +5,13 @@ RSpec.describe SecId::CEI do
 
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'CUSIP Entity Identifier',
+                  id_length: 10,
+                  has_check_digit: true,
+                  has_normalization: false
+
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'A0BCDEFGH1',
                   valid_id_without_check: 'A0BCDEFGH',

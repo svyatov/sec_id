@@ -21,6 +21,10 @@ module SecId
     include Checkable
     include IBANCountryRules
 
+    FULL_NAME = 'International Bank Account Number'
+    ID_LENGTH = (15..34)
+    EXAMPLE = 'GB29NWBK60161331926819'
+
     # Regular expression for parsing IBAN components.
     # Note: Check digit positioning is handled in initialize, not in the regex.
     ID_REGEX = /\A

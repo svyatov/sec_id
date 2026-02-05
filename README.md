@@ -7,6 +7,7 @@
 - [Supported Ruby Versions](#supported-ruby-versions)
 - [Installation](#installation)
 - [Supported Standards and Usage](#supported-standards-and-usage)
+  - [Metadata Registry](#metadata-registry) - enumerate, filter, and look up identifier types
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [CEI](#cei) - CUSIP Entity Identifier
@@ -60,6 +61,35 @@ All identifier classes provide `valid?` and `valid_format?` methods at both clas
 
 **Normalization based identifiers** (CIK, OCC, Valoren) provide instead:
 - `normalize!` - pads/formats the identifier to its standard form
+
+### Metadata Registry
+
+All identifier classes are registered automatically and can be enumerated, filtered, and looked up by symbol key:
+
+```ruby
+# Look up by symbol key
+SecId[:isin]                              # => SecId::ISIN
+SecId[:cusip]                             # => SecId::CUSIP
+
+# Enumerate all identifier classes
+SecId.identifiers                         # => [SecId::ISIN, SecId::CUSIP, ...]
+SecId.identifiers.map(&:short_name)       # => ["ISIN", "CUSIP", "SEDOL", ...]
+
+# Query metadata
+SecId::ISIN.short_name                    # => "ISIN"
+SecId::ISIN.full_name                     # => "International Securities Identification Number"
+SecId::ISIN.id_length                     # => 12
+SecId::ISIN.example                       # => "US5949181045"
+SecId::ISIN.has_check_digit?              # => true
+SecId::ISIN.has_normalization?            # => false
+
+# Filter with standard Ruby
+SecId.identifiers.select(&:has_check_digit?).map(&:short_name)
+# => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI"]
+
+SecId.identifiers.select(&:has_normalization?).map(&:short_name)
+# => ["CIK", "OCC", "Valoren"]
+```
 
 ### ISIN
 

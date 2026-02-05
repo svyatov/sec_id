@@ -6,6 +6,13 @@ RSpec.describe SecId::Valoren do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Valoren Number',
+                  id_length: 5..9,
+                  has_check_digit: false,
+                  has_normalization: true
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: '003886335',

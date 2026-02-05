@@ -17,6 +17,10 @@ module SecId
   class LEI < Base
     include Checkable
 
+    FULL_NAME = 'Legal Entity Identifier'
+    ID_LENGTH = 20
+    EXAMPLE = '7LTWFZYICNSX8D621K86'
+
     # Regular expression for parsing LEI components.
     ID_REGEX = /\A
       (?<identifier>

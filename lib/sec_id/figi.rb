@@ -19,6 +19,10 @@ module SecId
   class FIGI < Base
     include Checkable
 
+    FULL_NAME = 'Financial Instrument Global Identifier'
+    ID_LENGTH = 12
+    EXAMPLE = 'BBG000BLNNH6'
+
     # Regular expression for parsing FIGI components.
     # The third character must be 'G'. Excludes vowels from valid characters.
     ID_REGEX = /\A

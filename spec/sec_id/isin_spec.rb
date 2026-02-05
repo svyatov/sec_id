@@ -6,6 +6,13 @@ RSpec.describe SecId::ISIN do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'International Securities Identification Number',
+                  id_length: 12,
+                  has_check_digit: true,
+                  has_normalization: false
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'IE00B296YR77',

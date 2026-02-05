@@ -6,8 +6,8 @@ module SecId
   # OCC Option Symbol - standardized option symbol format used by Option Clearing Corporation.
   # Format: 6-char underlying (padded) + 6-char date (YYMMDD) + type (C/P) + 8-digit strike (in mills).
   #
-  # @note OCC identifiers have no check digit. The {#has_check_digit?} method returns false
-  #   and validation includes both format and date parseability checks.
+  # @note OCC identifiers have no check digit and validation includes both format
+  #   and date parseability checks.
   #
   # @see https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol
   # @see https://web.archive.org/web/20120507220143/http://www.theocc.com/components/docs/initiatives/symbology/symbology_initiative_v1_8.pdf
@@ -20,6 +20,10 @@ module SecId
   #   occ.to_s  #=> 'AAPL  210917C00150000'
   class OCC < Base
     include Normalizable
+
+    FULL_NAME = 'OCC Option Symbol'
+    ID_LENGTH = 21
+    EXAMPLE = 'AAPL  210917C00150000'
 
     # Regular expression for parsing OCC symbol components.
     ID_REGEX = /\A

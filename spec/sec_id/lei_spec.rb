@@ -6,6 +6,13 @@ RSpec.describe SecId::LEI do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Legal Entity Identifier',
+                  id_length: 20,
+                  has_check_digit: true,
+                  has_normalization: false
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: '5493006MHB84DD0ZWV18',
