@@ -55,8 +55,8 @@ module SecId
         raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
       end
 
-      restore!
-      isin = ISIN.new(country_code + full_number)
+      cusip_with_check_digit = "#{identifier}#{check_digit || calculate_check_digit}"
+      isin = ISIN.new(country_code + cusip_with_check_digit)
       isin.restore!
       isin
     end

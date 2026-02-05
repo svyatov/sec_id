@@ -65,6 +65,18 @@ RSpec.describe SecId::CUSIP do
         expect { cusip.to_isin('IE') }.to raise_error(SecId::InvalidFormatError)
       end
     end
+
+    context 'when CUSIP is missing check digit' do
+      let(:cusip_number) { '59491810' }
+
+      it 'returns valid ISIN without mutating source CUSIP' do
+        result = cusip.to_isin('US')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.full_number).to eq('US5949181045')
+        expect(cusip.full_number).to eq('59491810')
+        expect(cusip.check_digit).to be_nil
+      end
+    end
   end
 
   describe '#cins?' do

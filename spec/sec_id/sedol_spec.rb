@@ -153,11 +153,12 @@ RSpec.describe SecId::SEDOL do
     context 'when SEDOL is missing check digit' do
       let(:sedol_number) { 'B02H2F' }
 
-      it 'restores check digit and returns valid ISIN' do
+      it 'returns valid ISIN without mutating source SEDOL' do
         result = sedol.to_isin
         expect(result).to be_a(SecId::ISIN)
         expect(result.full_number).to eq('GB00B02H2F76')
-        expect(sedol.full_number).to eq('B02H2F7')
+        expect(sedol.full_number).to eq('B02H2F')
+        expect(sedol.check_digit).to be_nil
       end
     end
 
