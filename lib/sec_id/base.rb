@@ -69,6 +69,18 @@ module SecId
         new(id).valid_format?
       end
 
+      # @param id [String] the identifier to validate
+      # @return [ValidationResult]
+      def validate(id)
+        new(id).validate
+      end
+
+      # @param id [String] the identifier to validate
+      # @return [Array<Symbol>] error code symbols
+      def validation_errors(id)
+        new(id).validation_errors
+      end
+
       # Returns the unqualified class name (e.g. "ISIN", "CUSIP").
       #
       # @return [String]
@@ -128,6 +140,23 @@ module SecId
       !identifier.nil?
     end
 
+    # Returns a {ValidationResult} with error codes and human-readable messages.
+    #
+    # @return [ValidationResult]
+    def validate
+      errors = validation_errors.map { |code| build_error(code, validation_message(code)) }
+      ValidationResult.new(errors)
+    end
+
+    # Returns an array of error code symbols describing why validation failed.
+    #
+    # @return [Array<Symbol>]
+    def validation_errors
+      return [] if valid_format?
+
+      format_errors
+    end
+
     # @return [String]
     def to_s
       identifier.to_s
@@ -135,6 +164,58 @@ module SecId
     alias to_str to_s
 
     private
+
+    # Three-stage fallback for format error detection: length, characters, then structure.
+    #
+    # @return [Array<Symbol>]
+    def format_errors
+      return [:invalid_length] unless valid_length?
+      return [:invalid_characters] unless valid_characters?
+
+      [:invalid_format]
+    end
+
+    # @return [Boolean]
+    def valid_length?
+      return false if full_number.empty?
+
+      id_length = self.class::ID_LENGTH
+      expected = id_length.is_a?(Range) ? id_length : ((id_length - check_digit_width)..id_length)
+      expected.cover?(full_number.length)
+    end
+
+    # @return [Boolean]
+    def valid_characters?
+      full_number.match?(self.class::VALID_CHARS_REGEX)
+    end
+
+    # @return [Integer] width of the check digit (0 for non-checkable, overridden in Checkable)
+    def check_digit_width
+      0
+    end
+
+    # @param code [Symbol] error code
+    # @return [String] human-readable error message
+    def validation_message(code)
+      case code
+      when :invalid_length
+        expected = self.class::ID_LENGTH
+        "Expected #{expected} characters, got #{full_number.length}"
+      when :invalid_characters
+        "Contains invalid characters for #{self.class.short_name}"
+      when :invalid_format
+        "Does not match #{self.class.short_name} format"
+      else
+        code.to_s
+      end
+    end
+
+    # @param code [Symbol]
+    # @param message [String]
+    # @return [Hash{Symbol => Symbol, String}]
+    def build_error(code, message)
+      { code: code, message: message }.freeze
+    end
 
     # @param sec_id_number [String, #to_s] the identifier to parse
     # @param upcase [Boolean] whether to upcase the input

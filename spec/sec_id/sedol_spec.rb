@@ -13,6 +13,16 @@ RSpec.describe SecId::SEDOL do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'B19GKT4',
+                  invalid_length_id: 'B1',
+                  invalid_chars_id: 'B19AKT4'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: 'B19GKT4',
+                  invalid_check_digit_id: 'B19GKT0'
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'B19GKT4',

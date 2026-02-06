@@ -13,6 +13,16 @@ RSpec.describe SecId::LEI do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: '5493006MHB84DD0ZWV18',
+                  invalid_length_id: '5493',
+                  invalid_chars_id: '5493006MHB84DD0ZWV!!'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: '5493006MHB84DD0ZWV18',
+                  invalid_check_digit_id: '5493006MHB84DD0ZWV99'
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: '5493006MHB84DD0ZWV18',

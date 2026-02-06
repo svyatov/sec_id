@@ -13,6 +13,12 @@ RSpec.describe SecId::CIK do
                   has_check_digit: false,
                   has_normalization: true
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: '0001521365',
+                  invalid_length_id: '00015213650000',
+                  invalid_chars_id: 'ABCDEFG'
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: '0001521365',

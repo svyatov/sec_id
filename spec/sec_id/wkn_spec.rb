@@ -13,6 +13,12 @@ RSpec.describe SecId::WKN do
                   has_check_digit: false,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: '514000',
+                  invalid_length_id: '51',
+                  invalid_chars_id: '514-00'
+
   context 'when WKN is valid' do
     let(:wkn_number) { '514000' }
 

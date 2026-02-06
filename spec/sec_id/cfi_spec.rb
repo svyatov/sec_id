@@ -13,6 +13,12 @@ RSpec.describe SecId::CFI do
                   has_check_digit: false,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'ESXXXX',
+                  invalid_length_id: 'ES',
+                  invalid_chars_id: 'ES1234'
+
   describe 'valid CFI parsing' do
     context 'when CFI is mixed case' do
       let(:cfi_code) { 'EsXxXx' }
@@ -252,6 +258,48 @@ RSpec.describe SecId::CFI do
 
       it 'returns false for invalid group' do
         expect(described_class.valid_format?('EZXXXX')).to be(false)
+      end
+    end
+  end
+
+  describe '#validation_errors' do
+    context 'when category is invalid' do
+      it 'returns errors including :invalid_category' do
+        errors = described_class.new('ZSXXXX').validation_errors
+        expect(errors).to include(:invalid_category)
+      end
+    end
+
+    context 'when group is invalid for category' do
+      it 'returns [:invalid_group]' do
+        expect(described_class.new('EZXXXX').validation_errors).to eq([:invalid_group])
+      end
+    end
+
+    context 'when both category and group are invalid' do
+      it 'returns [:invalid_category, :invalid_group]' do
+        errors = described_class.new('QZXXXX').validation_errors
+        expect(errors).to eq(%i[invalid_category invalid_group])
+      end
+    end
+  end
+
+  describe '#validate' do
+    context 'when category is invalid' do
+      it 'returns result with descriptive message' do
+        result = described_class.new('ZSXXXX').validate
+        expect(result.valid?).to be(false)
+        expect(result.error_codes).to include(:invalid_category)
+        expect(result.errors.first[:message]).to match(/category/i)
+      end
+    end
+
+    context 'when group is invalid' do
+      it 'returns result with descriptive message' do
+        result = described_class.new('EZXXXX').validate
+        expect(result.valid?).to be(false)
+        expect(result.error_codes).to eq([:invalid_group])
+        expect(result.errors.first[:message]).to match(/Group/i)
       end
     end
   end

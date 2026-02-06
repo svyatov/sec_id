@@ -22,15 +22,17 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 ### Class Hierarchy
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `valid_format?`
+- Core API: `valid?`, `valid_format?`, `validate`, `validation_errors`
 - Class-level convenience methods that delegate to instance methods
 - `parse` helper method for extracting identifier components
 - Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
+- Private validation helpers: `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
 
 Each identifier class defines these metadata constants:
 - `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
 - `ID_LENGTH` — fixed length or valid length range
 - `EXAMPLE` — representative valid identifier string
+- `VALID_CHARS_REGEX` — regex for valid character set (used by `format_errors` fallback)
 
 Classes with check digits include the `Checkable` concern, which adds:
 - `valid?` override that validates check digit
@@ -61,6 +63,10 @@ Luhn algorithm variants:
 - `reversed_digits_single(id)` - Converts identifier to reversed digit array (single-digit mapping)
 - `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
 
+Validation overrides:
+- `validation_errors` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
+- `check_digit_width` - Returns `1` (used by `Base#valid_length?` to allow optional check digit in length check)
+
 Helper methods:
 - `mod10`, `div10mod10`, `mod97` - Check digit calculation helpers
 - `char_to_digit`, `char_to_digits` - Character conversion helpers
@@ -80,10 +86,17 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 **Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI):
 - Include `Checkable` concern
 - Implement `calculate_check_digit` with standard-specific algorithm
+- LEI overrides `check_digit_width` → `2` (two-character check digit)
 
 **Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN):
 - Do not include `Checkable`
 - Validation based solely on format
+
+**Type-specific validation overrides:**
+- FIGI: `format_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)
+- CFI: `format_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes
+- IBAN: `format_errors` returns `:invalid_bban` when BBAN format doesn't match country rules
+- OCC: `validation_errors` returns `:invalid_date` when date string can't be parsed
 
 ### Conversion Methods
 
@@ -95,6 +108,14 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - `SEDOL#to_isin(country_code = 'GB')` - Convert SEDOL to ISIN (supports GB, IE, GG, IM, JE)
 - `WKN#to_isin(country_code = 'DE')` - Convert WKN to ISIN
 - `Valoren#to_isin(country_code = 'CH')` - Convert Valoren to ISIN (supports CH, LI)
+
+### ValidationResult (`lib/sec_id/validation_result.rb`)
+
+Frozen, immutable value object returned by `#validate`. Contains:
+- `errors` — array of `{ code: Symbol, message: String }` hashes (frozen)
+- `valid?` — true when errors empty
+- `error_codes` — maps errors to just code symbols
+- `to_a` — aliases to `errors`
 
 ### Error Handling
 

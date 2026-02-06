@@ -20,6 +20,7 @@ module SecId
     FULL_NAME = 'Legal Entity Identifier'
     ID_LENGTH = 20
     EXAMPLE = '7LTWFZYICNSX8D621K86'
+    VALID_CHARS_REGEX = /\A[0-9A-Z]+\z/
 
     # Regular expression for parsing LEI components.
     ID_REGEX = /\A
@@ -64,6 +65,11 @@ module SecId
     end
 
     private
+
+    # @return [Integer]
+    def check_digit_width
+      2
+    end
 
     # @return [String] the numeric string representation
     def numeric_identifier

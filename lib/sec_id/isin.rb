@@ -19,6 +19,7 @@ module SecId
     FULL_NAME = 'International Securities Identification Number'
     ID_LENGTH = 12
     EXAMPLE = 'US5949181045'
+    VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing ISIN components.
     ID_REGEX = /\A

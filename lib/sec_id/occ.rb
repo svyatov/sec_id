@@ -24,6 +24,7 @@ module SecId
     FULL_NAME = 'OCC Option Symbol'
     ID_LENGTH = (16..21)
     EXAMPLE = 'AAPL  210917C00150000'
+    VALID_CHARS_REGEX = /\A[A-Z0-9 ]+\z/
 
     # Regular expression for parsing OCC symbol components.
     ID_REGEX = /\A
@@ -118,6 +119,14 @@ module SecId
       valid_format? && !date.nil? # date must be parseable
     end
 
+    # @return [Array<Symbol>]
+    def validation_errors
+      return format_errors unless valid_format?
+      return [:invalid_date] if date.nil?
+
+      []
+    end
+
     # @return [Date, nil] the parsed date or nil if invalid
     def date
       return nil unless date_str
@@ -143,6 +152,16 @@ module SecId
     # @return [String]
     def full_symbol
       full_number
+    end
+
+    private
+
+    # @param code [Symbol]
+    # @return [String]
+    def validation_message(code)
+      return "Date '#{date_str}' cannot be parsed" if code == :invalid_date
+
+      super
     end
   end
 end

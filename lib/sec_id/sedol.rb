@@ -20,6 +20,7 @@ module SecId
     FULL_NAME = 'Stock Exchange Daily Official List'
     ID_LENGTH = 7
     EXAMPLE = 'B0YBKJ7'
+    VALID_CHARS_REGEX = /\A[0-9BCDFGHJKLMNPQRSTVWXYZ]+\z/
 
     # Regular expression for parsing SEDOL components.
     # Excludes vowels (A, E, I, O, U) from valid characters.

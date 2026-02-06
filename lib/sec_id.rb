@@ -48,6 +48,7 @@ module SecId
   end
 end
 
+require 'sec_id/validation_result'
 require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/checkable'
 require 'sec_id/base'

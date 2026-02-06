@@ -20,6 +20,7 @@ module SecId
     FULL_NAME = 'Central Index Key'
     ID_LENGTH = (1..10)
     EXAMPLE = '0001521365'
+    VALID_CHARS_REGEX = /\A[0-9]+\z/
 
     # Regular expression for parsing CIK components.
     ID_REGEX = /\A

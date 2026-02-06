@@ -80,6 +80,16 @@ module SecId
       end
     end
 
+    # Returns error codes including check digit validation.
+    #
+    # @return [Array<Symbol>]
+    def validation_errors
+      return format_errors unless valid_format?
+      return [:invalid_check_digit] unless check_digit == calculate_check_digit
+
+      []
+    end
+
     # Validates format and check digit.
     #
     # @return [Boolean]
@@ -171,6 +181,21 @@ module SecId
     end
 
     private
+
+    # @return [Integer]
+    def check_digit_width
+      1
+    end
+
+    # @param code [Symbol]
+    # @return [String]
+    def validation_message(code)
+      if code == :invalid_check_digit
+        return "Check digit '#{check_digit}' is invalid, expected '#{calculate_check_digit}'"
+      end
+
+      super
+    end
 
     # @raise [InvalidFormatError] if valid_format? returns false
     # @return [void]

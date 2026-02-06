@@ -16,6 +16,7 @@ module SecId
     FULL_NAME = 'CUSIP Entity Identifier'
     ID_LENGTH = 10
     EXAMPLE = 'A0BCDEFGH1'
+    VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing CEI components.
     ID_REGEX = /\A

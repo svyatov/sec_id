@@ -12,6 +12,16 @@ RSpec.describe SecId::CEI do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'A0BCDEFGH1',
+                  invalid_length_id: 'A0',
+                  invalid_chars_id: 'A0BCDEFG!1'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: 'A0BCDEFGH1',
+                  invalid_check_digit_id: 'A0BCDEFGH0'
+
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'A0BCDEFGH1',
                   valid_id_without_check: 'A0BCDEFGH',

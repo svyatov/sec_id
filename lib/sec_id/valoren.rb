@@ -22,6 +22,7 @@ module SecId
     FULL_NAME = 'Valoren Number'
     ID_LENGTH = (5..9)
     EXAMPLE = '3886335'
+    VALID_CHARS_REGEX = /\A[0-9]+\z/
 
     # Regular expression for parsing Valoren components.
     ID_REGEX = /\A

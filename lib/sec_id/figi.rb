@@ -22,6 +22,7 @@ module SecId
     FULL_NAME = 'Financial Instrument Global Identifier'
     ID_LENGTH = 12
     EXAMPLE = 'BBG000BLNNH6'
+    VALID_CHARS_REGEX = /\A[B-DF-HJ-NP-TV-Z0-9]+\z/
 
     # Regular expression for parsing FIGI components.
     # The third character must be 'G'. Excludes vowels from valid characters.
@@ -61,6 +62,23 @@ module SecId
     def calculate_check_digit
       validate_format_for_calculation!
       mod10(luhn_sum_indexed(reversed_digits_single(identifier)))
+    end
+
+    private
+
+    # @return [Array<Symbol>]
+    def format_errors
+      return [:invalid_prefix] if identifier && RESTRICTED_PREFIXES.include?(prefix)
+
+      super
+    end
+
+    # @param code [Symbol]
+    # @return [String]
+    def validation_message(code)
+      return "Prefix '#{prefix}' is restricted" if code == :invalid_prefix
+
+      super
     end
   end
 end
