@@ -11,10 +11,10 @@ module SecId
   # - Character-to-digit mapping constants
   # - Luhn algorithm variants for check-digit calculation
   # - `valid?` override that validates the check digit
-  # - `check_digit_valid?` predicate for check-digit correctness
+  # - `valid_check_digit?` predicate for check-digit correctness
   # - `restore!` method to calculate and set the check digit
   # - `check_digit` attribute
-  # - Class-level convenience methods: `restore!`, `check_digit`, `check_digit_valid?`
+  # - Class-level convenience methods: `restore!`, `check_digit`, `valid_check_digit?`
   #
   # @example Including in an identifier class
   #   class MyIdentifier < Base
@@ -84,8 +84,8 @@ module SecId
       #
       # @param id [String] the full identifier including check digit
       # @return [Boolean]
-      def check_digit_valid?(id)
-        new(id).check_digit_valid?
+      def valid_check_digit?(id)
+        new(id).valid_check_digit?
       end
     end
 
@@ -93,14 +93,14 @@ module SecId
     #
     # @return [Boolean]
     def valid?
-      check_digit_valid?
+      valid_check_digit?
     end
 
     # Returns whether the check digit is correct.
     # Returns `false` for invalid format, missing check digit, or mismatch. Never raises.
     #
     # @return [Boolean]
-    def check_digit_valid?
+    def valid_check_digit?
       return false unless valid_format?
 
       check_digit == calculate_check_digit
@@ -194,7 +194,7 @@ module SecId
     # @return [Array<Symbol>]
     def validation_errors
       return format_errors unless valid_format?
-      return [:invalid_check_digit] unless check_digit_valid?
+      return [:invalid_check_digit] unless valid_check_digit?
 
       []
     end

@@ -46,7 +46,7 @@ RSpec.describe SecId::Checkable do
     it 'adds class methods' do
       expect(test_class).to respond_to(:restore!)
       expect(test_class).to respond_to(:check_digit)
-      expect(test_class).to respond_to(:check_digit_valid?)
+      expect(test_class).to respond_to(:valid_check_digit?)
     end
   end
 
@@ -81,32 +81,32 @@ RSpec.describe SecId::Checkable do
     end
   end
 
-  describe '#check_digit_valid?' do
+  describe '#valid_check_digit?' do
     context 'when check digit is correct' do
       it 'returns true' do
         instance = test_class.new('ABC7')
-        expect(instance.check_digit_valid?).to be(true)
+        expect(instance.valid_check_digit?).to be(true)
       end
     end
 
     context 'when check digit is incorrect' do
       it 'returns false' do
         instance = test_class.new('ABC0')
-        expect(instance.check_digit_valid?).to be(false)
+        expect(instance.valid_check_digit?).to be(false)
       end
     end
 
     context 'when check digit is missing' do
       it 'returns false' do
         instance = test_class.new('ABC')
-        expect(instance.check_digit_valid?).to be(false)
+        expect(instance.valid_check_digit?).to be(false)
       end
     end
 
     context 'when format is invalid' do
       it 'returns false' do
         instance = test_class.new('INVALID')
-        expect(instance.check_digit_valid?).to be(false)
+        expect(instance.valid_check_digit?).to be(false)
       end
     end
   end
@@ -177,13 +177,13 @@ RSpec.describe SecId::Checkable do
     end
   end
 
-  describe '.check_digit_valid?' do
+  describe '.valid_check_digit?' do
     it 'returns true for correct check digit' do
-      expect(test_class.check_digit_valid?('ABC7')).to be(true)
+      expect(test_class.valid_check_digit?('ABC7')).to be(true)
     end
 
     it 'returns false for incorrect check digit' do
-      expect(test_class.check_digit_valid?('ABC0')).to be(false)
+      expect(test_class.valid_check_digit?('ABC0')).to be(false)
     end
   end
 

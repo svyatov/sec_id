@@ -36,10 +36,10 @@ Each identifier class defines these metadata constants:
 
 Classes with check digits include the `Checkable` concern, which adds:
 - `valid?` override that validates check digit
-- `check_digit_valid?` predicate for check-digit correctness
+- `valid_check_digit?` predicate for check-digit correctness
 - `restore!`, `check_digit`, `calculate_check_digit` methods
 - Character-to-digit conversion maps and Luhn algorithm variants
-- Class-level `restore!`, `check_digit`, and `check_digit_valid?` methods
+- Class-level `restore!`, `check_digit`, and `valid_check_digit?` methods
 
 ### Registry (`lib/sec_id.rb`)
 
@@ -140,14 +140,14 @@ Follow the "Stepdown Rule" from Clean Code: methods should be ordered so that ca
 # Good - caller before callee, reads top-to-bottom
 def validate
   check_format
-  check_digit_valid?
+  valid_check_digit?
 end
 
 def check_format
   parse_components
 end
 
-def check_digit_valid?
+def valid_check_digit?
   # ...
 end
 
@@ -166,7 +166,7 @@ end
 
 def validate
   check_format
-  check_digit_valid?
+  valid_check_digit?
 end
 ```
 
