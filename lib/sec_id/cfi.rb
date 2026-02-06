@@ -196,13 +196,6 @@ module SecId
       @attr4 = cfi_parts[:attr4]
     end
 
-    # Validates format including category and group codes.
-    #
-    # @return [Boolean]
-    def valid_format?
-      super && valid_category? && valid_group?
-    end
-
     # Returns the semantic category name.
     #
     # @return [Symbol, nil] category symbol or nil if invalid
@@ -305,6 +298,11 @@ module SecId
     end
 
     private
+
+    # @return [Boolean]
+    def valid_format?
+      super && valid_category? && valid_group?
+    end
 
     # @return [Array<Symbol>]
     def format_errors

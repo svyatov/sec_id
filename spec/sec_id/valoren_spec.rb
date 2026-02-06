@@ -133,26 +133,6 @@ RSpec.describe SecId::Valoren do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when Valoren is malformed' do
-      it 'returns false' do
-        expect(described_class.valid_format?('X9')).to be(false)
-        expect(described_class.valid_format?('0000')).to be(false)
-        expect(described_class.valid_format?('0123456789')).to be(false)
-      end
-    end
-
-    context 'when Valoren is valid or missing leading zeros' do
-      it 'returns true' do
-        expect(described_class.valid_format?('3886335')).to be(true)
-        expect(described_class.valid_format?('003886335')).to be(true)
-        expect(described_class.valid_format?('24476758')).to be(true)
-        expect(described_class.valid_format?('35514757')).to be(true)
-        expect(described_class.valid_format?('97429325')).to be(true)
-      end
-    end
-  end
-
   describe '#to_isin' do
     context 'when Valoren is valid' do
       let(:valoren_number) { '1222171' }

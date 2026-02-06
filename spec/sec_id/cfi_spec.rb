@@ -239,29 +239,6 @@ RSpec.describe SecId::CFI do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when format is valid' do
-      it 'returns true for valid formats' do
-        expect(described_class.valid_format?('ESXXXX')).to be(true)
-        expect(described_class.valid_format?('DBXXXX')).to be(true)
-      end
-    end
-
-    context 'when format is invalid' do
-      it 'returns false for wrong length' do
-        expect(described_class.valid_format?('ESXXX')).to be(false)
-      end
-
-      it 'returns false for invalid category' do
-        expect(described_class.valid_format?('QSXXXX')).to be(false)
-      end
-
-      it 'returns false for invalid group' do
-        expect(described_class.valid_format?('EZXXXX')).to be(false)
-      end
-    end
-  end
-
   describe '#errors' do
     context 'when category is invalid' do
       it 'returns :invalid_category error with descriptive message' do

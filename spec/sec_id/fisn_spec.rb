@@ -80,7 +80,6 @@ RSpec.describe SecId::FISN do
 
       it 'is valid' do
         expect(fisn.valid?).to be(true)
-        expect(fisn.valid_format?).to be(true)
       end
     end
 
@@ -239,25 +238,6 @@ RSpec.describe SecId::FISN do
 
       it 'allows trailing space in description' do
         expect(described_class.valid?('APPLE/SH ')).to be(true)
-      end
-    end
-  end
-
-  describe '.valid_format?' do
-    context 'when format is valid' do
-      it 'returns true for valid formats' do
-        expect(described_class.valid_format?('APPLE INC/SH')).to be(true)
-        expect(described_class.valid_format?('A/B')).to be(true)
-      end
-    end
-
-    context 'when format is invalid' do
-      it 'returns false for missing slash' do
-        expect(described_class.valid_format?('APPLE INC SH')).to be(false)
-      end
-
-      it 'returns false for invalid characters' do
-        expect(described_class.valid_format?('APPLE-INC/SH')).to be(false)
       end
     end
   end

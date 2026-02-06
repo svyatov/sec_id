@@ -70,17 +70,6 @@ RSpec.describe SecId::CEI do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when CEI is valid or missing check-digit' do
-      it 'returns true for various valid formats' do
-        expect(described_class.valid_format?('A0BCDEFGH')).to be(true)
-        expect(described_class.valid_format?('A0BCDEFGH1')).to be(true)
-        expect(described_class.valid_format?('Z9ZZZZZZZ')).to be(true)
-        expect(described_class.valid_format?('Z9ZZZZZZZ2')).to be(true)
-      end
-    end
-  end
-
   describe '.check_digit' do
     it 'calculates check-digit for various CEIs' do
       expect(described_class.check_digit('A0BCDEFGH')).to eq(1)

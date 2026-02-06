@@ -117,24 +117,4 @@ RSpec.describe SecId::CIK do
       end
     end
   end
-
-  describe '.valid_format?' do
-    context 'when CIK is malformed' do
-      it 'returns false' do
-        expect(described_class.valid_format?('X9')).to be(false)
-        expect(described_class.valid_format?('0000000000')).to be(false)
-        expect(described_class.valid_format?('01234567890')).to be(false)
-      end
-    end
-
-    context 'when CIK is valid or missing leading zeros' do
-      it 'returns true' do
-        expect(described_class.valid_format?('3')).to be(true)
-        expect(described_class.valid_format?('0000000003')).to be(true)
-        expect(described_class.valid_format?('1072424')).to be(true)
-        expect(described_class.valid_format?('001072424')).to be(true)
-        expect(described_class.valid_format?('0001072424')).to be(true)
-      end
-    end
-  end
 end

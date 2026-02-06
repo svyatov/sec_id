@@ -273,12 +273,6 @@ RSpec.describe SecId::IBAN do
       end
     end
 
-    describe '#valid_format?' do
-      it 'returns false' do
-        expect(iban.valid_format?).to be(false)
-      end
-    end
-
     describe '#valid_bban_format?' do
       it 'returns false' do
         expect(iban.valid_bban_format?).to be(false)
@@ -292,12 +286,6 @@ RSpec.describe SecId::IBAN do
     it 'parses country code and BBAN' do
       expect(iban.country_code).to eq('DE')
       expect(iban.bban).to eq('ABCD00440532013000')
-    end
-
-    describe '#valid_format?' do
-      it 'returns false' do
-        expect(iban.valid_format?).to be(false)
-      end
     end
   end
 
@@ -352,12 +340,6 @@ RSpec.describe SecId::IBAN do
         expect(iban.known_country?).to be(false)
       end
     end
-
-    describe '#valid_format?' do
-      it 'returns true for unknown countries (lenient mode)' do
-        expect(iban.valid_format?).to be(true)
-      end
-    end
   end
 
   describe '#errors' do
@@ -400,16 +382,6 @@ RSpec.describe SecId::IBAN do
         expect(described_class.valid?('IE29AIBK93115212345678')).to be(true) # Ireland
       end
       # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
-    end
-  end
-
-  describe '.valid_format?' do
-    context 'when IBAN format is valid (with or without check-digit)' do
-      it 'returns true' do
-        expect(described_class.valid_format?('DE89370400440532013000')).to be(true)
-        expect(described_class.valid_format?('DE370400440532013000')).to be(true)
-        expect(described_class.valid_format?('DE99370400440532013000')).to be(true)
-      end
     end
   end
 

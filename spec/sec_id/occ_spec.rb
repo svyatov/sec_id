@@ -152,50 +152,6 @@ RSpec.describe SecId::OCC do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when OCC symbol has an unsupported underlying symbol' do
-      it 'returns false' do
-        expect(described_class.valid_format?('GOOGLE251219P00131000')).to be(false)
-        expect(described_class.valid_format?('OAKpA 240517C00001000')).to be(false)
-        expect(described_class.valid_format?('BRK.B 240517C00001000')).to be(false)
-        expect(described_class.valid_format?('BRK B 240517C00001000')).to be(false)
-      end
-    end
-
-    context 'when OCC symbol has an invalid type' do
-      it 'returns false' do
-        expect(described_class.valid_format?('CZOO1 240517c00001000')).to be(false)
-        expect(described_class.valid_format?('CZOO1 240517p00001000')).to be(false)
-        expect(described_class.valid_format?('CZOO1 240517o00001000')).to be(false)
-        expect(described_class.valid_format?('CZOO1 240517x00001000')).to be(false)
-        expect(described_class.valid_format?('CZOO1 240517X00001000')).to be(false)
-      end
-    end
-
-    context 'when OCC symbol has four-digit year' do
-      it 'returns false' do
-        expect(described_class.valid_format?('PAAS1 20250919C00022500')).to be(false)
-        expect(described_class.valid_format?('X     20250620C00050000')).to be(false)
-      end
-    end
-
-    context 'when OCC symbol has extra leading zeros in whole part of strike' do
-      it 'returns false' do
-        expect(described_class.valid_format?('PAAS1 250919C000000022500')).to be(false)
-        expect(described_class.valid_format?('X     250620C000000050000')).to be(false)
-      end
-    end
-
-    context 'when OCC symbol is valid or has normalizable attributes' do
-      it 'returns true' do
-        expect(described_class.valid_format?('X250620C00050000')).to be(true)
-        expect(described_class.valid_format?('X 250620C00050000')).to be(true)
-        expect(described_class.valid_format?('X  250620C00050000')).to be(true)
-        expect(described_class.valid_format?('X   250620C00050000')).to be(true)
-      end
-    end
-  end
-
   describe '.build' do
     context 'with component strings in canonical form' do
       it 'composes OCC symbol' do

@@ -119,16 +119,6 @@ RSpec.describe SecId::LEI do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when LEI format is valid (with or without check-digit)' do
-      it 'returns true' do
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV18')).to be(true)
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV')).to be(true)
-        expect(described_class.valid_format?('5493006MHB84DD0ZWV99')).to be(true)
-      end
-    end
-  end
-
   describe '.restore!' do
     context 'when LEI format is valid' do
       it 'restores check-digit for various LEIs' do
