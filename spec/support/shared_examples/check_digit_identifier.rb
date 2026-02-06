@@ -28,6 +28,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(true)
       end
 
+      it 'returns true for #check_digit_valid?' do
+        expect(instance.check_digit_valid?).to be(true)
+      end
+
       it 'returns true for #valid_format?' do
         expect(instance.valid_format?).to be(true)
       end
@@ -47,6 +51,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns false for #valid?' do
         expect(instance.valid?).to be(false)
+      end
+
+      it 'returns false for #check_digit_valid?' do
+        expect(instance.check_digit_valid?).to be(false)
       end
 
       it 'returns true for #valid_format?' do
@@ -70,6 +78,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(false)
       end
 
+      it 'returns false for #check_digit_valid?' do
+        expect(instance.check_digit_valid?).to be(false)
+      end
+
       it 'returns true for #valid_format?' do
         expect(instance.valid_format?).to be(true)
       end
@@ -85,6 +97,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns false for #valid?' do
         expect(instance.valid?).to be(false)
+      end
+
+      it 'returns false for #check_digit_valid?' do
+        expect(instance.check_digit_valid?).to be(false)
       end
 
       it 'returns false for #valid_format?' do
@@ -171,6 +187,24 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'raises error for invalid format' do
         expect { identifier_class.check_digit(invalid_format_id) }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
+
+    describe '.check_digit_valid?' do
+      it 'returns true for valid identifier' do
+        expect(identifier_class.check_digit_valid?(valid_id)).to be(true)
+      end
+
+      it 'returns false for identifier without check-digit' do
+        expect(identifier_class.check_digit_valid?(valid_id_without_check)).to be(false)
+      end
+
+      it 'returns false for identifier with invalid check-digit' do
+        expect(identifier_class.check_digit_valid?(invalid_check_digit_id)).to be(false)
+      end
+
+      it 'returns false for invalid format' do
+        expect(identifier_class.check_digit_valid?(invalid_format_id)).to be(false)
       end
     end
   end
