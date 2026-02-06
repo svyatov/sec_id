@@ -9,7 +9,7 @@ RSpec.describe SecId::OCC do
   # Metadata
   it_behaves_like 'an identifier with metadata',
                   full_name: 'OCC Option Symbol',
-                  id_length: 21,
+                  id_length: (16..21),
                   has_check_digit: false,
                   has_normalization: true
 

@@ -305,7 +305,7 @@ cik.to_s          # => '0001094517'
 
 ### OCC
 
-> [Options Clearing Corporation Symbol](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol) - a 21-character code used to identify equity options contracts.
+> [Options Clearing Corporation Symbol](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol) - a 16-to-21-character code used to identify equity options contracts.
 
 ```ruby
 # class level

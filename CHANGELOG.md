@@ -13,6 +13,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
 
+### Fixed
+
+- OCC `ID_LENGTH` changed from `21` to `(16..21)` to correctly reflect that valid OCC symbols range from 16 to 21 characters
+
 ## [4.4.1] - 2026-02-05
 
 ### Fixed

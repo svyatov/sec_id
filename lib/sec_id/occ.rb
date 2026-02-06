@@ -22,7 +22,7 @@ module SecId
     include Normalizable
 
     FULL_NAME = 'OCC Option Symbol'
-    ID_LENGTH = 21
+    ID_LENGTH = (16..21)
     EXAMPLE = 'AAPL  210917C00150000'
 
     # Regular expression for parsing OCC symbol components.

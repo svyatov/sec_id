@@ -25,6 +25,18 @@ RSpec.shared_examples 'an identifier with metadata' do |params|
       expect(described_class.valid?(described_class.example)).to be(true)
     end
 
+    it '.example length is consistent with .id_length' do
+      length = described_class.example.length
+      id_length = described_class.id_length
+
+      case id_length
+      when Range
+        expect(id_length).to cover(length)
+      else
+        expect(length).to eq(id_length)
+      end
+    end
+
     it '.has_check_digit? returns the expected value' do
       expect(described_class.has_check_digit?).to be(params[:has_check_digit])
     end
