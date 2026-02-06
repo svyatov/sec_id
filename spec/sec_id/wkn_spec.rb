@@ -119,23 +119,6 @@ RSpec.describe SecId::WKN do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when WKN is valid' do
-      it 'returns true for various valid formats' do
-        expect(described_class.valid_format?('514000')).to be(true)
-        expect(described_class.valid_format?('CBK100')).to be(true)
-        expect(described_class.valid_format?('A1EWWW')).to be(true)
-      end
-    end
-
-    context 'when WKN format is invalid' do
-      it 'returns false for invalid formats' do
-        expect(described_class.valid_format?('12345')).to be(false)
-        expect(described_class.valid_format?('ABCIO1')).to be(false)
-      end
-    end
-  end
-
   describe '#to_isin' do
     context 'when WKN is valid' do
       let(:wkn_number) { '716460' }

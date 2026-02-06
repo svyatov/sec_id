@@ -73,13 +73,6 @@ module SecId
     end
 
     # @return [Boolean]
-    def valid_format?
-      return false unless identifier
-
-      valid_bban_format?
-    end
-
-    # @return [Boolean]
     def valid_bban_format?
       return false unless bban
 
@@ -107,6 +100,13 @@ module SecId
     end
 
     private
+
+    # @return [Boolean]
+    def valid_format?
+      return false unless identifier
+
+      valid_bban_format?
+    end
 
     # @return [Array<Symbol>]
     def format_errors

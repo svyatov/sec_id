@@ -52,11 +52,6 @@ module SecId
       @check_digit = figi_parts[:check_digit]&.to_i
     end
 
-    # @return [Boolean]
-    def valid_format?
-      !identifier.nil? && !RESTRICTED_PREFIXES.include?(prefix)
-    end
-
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the FIGI format is invalid
     def calculate_check_digit
@@ -65,6 +60,11 @@ module SecId
     end
 
     private
+
+    # @return [Boolean]
+    def valid_format?
+      !identifier.nil? && !RESTRICTED_PREFIXES.include?(prefix)
+    end
 
     # @return [Array<Symbol>]
     def format_errors

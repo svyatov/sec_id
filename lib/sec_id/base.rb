@@ -63,12 +63,6 @@ module SecId
         new(id).valid?
       end
 
-      # @param id [String] the identifier to check
-      # @return [Boolean]
-      def valid_format?(id)
-        new(id).valid_format?
-      end
-
       # @param id [String] the identifier to validate
       # @return [ValidationResult]
       def validate(id)
@@ -127,13 +121,6 @@ module SecId
       valid_format?
     end
 
-    # Override in subclasses for additional format validation.
-    #
-    # @return [Boolean]
-    def valid_format?
-      !identifier.nil?
-    end
-
     # Returns a {ValidationResult} with error codes and human-readable messages.
     #
     # @return [ValidationResult]
@@ -151,6 +138,13 @@ module SecId
     alias to_str to_s
 
     private
+
+    # Override in subclasses for additional format validation.
+    #
+    # @return [Boolean]
+    def valid_format?
+      !identifier.nil?
+    end
 
     # Returns an array of error code symbols describing why validation failed.
     #

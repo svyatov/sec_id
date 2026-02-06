@@ -10,7 +10,7 @@ module SecId
   # This module provides:
   # - Character-to-digit mapping constants
   # - Luhn algorithm variants for check-digit calculation
-  # - `valid?` override that validates the check digit
+  # - `valid?` override that validates format and check digit
   # - `restore!` method to calculate and set the check digit
   # - `check_digit` attribute
   # - Class-level convenience methods: `restore!`, `check_digit`
@@ -84,9 +84,7 @@ module SecId
     #
     # @return [Boolean]
     def valid?
-      return false unless valid_format?
-
-      check_digit == calculate_check_digit
+      valid_format? && check_digit == calculate_check_digit
     end
 
     # Calculates and sets the check digit, updating full_number.

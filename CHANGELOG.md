@@ -13,7 +13,6 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
-
 ### Changed
 
 - **BREAKING:** `#validate` renamed to `#errors` (memoized); class-level `.validate` still available
@@ -24,6 +23,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Removed
 
+- `#valid_format?` instance method (now private) and `.valid_format?` class method
+- `#valid_check_digit?` instance method and `.valid_check_digit?` class method
 - `#validation_errors` instance method (now private)
 - `.validation_errors` class method
 

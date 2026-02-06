@@ -22,11 +22,11 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 ### Class Hierarchy
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `valid_format?`, `errors` (memoized, returns `ValidationResult`)
-- Class-level convenience methods: `valid?`, `valid_format?`, `validate` (returns `ValidationResult`)
+- Core API: `valid?`, `errors` (memoized, returns `ValidationResult`)
+- Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`)
 - `parse` helper method for extracting identifier components
 - Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
-- Private validation helpers: `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
+- Private validation helpers: `valid_format?`, `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
 
 Each identifier class defines these metadata constants:
 - `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
@@ -35,7 +35,7 @@ Each identifier class defines these metadata constants:
 - `VALID_CHARS_REGEX` — regex for valid character set (used by `format_errors` fallback)
 
 Classes with check digits include the `Checkable` concern, which adds:
-- `valid?` override that validates check digit
+- `valid?` override that validates format and check digit
 - `restore!`, `check_digit`, `calculate_check_digit` methods
 - Character-to-digit conversion maps and Luhn algorithm variants
 - Class-level `restore!` and `check_digit` methods
@@ -139,14 +139,14 @@ Follow the "Stepdown Rule" from Clean Code: methods should be ordered so that ca
 # Good - caller before callee, reads top-to-bottom
 def validate
   check_format
-  check_digit_valid?
+  check_value
 end
 
 def check_format
   parse_components
 end
 
-def check_digit_valid?
+def check_value
   # ...
 end
 
@@ -165,7 +165,7 @@ end
 
 def validate
   check_format
-  check_digit_valid?
+  check_value
 end
 ```
 

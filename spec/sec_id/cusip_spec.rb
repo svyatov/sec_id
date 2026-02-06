@@ -126,18 +126,6 @@ RSpec.describe SecId::CUSIP do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when CUSIP is valid or missing check-digit' do
-      it 'returns true for various valid formats' do
-        expect(described_class.valid_format?('38259P50')).to be(true)
-        expect(described_class.valid_format?('38259P508')).to be(true)
-        expect(described_class.valid_format?('68389X10')).to be(true)
-        expect(described_class.valid_format?('68389X105')).to be(true)
-        expect(described_class.valid_format?('986191302')).to be(true)
-      end
-    end
-  end
-
   describe '.check_digit' do
     context 'when CUSIP is valid' do
       it 'calculates check-digit for various CUSIPs' do

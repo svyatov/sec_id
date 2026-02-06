@@ -110,28 +110,6 @@ RSpec.describe SecId::FIGI do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when FIGI has a disallowed prefix' do
-      it 'returns false' do
-        expect(described_class.valid_format?('GGGKFNH88CW')).to be(false)
-        expect(described_class.valid_format?('GBGFFK4C9TP')).to be(false)
-        expect(described_class.valid_format?('GHGH4FR4J04')).to be(false)
-        expect(described_class.valid_format?('KYGLM70ZJQD')).to be(false)
-        expect(described_class.valid_format?('VGG19LLVFTH')).to be(false)
-      end
-    end
-
-    context 'when FIGI is valid or missing check-digit' do
-      it 'returns true for various valid formats' do
-        expect(described_class.valid_format?('BBG000HY4HW')).to be(true)
-        expect(described_class.valid_format?('BBG000HY4HW9')).to be(true)
-        expect(described_class.valid_format?('BBG000BCK0D')).to be(true)
-        expect(described_class.valid_format?('BBG000BCK0D3')).to be(true)
-        expect(described_class.valid_format?('BBG000BKRK3')).to be(true)
-      end
-    end
-  end
-
   describe '#errors' do
     context 'when prefix is restricted' do
       it 'returns :invalid_prefix error with descriptive message' do

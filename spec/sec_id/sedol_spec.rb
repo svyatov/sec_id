@@ -74,18 +74,6 @@ RSpec.describe SecId::SEDOL do
     end
   end
 
-  describe '.valid_format?' do
-    context 'when SEDOL is valid or missing check-digit' do
-      it 'returns true for various valid formats' do
-        expect(described_class.valid_format?('B09CBL4')).to be(true)
-        expect(described_class.valid_format?('219071')).to be(true)
-        expect(described_class.valid_format?('B923452')).to be(true)
-        expect(described_class.valid_format?('B99876')).to be(true)
-        expect(described_class.valid_format?('2307389')).to be(true)
-      end
-    end
-  end
-
   describe '.check_digit' do
     context 'when SEDOL is valid' do
       it 'calculates check-digit for various SEDOLs' do
