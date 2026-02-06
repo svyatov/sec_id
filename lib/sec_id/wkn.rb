@@ -16,6 +16,7 @@ module SecId
     FULL_NAME = 'Wertpapierkennnummer'
     ID_LENGTH = 6
     EXAMPLE = '514000'
+    VALID_CHARS_REGEX = /\A[0-9A-HJ-NP-Z]+\z/
 
     # Regular expression for parsing WKN components.
     # Excludes letters I and O to avoid confusion with 1 and 0.

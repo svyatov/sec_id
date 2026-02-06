@@ -24,6 +24,7 @@ module SecId
     FULL_NAME = 'Classification of Financial Instruments'
     ID_LENGTH = 6
     EXAMPLE = 'ESVUFR'
+    VALID_CHARS_REGEX = /\A[A-Z]+\z/
 
     # Regular expression for parsing CFI components.
     ID_REGEX = /\A
@@ -304,6 +305,31 @@ module SecId
     end
 
     private
+
+    # @return [Array<Symbol>]
+    def format_errors
+      return super unless identifier
+
+      errors = []
+      errors << :invalid_category unless valid_category?
+      errors << :invalid_group unless valid_group?
+      return errors unless errors.empty?
+
+      super
+    end
+
+    # @param code [Symbol]
+    # @return [String]
+    def validation_message(code)
+      case code
+      when :invalid_category
+        "Category '#{category_code}' is not a valid CFI category"
+      when :invalid_group
+        "Group '#{group_code}' is not valid for category '#{category_code}'"
+      else
+        super
+      end
+    end
 
     # @return [Boolean]
     def valid_category?

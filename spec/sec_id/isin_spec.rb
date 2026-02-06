@@ -13,6 +13,16 @@ RSpec.describe SecId::ISIN do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'US5949181045',
+                  invalid_length_id: 'US',
+                  invalid_chars_id: 'US59491810-5'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: 'US5949181045',
+                  invalid_check_digit_id: 'IE00B296YR70'
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'IE00B296YR77',

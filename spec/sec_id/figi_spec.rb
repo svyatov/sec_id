@@ -13,6 +13,16 @@ RSpec.describe SecId::FIGI do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'BBG000H4FSM0',
+                  invalid_length_id: 'BBG',
+                  invalid_chars_id: 'BBG000H!FSM0'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: 'BBG000H4FSM0',
+                  invalid_check_digit_id: 'BBG000H4FSM5'
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'BBG000H4FSM0',
@@ -118,6 +128,25 @@ RSpec.describe SecId::FIGI do
         expect(described_class.valid_format?('BBG000BCK0D')).to be(true)
         expect(described_class.valid_format?('BBG000BCK0D3')).to be(true)
         expect(described_class.valid_format?('BBG000BKRK3')).to be(true)
+      end
+    end
+  end
+
+  describe '#errors' do
+    context 'when prefix is restricted' do
+      it 'returns :invalid_prefix error with descriptive message' do
+        result = described_class.new('BSG000BLNNH6').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_prefix])
+        expect(result.details.first[:message]).to match(/restricted/)
+      end
+    end
+
+    context 'when prefix is restricted (various)' do
+      %w[BSG BMG GGG GBG GHG KYG VGG].each do |prefix|
+        it "detects restricted prefix #{prefix[0..1]}" do
+          result = described_class.new("#{prefix}000BLNNH6").errors
+          expect(result.details.map { |d| d[:error] }).to include(:invalid_prefix)
+        end
       end
     end
   end

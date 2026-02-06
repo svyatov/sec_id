@@ -13,6 +13,12 @@ RSpec.describe SecId::Valoren do
                   has_check_digit: false,
                   has_normalization: true
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: '3886335',
+                  invalid_length_id: '12',
+                  invalid_chars_id: 'ABCDE'
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: '003886335',

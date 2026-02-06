@@ -8,6 +8,7 @@
 - [Installation](#installation)
 - [Supported Standards and Usage](#supported-standards-and-usage)
   - [Metadata Registry](#metadata-registry) - enumerate, filter, and look up identifier types
+  - [Structured Validation](#structured-validation) - detailed error codes and messages
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [CEI](#cei) - CUSIP Entity Identifier
@@ -53,7 +54,7 @@ gem install sec_id
 
 ## Supported Standards and Usage
 
-All identifier classes provide `valid?` and `valid_format?` methods at both class and instance levels.
+All identifier classes provide `valid?`, `valid_format?`, `errors`, and `.validate` methods at both class and instance levels.
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore!` - restores check-digit and returns the full number
@@ -90,6 +91,37 @@ SecId.identifiers.select(&:has_check_digit?).map(&:short_name)
 SecId.identifiers.select(&:has_normalization?).map(&:short_name)
 # => ["CIK", "OCC", "Valoren"]
 ```
+
+### Structured Validation
+
+All identifier classes provide a Rails-like `#errors` API for detailed error reporting:
+
+```ruby
+isin = SecId::ISIN.new('US5949181040')
+isin.errors.valid?    # => false
+isin.errors.messages  # => ["Check digit '0' is invalid, expected '5'"]
+isin.errors.details   # => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
+isin.errors.any?      # => true
+isin.errors.empty?    # => false
+isin.errors.size      # => 1
+isin.errors.to_a      # => same as messages
+
+# Class-level convenience method
+SecId::ISIN.validate('US5949181040')  # => #<SecId::ValidationResult>
+```
+
+**Common error codes** (all identifier types):
+- `:invalid_length` - wrong number of characters
+- `:invalid_characters` - contains characters not allowed for this type
+- `:invalid_format` - correct length and characters but wrong structure
+
+**Type-specific error codes:**
+- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI)
+- `:invalid_prefix` - restricted FIGI prefix (FIGI)
+- `:invalid_category` - unknown CFI category code (CFI)
+- `:invalid_group` - unknown CFI group code for category (CFI)
+- `:invalid_bban` - BBAN format invalid for country (IBAN)
+- `:invalid_date` - unparseable expiration date (OCC)
 
 ### ISIN
 

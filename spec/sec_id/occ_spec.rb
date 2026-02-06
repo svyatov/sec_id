@@ -13,6 +13,12 @@ RSpec.describe SecId::OCC do
                   has_check_digit: false,
                   has_normalization: true
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'AAPL  210917C00150000',
+                  invalid_length_id: 'AAPL',
+                  invalid_chars_id: 'AAPL!!210917C00150000'
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: 'EQX   260116C00005500',
@@ -78,6 +84,23 @@ RSpec.describe SecId::OCC do
       expect(occ.date_str).to eq('260116')
       expect(occ.type).to eq('C')
       expect(occ.instance_variable_get(:@strike_mills)).to eq('00005500')
+    end
+  end
+
+  describe '#errors' do
+    context 'when date is unparseable' do
+      it 'returns :invalid_date error' do
+        result = described_class.new('SPX   141199P01950000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
+        expect(result.details.first[:message]).to match(/cannot be parsed/)
+      end
+    end
+
+    context 'when date month is invalid' do
+      it 'returns :invalid_date error' do
+        result = described_class.new('SPX   140022P01950000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
+      end
     end
   end
 

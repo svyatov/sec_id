@@ -24,6 +24,7 @@ module SecId
     FULL_NAME = 'International Bank Account Number'
     ID_LENGTH = (15..34)
     EXAMPLE = 'GB29NWBK60161331926819'
+    VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing IBAN components.
     # Note: Check digit positioning is handled in initialize, not in the regex.
@@ -106,6 +107,21 @@ module SecId
     end
 
     private
+
+    # @return [Array<Symbol>]
+    def format_errors
+      return [:invalid_bban] if identifier && !valid_bban_format?
+
+      super
+    end
+
+    # @param code [Symbol]
+    # @return [String]
+    def validation_message(code)
+      return "BBAN format is invalid for country '#{country_code}'" if code == :invalid_bban
+
+      super
+    end
 
     # @param rest [String] the IBAN string after country code
     # @return [void]

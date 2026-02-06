@@ -20,6 +20,7 @@ module SecId
     FULL_NAME = 'Committee on Uniform Securities Identification Procedures'
     ID_LENGTH = 9
     EXAMPLE = '037833100'
+    VALID_CHARS_REGEX = /\A[A-Z0-9*@#]+\z/
 
     # Regular expression for parsing CUSIP components.
     ID_REGEX = /\A

@@ -13,6 +13,15 @@ RSpec.describe SecId::FISN do
                   has_check_digit: false,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'APPLE INC/SH',
+                  invalid_length_id: 'AB',
+                  invalid_chars_id: 'APPLE-INC/SH!'
+
+  it_behaves_like 'detects invalid format',
+                  invalid_format_id: 'APPLE INC SH'
+
   describe 'valid FISN parsing' do
     context 'when FISN is simple (APPLE INC/SH)' do
       let(:fisn_code) { 'APPLE INC/SH' }

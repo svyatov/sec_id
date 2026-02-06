@@ -13,6 +13,16 @@ RSpec.describe SecId::IBAN do
                   has_check_digit: true,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'DE89370400440532013000',
+                  invalid_length_id: 'DE89',
+                  invalid_chars_id: 'DE89370400440532013!!!'
+
+  it_behaves_like 'detects invalid check digit',
+                  valid_id: 'DE89370400440532013000',
+                  invalid_check_digit_id: 'DE99370400440532013000'
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'DE89370400440532013000',
@@ -346,6 +356,24 @@ RSpec.describe SecId::IBAN do
     describe '#valid_format?' do
       it 'returns true for unknown countries (lenient mode)' do
         expect(iban.valid_format?).to be(true)
+      end
+    end
+  end
+
+  describe '#errors' do
+    context 'when BBAN format is invalid for country' do
+      it 'returns :invalid_bban error with descriptive message' do
+        # Letters in BBAN for DE (should be all digits)
+        result = described_class.new('DE89ABCD00440532013000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
+        expect(result.details.first[:message]).to match(/BBAN/)
+      end
+    end
+
+    context 'when BBAN length is wrong for country' do
+      it 'returns :invalid_bban error' do
+        result = described_class.new('DE8937040044053201').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
       end
     end
   end

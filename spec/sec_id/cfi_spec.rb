@@ -13,6 +13,12 @@ RSpec.describe SecId::CFI do
                   has_check_digit: false,
                   has_normalization: false
 
+  # Validation API
+  it_behaves_like 'a validatable identifier',
+                  valid_id: 'ESXXXX',
+                  invalid_length_id: 'ES',
+                  invalid_chars_id: 'ES1234'
+
   describe 'valid CFI parsing' do
     context 'when CFI is mixed case' do
       let(:cfi_code) { 'EsXxXx' }
@@ -252,6 +258,33 @@ RSpec.describe SecId::CFI do
 
       it 'returns false for invalid group' do
         expect(described_class.valid_format?('EZXXXX')).to be(false)
+      end
+    end
+  end
+
+  describe '#errors' do
+    context 'when category is invalid' do
+      it 'returns :invalid_category error with descriptive message' do
+        result = described_class.new('ZSXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to include(:invalid_category)
+        expect(result.details.first[:message]).to match(/category/i)
+      end
+    end
+
+    context 'when group is invalid for category' do
+      it 'returns :invalid_group error with descriptive message' do
+        result = described_class.new('EZXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_group])
+        expect(result.details.first[:message]).to match(/Group/i)
+      end
+    end
+
+    context 'when both category and group are invalid' do
+      it 'returns both errors with messages' do
+        result = described_class.new('QZXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to eq(%i[invalid_category invalid_group])
+        expect(result.messages.size).to eq(2)
+        expect(result.size).to eq(2)
       end
     end
   end
