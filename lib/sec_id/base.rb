@@ -201,8 +201,6 @@ module SecId
         "Contains invalid characters for #{self.class.short_name}"
       when :invalid_format
         "Does not match #{self.class.short_name} format"
-      else
-        code.to_s
       end
     end
 

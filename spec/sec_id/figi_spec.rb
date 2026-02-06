@@ -142,7 +142,7 @@ RSpec.describe SecId::FIGI do
     end
 
     context 'when prefix is restricted (various)' do
-      %w[BSG GBG GHG KYG VGG].each do |prefix|
+      %w[BSG BMG GGG GBG GHG KYG VGG].each do |prefix|
         it "detects restricted prefix #{prefix[0..1]}" do
           result = described_class.new("#{prefix}000BLNNH6").errors
           expect(result.details.map { |d| d[:error] }).to include(:invalid_prefix)

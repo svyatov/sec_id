@@ -79,6 +79,11 @@ RSpec.describe SecId::ValidationResult do
       expect(result.to_a).to eq(result.messages)
     end
 
+    it 'returns strings from to_a, not hashes' do
+      expect(result.to_a).to all(be_a(String))
+      expect(result.to_a).not_to eq(result.details)
+    end
+
     it 'is frozen' do
       expect(result).to be_frozen
     end
