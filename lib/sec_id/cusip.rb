@@ -17,6 +17,10 @@ module SecId
   class CUSIP < Base
     include Checkable
 
+    FULL_NAME = 'Committee on Uniform Securities Identification Procedures'
+    ID_LENGTH = 9
+    EXAMPLE = '037833100'
+
     # Regular expression for parsing CUSIP components.
     ID_REGEX = /\A
       (?<identifier>

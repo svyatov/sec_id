@@ -16,6 +16,10 @@ module SecId
   class ISIN < Base
     include Checkable
 
+    FULL_NAME = 'International Securities Identification Number'
+    ID_LENGTH = 12
+    EXAMPLE = 'US5949181045'
+
     # Regular expression for parsing ISIN components.
     ID_REGEX = /\A
       (?<identifier>

@@ -6,8 +6,7 @@ module SecId
   #
   # Format: 5-9 numeric digits
   #
-  # @note Valoren identifiers have no check digit. The {#has_check_digit?} method
-  #   returns false and validation is based solely on format.
+  # @note Valoren identifiers have no check digit and validation is based solely on format.
   #
   # @see https://en.wikipedia.org/wiki/Valoren_number
   #
@@ -19,6 +18,10 @@ module SecId
   #   SecId::Valoren.normalize!('3886335')  #=> '003886335'
   class Valoren < Base
     include Normalizable
+
+    FULL_NAME = 'Valoren Number'
+    ID_LENGTH = (5..9)
+    EXAMPLE = '3886335'
 
     # Regular expression for parsing Valoren components.
     ID_REGEX = /\A

@@ -13,6 +13,10 @@ module SecId
   class CEI < Base
     include Checkable
 
+    FULL_NAME = 'CUSIP Entity Identifier'
+    ID_LENGTH = 10
+    EXAMPLE = 'A0BCDEFGH1'
+
     # Regular expression for parsing CEI components.
     ID_REGEX = /\A
       (?<identifier>

@@ -38,12 +38,23 @@ module SecId
   #       @identifier = parts[:identifier]
   #     end
   #   end
+  #
+  # @example Querying identifier metadata
+  #   SecId::ISIN.short_name       #=> "ISIN"
+  #   SecId::ISIN.full_name        #=> "International Securities Identification Number"
+  #   SecId::ISIN.has_check_digit? #=> true
   class Base
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_number
 
     # @return [String, nil] the main identifier portion (without check digit)
     attr_reader :identifier
+
+    # @api private
+    def self.inherited(subclass)
+      super
+      SecId.__send__(:register_identifier, subclass) if subclass.name&.start_with?('SecId::')
+    end
 
     class << self
       # @param id [String] the identifier to validate
@@ -56,6 +67,44 @@ module SecId
       # @return [Boolean]
       def valid_format?(id)
         new(id).valid_format?
+      end
+
+      # Returns the unqualified class name (e.g. "ISIN", "CUSIP").
+      #
+      # @return [String]
+      def short_name
+        name.split('::').last
+      end
+
+      # Returns the full human-readable standard name.
+      #
+      # @return [String]
+      def full_name
+        self::FULL_NAME
+      end
+
+      # Returns the fixed length or valid length range for identifiers of this type.
+      #
+      # @return [Integer, Range]
+      def id_length
+        self::ID_LENGTH
+      end
+
+      # Returns a representative valid identifier string.
+      #
+      # @return [String]
+      def example
+        self::EXAMPLE
+      end
+
+      # @return [Boolean] true if this identifier type uses a check digit
+      def has_check_digit?
+        ancestors.include?(SecId::Checkable)
+      end
+
+      # @return [Boolean] true if this identifier type supports normalization
+      def has_normalization?
+        ancestors.include?(SecId::Normalizable)
       end
     end
 

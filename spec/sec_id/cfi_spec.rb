@@ -6,6 +6,13 @@ RSpec.describe SecId::CFI do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Classification of Financial Instruments',
+                  id_length: 6,
+                  has_check_digit: false,
+                  has_normalization: false
+
   describe 'valid CFI parsing' do
     context 'when CFI is mixed case' do
       let(:cfi_code) { 'EsXxXx' }

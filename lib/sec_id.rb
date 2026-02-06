@@ -2,6 +2,52 @@
 
 require 'set'
 require 'sec_id/version'
+
+module SecId
+  class Error < StandardError; end
+  class InvalidFormatError < Error; end
+
+  class << self
+    # Looks up an identifier class by its symbol key.
+    #
+    # @param key [Symbol] identifier type (e.g. :isin, :cusip)
+    # @return [Class] the identifier class
+    # @raise [ArgumentError] if key is unknown
+    def [](key)
+      identifier_map.fetch(key) do
+        raise ArgumentError, "Unknown identifier type: #{key.inspect}"
+      end
+    end
+
+    # Returns all registered identifier classes in load order.
+    #
+    # @return [Array<Class>]
+    def identifiers
+      identifier_list.dup
+    end
+
+    private
+
+    # @param klass [Class] the identifier class to register
+    # @return [void]
+    def register_identifier(klass)
+      key = klass.name.split('::').last.downcase.to_sym
+      identifier_map[key] = klass
+      identifier_list << klass
+    end
+
+    # @return [Hash{Symbol => Class}]
+    def identifier_map
+      @identifier_map ||= {}
+    end
+
+    # @return [Array<Class>]
+    def identifier_list
+      @identifier_list ||= []
+    end
+  end
+end
+
 require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/checkable'
 require 'sec_id/base'
@@ -18,8 +64,3 @@ require 'sec_id/valoren'
 require 'sec_id/cei'
 require 'sec_id/cfi'
 require 'sec_id/fisn'
-
-module SecId
-  class Error < StandardError; end
-  class InvalidFormatError < Error; end
-end

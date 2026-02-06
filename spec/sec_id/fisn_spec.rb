@@ -6,6 +6,13 @@ RSpec.describe SecId::FISN do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Financial Instrument Short Name',
+                  id_length: 3..35,
+                  has_check_digit: false,
+                  has_normalization: false
+
   describe 'valid FISN parsing' do
     context 'when FISN is simple (APPLE INC/SH)' do
       let(:fisn_code) { 'APPLE INC/SH' }

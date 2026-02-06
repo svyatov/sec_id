@@ -6,6 +6,13 @@ RSpec.describe SecId::CIK do
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
+  # Metadata
+  it_behaves_like 'an identifier with metadata',
+                  full_name: 'Central Index Key',
+                  id_length: 1..10,
+                  has_check_digit: false,
+                  has_normalization: true
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: '0001521365',

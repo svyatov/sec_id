@@ -21,6 +21,10 @@ module SecId
   #   fisn.issuer       #=> 'APPLE INC'
   #   fisn.description  #=> 'SH'
   class FISN < Base
+    FULL_NAME = 'Financial Instrument Short Name'
+    ID_LENGTH = (3..35)
+    EXAMPLE = 'APPLE INC/SH'
+
     # Regular expression for parsing FISN components.
     # Issuer: 1-15 chars, Description: 1-19 chars, Total: max 35 chars
     ID_REGEX = %r{\A

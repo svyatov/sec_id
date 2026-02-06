@@ -21,6 +21,10 @@ module SecId
   #   cfi.group           #=> :common_shares
   #   cfi.voting?         #=> true
   class CFI < Base
+    FULL_NAME = 'Classification of Financial Instruments'
+    ID_LENGTH = 6
+    EXAMPLE = 'ESVUFR'
+
     # Regular expression for parsing CFI components.
     ID_REGEX = /\A
       (?<identifier>
