@@ -25,12 +25,24 @@ All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which 
 - Core API: `valid?`, `valid_format?`
 - Class-level convenience methods that delegate to instance methods
 - `parse` helper method for extracting identifier components
+- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
+
+Each identifier class defines these metadata constants:
+- `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
+- `ID_LENGTH` — fixed length or valid length range
+- `EXAMPLE` — representative valid identifier string
 
 Classes with check digits include the `Checkable` concern, which adds:
 - `valid?` override that validates check digit
 - `restore!`, `check_digit`, `calculate_check_digit` methods
 - Character-to-digit conversion maps and Luhn algorithm variants
 - Class-level `restore!` and `check_digit` methods
+
+### Registry (`lib/sec_id.rb`)
+
+Identifier classes auto-register via `Base.inherited`. Access them through:
+- `SecId[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
+- `SecId.identifiers` — all registered classes in load order
 
 ### Concerns (`lib/sec_id/concerns/`)
 
