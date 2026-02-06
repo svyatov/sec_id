@@ -87,27 +87,19 @@ RSpec.describe SecId::OCC do
     end
   end
 
-  describe '#validation_errors' do
+  describe '#errors' do
     context 'when date is unparseable' do
-      it 'returns [:invalid_date]' do
-        expect(described_class.new('SPX   141199P01950000').validation_errors).to eq([:invalid_date])
+      it 'returns :invalid_date error' do
+        result = described_class.new('SPX   141199P01950000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
+        expect(result.details.first[:message]).to match(/cannot be parsed/)
       end
     end
 
     context 'when date month is invalid' do
-      it 'returns [:invalid_date]' do
-        expect(described_class.new('SPX   140022P01950000').validation_errors).to eq([:invalid_date])
-      end
-    end
-  end
-
-  describe '#validate' do
-    context 'when date is unparseable' do
-      it 'returns result with descriptive message' do
-        result = described_class.new('SPX   141199P01950000').validate
-        expect(result.valid?).to be(false)
-        expect(result.error_codes).to eq([:invalid_date])
-        expect(result.errors.first[:message]).to match(/cannot be parsed/)
+      it 'returns :invalid_date error' do
+        result = described_class.new('SPX   140022P01950000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
       end
     end
   end

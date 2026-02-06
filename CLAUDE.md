@@ -22,11 +22,11 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 ### Class Hierarchy
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `valid_format?`, `validate`, `validation_errors`
-- Class-level convenience methods that delegate to instance methods
+- Core API: `valid?`, `valid_format?`, `errors` (memoized, returns `ValidationResult`)
+- Class-level convenience methods: `valid?`, `valid_format?`, `validate` (returns `ValidationResult`)
 - `parse` helper method for extracting identifier components
 - Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
-- Private validation helpers: `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
+- Private validation helpers: `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
 
 Each identifier class defines these metadata constants:
 - `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
@@ -63,7 +63,7 @@ Luhn algorithm variants:
 - `reversed_digits_single(id)` - Converts identifier to reversed digit array (single-digit mapping)
 - `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
 
-Validation overrides:
+Validation overrides (private):
 - `validation_errors` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
 - `check_digit_width` - Returns `1` (used by `Base#valid_length?` to allow optional check digit in length check)
 
@@ -111,11 +111,12 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 ### ValidationResult (`lib/sec_id/validation_result.rb`)
 
-Frozen, immutable value object returned by `#validate`. Contains:
-- `errors` — array of `{ code: Symbol, message: String }` hashes (frozen)
-- `valid?` — true when errors empty
-- `error_codes` — maps errors to just code symbols
-- `to_a` — aliases to `errors`
+Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
+- `details` — array of `{ error: Symbol, message: String }` hashes (frozen)
+- `messages` — array of human-readable error message strings
+- `valid?` — true when no errors
+- `any?` / `empty?` / `size` — collection-like query methods
+- `to_a` — alias for `messages`
 
 ### Error Handling
 

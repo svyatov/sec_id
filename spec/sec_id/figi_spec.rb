@@ -132,31 +132,21 @@ RSpec.describe SecId::FIGI do
     end
   end
 
-  describe '#validation_errors' do
+  describe '#errors' do
     context 'when prefix is restricted' do
-      it 'returns [:invalid_prefix]' do
-        expect(described_class.new('BSG000BLNNH6').validation_errors).to eq([:invalid_prefix])
+      it 'returns :invalid_prefix error with descriptive message' do
+        result = described_class.new('BSG000BLNNH6').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_prefix])
+        expect(result.details.first[:message]).to match(/restricted/)
       end
     end
 
     context 'when prefix is restricted (various)' do
       %w[BSG GBG GHG KYG VGG].each do |prefix|
         it "detects restricted prefix #{prefix[0..1]}" do
-          figi = described_class.new("#{prefix}000BLNNH6")
-          errors = figi.validation_errors
-          expect(errors).to include(:invalid_prefix)
+          result = described_class.new("#{prefix}000BLNNH6").errors
+          expect(result.details.map { |d| d[:error] }).to include(:invalid_prefix)
         end
-      end
-    end
-  end
-
-  describe '#validate' do
-    context 'when prefix is restricted' do
-      it 'returns result with descriptive message' do
-        result = described_class.new('BSG000BLNNH6').validate
-        expect(result.valid?).to be(false)
-        expect(result.error_codes).to eq([:invalid_prefix])
-        expect(result.errors.first[:message]).to match(/restricted/)
       end
     end
   end

@@ -80,16 +80,6 @@ module SecId
       end
     end
 
-    # Returns error codes including check digit validation.
-    #
-    # @return [Array<Symbol>]
-    def validation_errors
-      return format_errors unless valid_format?
-      return [:invalid_check_digit] unless check_digit == calculate_check_digit
-
-      []
-    end
-
     # Validates format and check digit.
     #
     # @return [Boolean]
@@ -181,6 +171,16 @@ module SecId
     end
 
     private
+
+    # Returns error codes including check digit validation.
+    #
+    # @return [Array<Symbol>]
+    def validation_errors
+      return format_errors unless valid_format?
+      return [:invalid_check_digit] unless check_digit == calculate_check_digit
+
+      []
+    end
 
     # @return [Integer]
     def check_digit_width

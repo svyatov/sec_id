@@ -119,14 +119,6 @@ module SecId
       valid_format? && !date.nil? # date must be parseable
     end
 
-    # @return [Array<Symbol>]
-    def validation_errors
-      return format_errors unless valid_format?
-      return [:invalid_date] if date.nil?
-
-      []
-    end
-
     # @return [Date, nil] the parsed date or nil if invalid
     def date
       return nil unless date_str
@@ -155,6 +147,14 @@ module SecId
     end
 
     private
+
+    # @return [Array<Symbol>]
+    def validation_errors
+      return format_errors unless valid_format?
+      return [:invalid_date] if date.nil?
+
+      []
+    end
 
     # @param code [Symbol]
     # @return [String]

@@ -360,28 +360,20 @@ RSpec.describe SecId::IBAN do
     end
   end
 
-  describe '#validation_errors' do
+  describe '#errors' do
     context 'when BBAN format is invalid for country' do
-      it 'returns [:invalid_bban]' do
+      it 'returns :invalid_bban error with descriptive message' do
         # Letters in BBAN for DE (should be all digits)
-        expect(described_class.new('DE89ABCD00440532013000').validation_errors).to eq([:invalid_bban])
+        result = described_class.new('DE89ABCD00440532013000').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
+        expect(result.details.first[:message]).to match(/BBAN/)
       end
     end
 
     context 'when BBAN length is wrong for country' do
-      it 'returns [:invalid_bban]' do
-        expect(described_class.new('DE8937040044053201').validation_errors).to eq([:invalid_bban])
-      end
-    end
-  end
-
-  describe '#validate' do
-    context 'when BBAN format is invalid' do
-      it 'returns result with descriptive message' do
-        result = described_class.new('DE89ABCD00440532013000').validate
-        expect(result.valid?).to be(false)
-        expect(result.error_codes).to eq([:invalid_bban])
-        expect(result.errors.first[:message]).to match(/BBAN/)
+      it 'returns :invalid_bban error' do
+        result = described_class.new('DE8937040044053201').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
       end
     end
   end

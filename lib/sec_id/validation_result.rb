@@ -2,42 +2,59 @@
 
 module SecId
   # Immutable value object representing the result of identifier validation.
-  # Contains a list of errors (if any), each with a code and human-readable message.
+  # Follows Rails/ActiveModel conventions: use {#details} for structured error data
+  # and {#messages} for human-readable strings.
   #
   # @example Valid result
   #   result = SecId::ValidationResult.new([])
-  #   result.valid?       #=> true
-  #   result.errors       #=> []
-  #   result.error_codes  #=> []
+  #   result.valid?    #=> true
+  #   result.empty?    #=> true
+  #   result.messages  #=> []
   #
   # @example Invalid result
-  #   errors = [{ code: :invalid_length, message: "Expected 12 characters, got 5" }]
+  #   errors = [{ error: :invalid_length, message: "Expected 12 characters, got 5" }]
   #   result = SecId::ValidationResult.new(errors)
-  #   result.valid?       #=> false
-  #   result.error_codes  #=> [:invalid_length]
+  #   result.valid?    #=> false
+  #   result.details   #=> [{ error: :invalid_length, message: "..." }]
+  #   result.messages  #=> ["Expected 12 characters, got 5"]
   class ValidationResult
-    # @return [Array<Hash{Symbol => Symbol, String}>] array of error hashes with :code and :message keys
-    attr_reader :errors
+    # @return [Array<Hash{Symbol => Symbol, String}>] array of error hashes with :error and :message keys
+    attr_reader :details
 
     # @param errors [Array<Hash{Symbol => Symbol, String}>] array of error hashes
     def initialize(errors)
-      @errors = errors.freeze
+      @details = errors.freeze
       freeze
     end
 
     # @return [Boolean] true when there are no errors
     def valid?
-      @errors.empty?
+      @details.empty?
     end
 
-    # @return [Array<Symbol>] error code symbols
-    def error_codes
-      @errors.map { |e| e[:code] }
+    # @return [Array<String>] human-readable error messages
+    def messages
+      @details.map { |e| e[:message] }
     end
 
-    # @return [Array<Hash{Symbol => Symbol, String}>] alias for errors
+    # @return [Boolean] true when there are errors
+    def any?
+      !@details.empty?
+    end
+
+    # @return [Boolean] true when there are no errors
+    def empty?
+      @details.empty?
+    end
+
+    # @return [Integer] number of errors
+    def size
+      @details.size
+    end
+
+    # @return [Array<String>] alias for {#messages}
     def to_a
-      @errors
+      messages
     end
   end
 end

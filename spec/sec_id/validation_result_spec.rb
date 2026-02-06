@@ -8,12 +8,24 @@ RSpec.describe SecId::ValidationResult do
       expect(result.valid?).to be(true)
     end
 
-    it 'has empty errors' do
-      expect(result.errors).to eq([])
+    it 'has empty details' do
+      expect(result.details).to eq([])
     end
 
-    it 'has empty error_codes' do
-      expect(result.error_codes).to eq([])
+    it 'has empty messages' do
+      expect(result.messages).to eq([])
+    end
+
+    it 'is not any' do
+      expect(result.any?).to be(false)
+    end
+
+    it 'is empty' do
+      expect(result.empty?).to be(true)
+    end
+
+    it 'has size 0' do
+      expect(result.size).to eq(0)
     end
 
     it 'returns empty array from to_a' do
@@ -24,8 +36,8 @@ RSpec.describe SecId::ValidationResult do
       expect(result).to be_frozen
     end
 
-    it 'has frozen errors array' do
-      expect(result.errors).to be_frozen
+    it 'has frozen details array' do
+      expect(result.details).to be_frozen
     end
   end
 
@@ -34,8 +46,8 @@ RSpec.describe SecId::ValidationResult do
 
     let(:errors) do
       [
-        { code: :invalid_length, message: 'Expected 12 characters, got 5' },
-        { code: :invalid_characters, message: 'Contains invalid characters for ISIN' },
+        { error: :invalid_length, message: 'Expected 12 characters, got 5' },
+        { error: :invalid_characters, message: 'Contains invalid characters for ISIN' },
       ]
     end
 
@@ -43,38 +55,54 @@ RSpec.describe SecId::ValidationResult do
       expect(result.valid?).to be(false)
     end
 
-    it 'returns errors' do
-      expect(result.errors).to eq(errors)
+    it 'returns details' do
+      expect(result.details).to eq(errors)
     end
 
-    it 'returns error codes' do
-      expect(result.error_codes).to eq(%i[invalid_length invalid_characters])
+    it 'returns messages' do
+      expect(result.messages).to eq(['Expected 12 characters, got 5', 'Contains invalid characters for ISIN'])
     end
 
-    it 'returns errors from to_a' do
-      expect(result.to_a).to eq(errors)
+    it 'is any' do
+      expect(result.any?).to be(true)
+    end
+
+    it 'is not empty' do
+      expect(result.empty?).to be(false)
+    end
+
+    it 'has size 2' do
+      expect(result.size).to eq(2)
+    end
+
+    it 'returns messages from to_a' do
+      expect(result.to_a).to eq(result.messages)
     end
 
     it 'is frozen' do
       expect(result).to be_frozen
     end
 
-    it 'has frozen errors array' do
-      expect(result.errors).to be_frozen
+    it 'has frozen details array' do
+      expect(result.details).to be_frozen
     end
   end
 
   describe 'when single error' do
     subject(:result) { described_class.new(errors) }
 
-    let(:errors) { [{ code: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }] }
+    let(:errors) { [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }] }
 
     it 'is not valid' do
       expect(result.valid?).to be(false)
     end
 
-    it 'returns single error code' do
-      expect(result.error_codes).to eq([:invalid_check_digit])
+    it 'returns single detail' do
+      expect(result.details.first[:error]).to eq(:invalid_check_digit)
+    end
+
+    it 'has size 1' do
+      expect(result.size).to eq(1)
     end
   end
 end

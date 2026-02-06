@@ -262,44 +262,29 @@ RSpec.describe SecId::CFI do
     end
   end
 
-  describe '#validation_errors' do
+  describe '#errors' do
     context 'when category is invalid' do
-      it 'returns errors including :invalid_category' do
-        errors = described_class.new('ZSXXXX').validation_errors
-        expect(errors).to include(:invalid_category)
+      it 'returns :invalid_category error with descriptive message' do
+        result = described_class.new('ZSXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to include(:invalid_category)
+        expect(result.details.first[:message]).to match(/category/i)
       end
     end
 
     context 'when group is invalid for category' do
-      it 'returns [:invalid_group]' do
-        expect(described_class.new('EZXXXX').validation_errors).to eq([:invalid_group])
+      it 'returns :invalid_group error with descriptive message' do
+        result = described_class.new('EZXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_group])
+        expect(result.details.first[:message]).to match(/Group/i)
       end
     end
 
     context 'when both category and group are invalid' do
-      it 'returns [:invalid_category, :invalid_group]' do
-        errors = described_class.new('QZXXXX').validation_errors
-        expect(errors).to eq(%i[invalid_category invalid_group])
-      end
-    end
-  end
-
-  describe '#validate' do
-    context 'when category is invalid' do
-      it 'returns result with descriptive message' do
-        result = described_class.new('ZSXXXX').validate
-        expect(result.valid?).to be(false)
-        expect(result.error_codes).to include(:invalid_category)
-        expect(result.errors.first[:message]).to match(/category/i)
-      end
-    end
-
-    context 'when group is invalid' do
-      it 'returns result with descriptive message' do
-        result = described_class.new('EZXXXX').validate
-        expect(result.valid?).to be(false)
-        expect(result.error_codes).to eq([:invalid_group])
-        expect(result.errors.first[:message]).to match(/Group/i)
+      it 'returns both errors with messages' do
+        result = described_class.new('QZXXXX').errors
+        expect(result.details.map { |d| d[:error] }).to eq(%i[invalid_category invalid_group])
+        expect(result.messages.size).to eq(2)
+        expect(result.size).to eq(2)
       end
     end
   end

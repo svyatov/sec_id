@@ -10,9 +10,22 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- Structured validation with `#validate` (returns `ValidationResult` with error codes and messages) and `#validation_errors` (returns error code symbols) on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
+- Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
+
+### Changed
+
+- **BREAKING:** `#validate` renamed to `#errors` (memoized); class-level `.validate` still available
+- **BREAKING:** `ValidationResult#errors` renamed to `#details`; each hash uses `:error` key instead of `:code`
+- **BREAKING:** `ValidationResult#error_codes` removed; use `details.map { |d| d[:error] }`
+- **BREAKING:** `ValidationResult#to_a` now returns `messages` (array of strings) instead of raw error hashes
+- **BREAKING:** `#validation_errors` and `.validation_errors` removed from public API
+
+### Removed
+
+- `#validation_errors` instance method (now private)
+- `.validation_errors` class method
 
 ### Fixed
 

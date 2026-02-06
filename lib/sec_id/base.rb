@@ -72,13 +72,7 @@ module SecId
       # @param id [String] the identifier to validate
       # @return [ValidationResult]
       def validate(id)
-        new(id).validate
-      end
-
-      # @param id [String] the identifier to validate
-      # @return [Array<Symbol>] error code symbols
-      def validation_errors(id)
-        new(id).validation_errors
+        new(id).errors
       end
 
       # Returns the unqualified class name (e.g. "ISIN", "CUSIP").
@@ -143,18 +137,11 @@ module SecId
     # Returns a {ValidationResult} with error codes and human-readable messages.
     #
     # @return [ValidationResult]
-    def validate
-      errors = validation_errors.map { |code| build_error(code, validation_message(code)) }
-      ValidationResult.new(errors)
-    end
-
-    # Returns an array of error code symbols describing why validation failed.
-    #
-    # @return [Array<Symbol>]
-    def validation_errors
-      return [] if valid_format?
-
-      format_errors
+    def errors
+      @errors ||= begin
+        err = validation_errors.map { |code| build_error(code, validation_message(code)) }
+        ValidationResult.new(err)
+      end
     end
 
     # @return [String]
@@ -164,6 +151,15 @@ module SecId
     alias to_str to_s
 
     private
+
+    # Returns an array of error code symbols describing why validation failed.
+    #
+    # @return [Array<Symbol>]
+    def validation_errors
+      return [] if valid_format?
+
+      format_errors
+    end
 
     # Three-stage fallback for format error detection: length, characters, then structure.
     #
@@ -214,7 +210,7 @@ module SecId
     # @param message [String]
     # @return [Hash{Symbol => Symbol, String}]
     def build_error(code, message)
-      { code: code, message: message }.freeze
+      { error: code, message: message }.freeze
     end
 
     # @param sec_id_number [String, #to_s] the identifier to parse

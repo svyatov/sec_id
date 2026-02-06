@@ -54,7 +54,7 @@ gem install sec_id
 
 ## Supported Standards and Usage
 
-All identifier classes provide `valid?`, `valid_format?`, `validate`, and `validation_errors` methods at both class and instance levels.
+All identifier classes provide `valid?`, `valid_format?`, `errors`, and `.validate` methods at both class and instance levels.
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore!` - restores check-digit and returns the full number
@@ -94,25 +94,20 @@ SecId.identifiers.select(&:has_normalization?).map(&:short_name)
 
 ### Structured Validation
 
-All identifier classes provide `#validate` and `#validation_errors` for detailed error reporting:
+All identifier classes provide a Rails-like `#errors` API for detailed error reporting:
 
 ```ruby
-# Lightweight: array of error code symbols
-isin = SecId::ISIN.new('US594918104X')
-isin.validation_errors  # => [:invalid_characters]
-
 isin = SecId::ISIN.new('US5949181040')
-isin.validation_errors  # => [:invalid_check_digit]
+isin.errors.valid?    # => false
+isin.errors.messages  # => ["Check digit '0' is invalid, expected '5'"]
+isin.errors.details   # => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
+isin.errors.any?      # => true
+isin.errors.empty?    # => false
+isin.errors.size      # => 1
+isin.errors.to_a      # => same as messages
 
-# Rich: ValidationResult with codes and human-readable messages
-result = SecId::ISIN.new('US5949181040').validate
-result.valid?       # => false
-result.error_codes  # => [:invalid_check_digit]
-result.errors       # => [{ code: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
-
-# Class-level convenience methods
-SecId::ISIN.validate('US5949181040')        # => #<SecId::ValidationResult>
-SecId::ISIN.validation_errors('US5949181040') # => [:invalid_check_digit]
+# Class-level convenience method
+SecId::ISIN.validate('US5949181040')  # => #<SecId::ValidationResult>
 ```
 
 **Common error codes** (all identifier types):
