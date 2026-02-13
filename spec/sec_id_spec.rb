@@ -53,4 +53,22 @@ RSpec.describe SecId do
       expect { described_class[:unknown] }.to raise_error(ArgumentError, /Unknown identifier type/)
     end
   end
+
+  describe '.detect' do
+    it 'returns matching type symbols for a valid ISIN' do
+      expect(described_class.detect('US5949181045')).to eq([:isin])
+    end
+
+    it 'returns multiple matches when types overlap' do
+      expect(described_class.detect('514000')).to eq(%i[wkn valoren cik])
+    end
+
+    it 'returns empty array for invalid input' do
+      expect(described_class.detect('INVALID')).to eq([])
+    end
+
+    it 'returns empty array for nil' do
+      expect(described_class.detect(nil)).to eq([])
+    end
+  end
 end

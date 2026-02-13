@@ -7,7 +7,7 @@
 - [Supported Ruby Versions](#supported-ruby-versions)
 - [Installation](#installation)
 - [Supported Standards and Usage](#supported-standards-and-usage)
-  - [Metadata Registry](#metadata-registry) - enumerate, filter, and look up identifier types
+  - [Metadata Registry](#metadata-registry) - enumerate, filter, look up, and detect identifier types
   - [Structured Validation](#structured-validation) - detailed error codes and messages
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
@@ -90,6 +90,19 @@ SecId.identifiers.select(&:has_check_digit?).map(&:short_name)
 
 SecId.identifiers.select(&:has_normalization?).map(&:short_name)
 # => ["CIK", "OCC", "Valoren"]
+
+# Detect identifier type from an unknown string
+# Results are sorted by specificity: check-digit types first, then by length precision
+SecId.detect('US5949181045')  # => [:isin]
+SecId.detect('037833100')     # => [:cusip, :valoren, :cik]
+SecId.detect('APPLE INC/SH') # => [:fisn]
+SecId.detect('INVALID')      # => []
+
+# Work with the most specific match
+type = SecId.detect('US5949181045').first # => :isin
+isin = SecId[type].new('US5949181045')
+isin.valid?      # => true
+isin.check_digit # => 5
 ```
 
 ### Structured Validation
