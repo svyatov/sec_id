@@ -22,8 +22,8 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 ### Class Hierarchy
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `errors` (memoized, returns `ValidationResult`)
-- Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`)
+- Core API: `valid?`, `errors` (memoized, returns `ValidationResult`), `validate!` (returns self or raises)
+- Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`), `validate!` (returns instance or raises)
 - `parse` helper method for extracting identifier components
 - Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
 - Private validation helpers: `valid_format?`, `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
@@ -121,7 +121,11 @@ Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
 ### Error Handling
 
 - `SecId::Error` - Base error class
-- `SecId::InvalidFormatError` - Raised when check-digit calculation fails on invalid format
+- `SecId::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
+- `SecId::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
+- `SecId::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
+- `Base::EXCEPTION_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
+- `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
 - **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
 
 ## Code Style

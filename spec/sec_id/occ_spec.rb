@@ -19,6 +19,11 @@ RSpec.describe SecId::OCC do
                   invalid_length_id: 'AAPL',
                   invalid_chars_id: 'AAPL!!210917C00150000'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'AAPL  210917C00150000',
+                  invalid_length_id: 'AAPL',
+                  invalid_chars_id: 'AAPL!!210917C00150000'
+
   # Core normalization identifier behavior
   it_behaves_like 'a normalization identifier',
                   valid_id: 'EQX   260116C00005500',
@@ -100,6 +105,15 @@ RSpec.describe SecId::OCC do
       it 'returns :invalid_date error' do
         result = described_class.new('SPX   140022P01950000').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
+      end
+    end
+  end
+
+  describe '#validate!' do
+    context 'when date is unparseable' do
+      it 'raises InvalidStructureError' do
+        expect { described_class.new('SPX   141199P01950000').validate! }
+          .to raise_error(SecId::InvalidStructureError, /cannot be parsed/)
       end
     end
   end

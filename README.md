@@ -54,7 +54,7 @@ gem install sec_id
 
 ## Supported Standards and Usage
 
-All identifier classes provide `valid?`, `errors`, and `.validate` methods at both class and instance levels.
+All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` methods at both class and instance levels.
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore!` - restores check-digit and returns the full number
@@ -122,6 +122,28 @@ SecId::ISIN.validate('US5949181040')  # => #<SecId::ValidationResult>
 - `:invalid_group` - unknown CFI group code for category (CFI)
 - `:invalid_bban` - BBAN format invalid for country (IBAN)
 - `:invalid_date` - unparseable expiration date (OCC)
+
+#### Fail-fast validation with `validate!`
+
+Use `validate!` when you want to raise an exception on invalid input instead of inspecting errors:
+
+```ruby
+# Returns self when valid (enables chaining)
+SecId::ISIN.new('US5949181045').validate!  # => #<SecId::ISIN>
+
+# Raises with a descriptive message when invalid
+SecId::ISIN.new('INVALID').validate!
+# => SecId::InvalidFormatError: Expected 12 characters, got 7
+
+SecId::ISIN.new('US5949181040').validate!
+# => SecId::InvalidCheckDigitError: Check digit '0' is invalid, expected '5'
+
+SecId::FIGI.new('BSG000BLNNH6').validate!
+# => SecId::InvalidStructureError: Prefix 'BS' is restricted
+
+# Class-level convenience method (returns the instance)
+isin = SecId::ISIN.validate!('US5949181045')  # => #<SecId::ISIN>
+```
 
 ### ISIN
 

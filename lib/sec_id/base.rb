@@ -44,6 +44,15 @@ module SecId
   #   SecId::ISIN.full_name        #=> "International Securities Identification Number"
   #   SecId::ISIN.has_check_digit? #=> true
   class Base
+    EXCEPTION_MAP = {
+      invalid_check_digit: InvalidCheckDigitError,
+      invalid_prefix: InvalidStructureError,
+      invalid_category: InvalidStructureError,
+      invalid_group: InvalidStructureError,
+      invalid_bban: InvalidStructureError,
+      invalid_date: InvalidStructureError
+    }.freeze
+
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_number
 
@@ -67,6 +76,23 @@ module SecId
       # @return [ValidationResult]
       def validate(id)
         new(id).errors
+      end
+
+      # Validates the identifier, raising an exception if invalid.
+      #
+      # @param id [String] the identifier to validate
+      # @return [Base] the identifier instance
+      # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+      def validate!(id)
+        new(id).validate!
+      end
+
+      # Maps an error code symbol to its corresponding exception class.
+      #
+      # @param code [Symbol]
+      # @return [Class]
+      def exception_for_error(code)
+        EXCEPTION_MAP.fetch(code, InvalidFormatError)
       end
 
       # Returns the unqualified class name (e.g. "ISIN", "CUSIP").
@@ -129,6 +155,17 @@ module SecId
         err = validation_errors.map { |code| build_error(code, validation_message(code)) }
         ValidationResult.new(err)
       end
+    end
+
+    # Validates and returns self if valid, raises an exception otherwise.
+    #
+    # @return [self]
+    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    def validate!
+      return self if valid?
+
+      detail = errors.details.first
+      raise self.class.exception_for_error(detail[:error]), detail[:message]
     end
 
     # @return [String]

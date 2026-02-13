@@ -39,6 +39,7 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Exclude:
+    - 'lib/sec_id/base.rb'
     - 'lib/sec_id/cfi.rb'
 
 Lint/MissingSuper:

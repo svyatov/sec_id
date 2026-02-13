@@ -19,8 +19,16 @@ RSpec.describe SecId::SEDOL do
                   invalid_length_id: 'B1',
                   invalid_chars_id: 'B19AKT4'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'B19GKT4',
+                  invalid_length_id: 'B1',
+                  invalid_chars_id: 'B19AKT4'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: 'B19GKT4',
+                  invalid_check_digit_id: 'B19GKT0'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'B19GKT0'
 
   # Core check-digit identifier behavior

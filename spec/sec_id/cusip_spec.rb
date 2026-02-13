@@ -19,8 +19,16 @@ RSpec.describe SecId::CUSIP do
                   invalid_length_id: '0378',
                   invalid_chars_id: '03783310!'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: '037833100',
+                  invalid_length_id: '0378',
+                  invalid_chars_id: '03783310!'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: '68389X105',
+                  invalid_check_digit_id: '68389X100'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: '68389X100'
 
   # Core check-digit identifier behavior

@@ -19,6 +19,11 @@ RSpec.describe SecId::CFI do
                   invalid_length_id: 'ES',
                   invalid_chars_id: 'ES1234'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'ESXXXX',
+                  invalid_length_id: 'ES',
+                  invalid_chars_id: 'ES1234'
+
   describe 'valid CFI parsing' do
     context 'when CFI is mixed case' do
       let(:cfi_code) { 'EsXxXx' }
@@ -262,6 +267,22 @@ RSpec.describe SecId::CFI do
         expect(result.details.map { |d| d[:error] }).to eq(%i[invalid_category invalid_group])
         expect(result.messages.size).to eq(2)
         expect(result.size).to eq(2)
+      end
+    end
+  end
+
+  describe '#validate!' do
+    context 'when category is invalid' do
+      it 'raises InvalidStructureError' do
+        expect { described_class.new('ZSXXXX').validate! }
+          .to raise_error(SecId::InvalidStructureError, /category/i)
+      end
+    end
+
+    context 'when group is invalid' do
+      it 'raises InvalidStructureError' do
+        expect { described_class.new('EZXXXX').validate! }
+          .to raise_error(SecId::InvalidStructureError, /Group/i)
       end
     end
   end

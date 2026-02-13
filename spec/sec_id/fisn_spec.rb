@@ -19,6 +19,11 @@ RSpec.describe SecId::FISN do
                   invalid_length_id: 'AB',
                   invalid_chars_id: 'APPLE-INC/SH!'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'APPLE INC/SH',
+                  invalid_length_id: 'AB',
+                  invalid_chars_id: 'APPLE-INC/SH!'
+
   it_behaves_like 'detects invalid format',
                   invalid_format_id: 'APPLE INC SH'
 

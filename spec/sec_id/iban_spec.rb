@@ -19,8 +19,16 @@ RSpec.describe SecId::IBAN do
                   invalid_length_id: 'DE89',
                   invalid_chars_id: 'DE89370400440532013!!!'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'DE89370400440532013000',
+                  invalid_length_id: 'DE89',
+                  invalid_chars_id: 'DE89370400440532013!!!'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: 'DE89370400440532013000',
+                  invalid_check_digit_id: 'DE99370400440532013000'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'DE99370400440532013000'
 
   # Core check-digit identifier behavior
@@ -356,6 +364,15 @@ RSpec.describe SecId::IBAN do
       it 'returns :invalid_bban error' do
         result = described_class.new('DE8937040044053201').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
+      end
+    end
+  end
+
+  describe '#validate!' do
+    context 'when BBAN format is invalid' do
+      it 'raises InvalidStructureError' do
+        expect { described_class.new('DE89ABCD00440532013000').validate! }
+          .to raise_error(SecId::InvalidStructureError, /BBAN/)
       end
     end
   end

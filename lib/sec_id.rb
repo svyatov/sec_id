@@ -6,6 +6,8 @@ require 'sec_id/version'
 module SecId
   class Error < StandardError; end
   class InvalidFormatError < Error; end
+  class InvalidCheckDigitError < Error; end
+  class InvalidStructureError < Error; end
 
   class << self
     # Looks up an identifier class by its symbol key.
