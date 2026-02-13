@@ -19,8 +19,16 @@ RSpec.describe SecId::LEI do
                   invalid_length_id: '5493',
                   invalid_chars_id: '5493006MHB84DD0ZWV!!'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: '5493006MHB84DD0ZWV18',
+                  invalid_length_id: '5493',
+                  invalid_chars_id: '5493006MHB84DD0ZWV!!'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: '5493006MHB84DD0ZWV18',
+                  invalid_check_digit_id: '5493006MHB84DD0ZWV99'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: '5493006MHB84DD0ZWV99'
 
   # Core check-digit identifier behavior

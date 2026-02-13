@@ -19,6 +19,11 @@ RSpec.describe SecId::WKN do
                   invalid_length_id: '51',
                   invalid_chars_id: '514-00'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: '514000',
+                  invalid_length_id: '51',
+                  invalid_chars_id: '514-00'
+
   context 'when WKN is valid' do
     let(:wkn_number) { '514000' }
 

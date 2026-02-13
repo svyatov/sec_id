@@ -19,8 +19,16 @@ RSpec.describe SecId::FIGI do
                   invalid_length_id: 'BBG',
                   invalid_chars_id: 'BBG000H!FSM0'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'BBG000H4FSM0',
+                  invalid_length_id: 'BBG',
+                  invalid_chars_id: 'BBG000H!FSM0'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: 'BBG000H4FSM0',
+                  invalid_check_digit_id: 'BBG000H4FSM5'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'BBG000H4FSM5'
 
   # Core check-digit identifier behavior
@@ -116,6 +124,13 @@ RSpec.describe SecId::FIGI do
         result = described_class.new('BSG000BLNNH6').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_prefix])
         expect(result.details.first[:message]).to match(/restricted/)
+      end
+    end
+
+    context 'when prefix is restricted (validate!)' do
+      it 'raises InvalidStructureError' do
+        expect { described_class.new('BSG000BLNNH6').validate! }
+          .to raise_error(SecId::InvalidStructureError, /restricted/)
       end
     end
 

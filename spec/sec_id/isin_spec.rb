@@ -19,8 +19,16 @@ RSpec.describe SecId::ISIN do
                   invalid_length_id: 'US',
                   invalid_chars_id: 'US59491810-5'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'US5949181045',
+                  invalid_length_id: 'US',
+                  invalid_chars_id: 'US59491810-5'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: 'US5949181045',
+                  invalid_check_digit_id: 'IE00B296YR70'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'IE00B296YR70'
 
   # Core check-digit identifier behavior

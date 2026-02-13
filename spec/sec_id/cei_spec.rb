@@ -18,8 +18,16 @@ RSpec.describe SecId::CEI do
                   invalid_length_id: 'A0',
                   invalid_chars_id: 'A0BCDEFG!1'
 
+  it_behaves_like 'a validate! identifier',
+                  valid_id: 'A0BCDEFGH1',
+                  invalid_length_id: 'A0',
+                  invalid_chars_id: 'A0BCDEFG!1'
+
   it_behaves_like 'detects invalid check digit',
                   valid_id: 'A0BCDEFGH1',
+                  invalid_check_digit_id: 'A0BCDEFGH0'
+
+  it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'A0BCDEFGH0'
 
   it_behaves_like 'a check-digit identifier',
