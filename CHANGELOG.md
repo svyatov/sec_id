@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `SecId.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
 - `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success
 - Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key

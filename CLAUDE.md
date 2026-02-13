@@ -45,6 +45,18 @@ Classes with check digits include the `Checkable` concern, which adds:
 Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecId[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
 - `SecId.identifiers` — all registered classes in load order
+- `SecId.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
+
+### Detector (`lib/sec_id/detector.rb`)
+
+`@api private` class that implements type detection via a three-stage pipeline:
+1. **Special-char dispatch** — `/` routes to FISN, ` ` to OCC, `*@#` to CUSIP
+2. **Length lookup** — pre-computed `Hash{Integer => Array<Class>}` from `ID_LENGTH` constants
+3. **Charset pre-filter** — survivors filtered by `VALID_CHARS_REGEX` before calling `valid?`
+
+Specificity sort: check-digit types first, then smaller length range, then load order.
+
+Lazily instantiated from `SecId.detect`; cache invalidated when new types register.
 
 ### Concerns (`lib/sec_id/concerns/`)
 

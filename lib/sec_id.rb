@@ -28,6 +28,14 @@ module SecId
       identifier_list.dup
     end
 
+    # Detects all identifier types that match the given string.
+    #
+    # @param str [String, nil] the identifier string to detect
+    # @return [Array<Symbol>] matching type symbols sorted by specificity
+    def detect(str)
+      detector.call(str)
+    end
+
     private
 
     # @param klass [Class] the identifier class to register
@@ -36,6 +44,12 @@ module SecId
       key = klass.name.split('::').last.downcase.to_sym
       identifier_map[key] = klass
       identifier_list << klass
+      @detector = nil
+    end
+
+    # @return [Detector]
+    def detector
+      @detector ||= Detector.new(identifier_list)
     end
 
     # @return [Hash{Symbol => Class}]
@@ -54,6 +68,7 @@ require 'sec_id/validation_result'
 require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/checkable'
 require 'sec_id/base'
+require 'sec_id/detector'
 require 'sec_id/isin'
 require 'sec_id/cusip'
 require 'sec_id/sedol'
