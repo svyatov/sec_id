@@ -71,4 +71,51 @@ RSpec.describe SecId do
       expect(described_class.detect(nil)).to eq([])
     end
   end
+
+  describe '.valid?' do
+    context 'without types' do
+      it 'returns true for a valid ISIN' do
+        expect(described_class.valid?('US5949181045')).to be true
+      end
+
+      it 'returns true for a valid CUSIP' do
+        expect(described_class.valid?('594918104')).to be true
+      end
+
+      it 'returns false for an invalid identifier' do
+        expect(described_class.valid?('INVALID')).to be false
+      end
+
+      it 'returns false for nil' do
+        expect(described_class.valid?(nil)).to be false
+      end
+
+      it 'returns false for empty string' do
+        expect(described_class.valid?('')).to be false
+      end
+    end
+
+    context 'with types' do
+      it 'returns true when identifier matches a specified type' do
+        expect(described_class.valid?('US5949181045', types: [:isin])).to be true
+      end
+
+      it 'returns false when identifier does not match specified type' do
+        expect(described_class.valid?('US5949181045', types: [:cusip])).to be false
+      end
+
+      it 'returns true when identifier matches one of multiple types' do
+        expect(described_class.valid?('594918104', types: %i[cusip sedol])).to be true
+      end
+
+      it 'returns false when identifier matches none of the types' do
+        expect(described_class.valid?('INVALID', types: %i[isin cusip])).to be false
+      end
+
+      it 'raises ArgumentError for unknown type key' do
+        expect { described_class.valid?('US5949181045', types: [:unknown]) }
+          .to raise_error(ArgumentError, /Unknown identifier type/)
+      end
+    end
+  end
 end
