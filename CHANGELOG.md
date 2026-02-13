@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `SecId.parse(str, types: nil)` and `SecId.parse!(str, types: nil)` methods that return a typed identifier instance for the most specific match, with optional type filtering
 - `SecId.valid?(str, types: nil)` method for quick boolean validation against all or specific identifier types
 - `SecId.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
 - `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success

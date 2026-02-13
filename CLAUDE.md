@@ -46,6 +46,8 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecId[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
 - `SecId.identifiers` — all registered classes in load order
 - `SecId.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
+- `SecId.parse(str, types: nil)` — returns a typed instance for the most specific match (or `nil`)
+- `SecId.parse!(str, types: nil)` — like `parse` but raises `InvalidFormatError` on failure
 
 ### Detector (`lib/sec_id/detector.rb`)
 

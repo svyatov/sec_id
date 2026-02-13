@@ -48,6 +48,27 @@ module SecId
       types.any? { |key| self[key].valid?(str) }
     end
 
+    # Parses a string into the most specific matching identifier instance.
+    #
+    # @param str [String, nil] the identifier string to parse
+    # @param types [Array<Symbol>, nil] restrict to specific types (e.g. [:isin, :cusip])
+    # @return [SecId::Base, nil] a valid identifier instance, or nil if no match
+    # @raise [ArgumentError] if any key in types is unknown
+    def parse(str, types: nil)
+      types.nil? ? parse_any(str) : parse_from(str, types)
+    end
+
+    # Parses a string into the most specific matching identifier instance, raising on failure.
+    #
+    # @param str [String, nil] the identifier string to parse
+    # @param types [Array<Symbol>, nil] restrict to specific types (e.g. [:isin, :cusip])
+    # @return [SecId::Base] a valid identifier instance
+    # @raise [InvalidFormatError] if no matching identifier type is found
+    # @raise [ArgumentError] if any key in types is unknown
+    def parse!(str, types: nil)
+      parse(str, types: types) || raise(InvalidFormatError, parse_error_message(str, types))
+    end
+
     private
 
     # @param klass [Class] the identifier class to register
@@ -57,6 +78,27 @@ module SecId
       identifier_map[key] = klass
       identifier_list << klass
       @detector = nil
+    end
+
+    # @return [SecId::Base, nil]
+    def parse_any(str)
+      key = detect(str).first
+      key && self[key].new(str)
+    end
+
+    # @return [SecId::Base, nil]
+    def parse_from(str, types)
+      types.each do |key|
+        instance = self[key].new(str)
+        return instance if instance.valid?
+      end
+      nil
+    end
+
+    # @return [String]
+    def parse_error_message(str, types)
+      base = "No matching identifier type found for #{str.to_s.strip.inspect}"
+      types ? "#{base} among #{types.inspect}" : base
     end
 
     # @return [Detector]
