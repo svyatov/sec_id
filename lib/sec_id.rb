@@ -36,6 +36,18 @@ module SecId
       detector.call(str)
     end
 
+    # Checks whether the string is a valid identifier.
+    #
+    # @param str [String, nil] the identifier string to validate
+    # @param types [Array<Symbol>, nil] restrict to specific types (e.g. [:isin, :cusip])
+    # @return [Boolean]
+    # @raise [ArgumentError] if any key in types is unknown
+    def valid?(str, types: nil)
+      return detect(str).any? if types.nil?
+
+      types.any? { |key| self[key].valid?(str) }
+    end
+
     private
 
     # @param klass [Class] the identifier class to register

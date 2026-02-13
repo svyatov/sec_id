@@ -98,6 +98,13 @@ SecId.detect('037833100')     # => [:cusip, :valoren, :cik]
 SecId.detect('APPLE INC/SH') # => [:fisn]
 SecId.detect('INVALID')      # => []
 
+# Quick boolean validation
+SecId.valid?('US5949181045')                      # => true (any type)
+SecId.valid?('INVALID')                           # => false
+SecId.valid?('US5949181045', types: [:isin])      # => true
+SecId.valid?('594918104', types: %i[cusip sedol]) # => true
+SecId.valid?('US5949181045', types: [:cusip])     # => false
+
 # Work with the most specific match
 type = SecId.detect('US5949181045').first # => :isin
 isin = SecId[type].new('US5949181045')
