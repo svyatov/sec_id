@@ -35,23 +35,37 @@ RSpec.describe SecId::Detector do
       end
     end
 
-    context 'with fast-dispatch paths' do
-      it 'routes / to FISN only' do
-        result = detector.call('APPLE INC/SH')
-        expect(result).to eq([:fisn])
+    context 'with special-char dispatch' do
+      it 'routes / to FISN' do
+        expect(detector.call('APPLE INC/SH')).to eq([:fisn])
       end
 
-      it 'routes space (without /) to OCC only' do
-        result = detector.call('AAPL  210917C00150000')
-        expect(result).to eq([:occ])
+      it 'routes / + space to FISN (slash takes priority over space)' do
+        expect(detector.call('APPLE INC/SH SER A')).to eq([:fisn])
       end
 
-      it 'routes * to CUSIP candidates only' do
-        # * triggers special_types dispatch — only CUSIP accepts *@#
-        # Even if the check digit is wrong, the dispatch path is tested
-        result = detector.call('03783310*')
-        # Either detects as CUSIP (if check digit matches) or returns []
-        expect(result - [:cusip]).to be_empty
+      it 'routes space (without /) to OCC' do
+        expect(detector.call('AAPL  210917C00150000')).to eq([:occ])
+      end
+
+      it 'routes * to CUSIP candidates' do
+        expect(detector.call('03783310*') - [:cusip]).to be_empty
+      end
+
+      it 'routes @ to CUSIP candidates' do
+        expect(detector.call('03783310@') - [:cusip]).to be_empty
+      end
+
+      it 'routes # to CUSIP candidates' do
+        expect(detector.call('03783310#') - [:cusip]).to be_empty
+      end
+
+      it 'returns [] for invalid FISN through slash dispatch' do
+        expect(detector.call('/')).to eq([])
+      end
+
+      it 'returns [] for invalid OCC through space dispatch' do
+        expect(detector.call('AB CD')).to eq([])
       end
     end
 
@@ -91,7 +105,25 @@ RSpec.describe SecId::Detector do
       end
     end
 
-    context 'with edge cases' do
+    context 'with input normalization' do
+      it 'strips leading and trailing whitespace' do
+        expect(detector.call('  US5949181045  ')).to eq([:isin])
+      end
+
+      it 'detects lowercase input' do
+        expect(detector.call('us5949181045')).to eq([:isin])
+      end
+
+      it 'detects mixed-case input' do
+        expect(detector.call('Us5949181045')).to eq([:isin])
+      end
+
+      it 'accepts non-string input via to_s' do
+        expect(detector.call(514_000)).to eq(%i[wkn valoren cik])
+      end
+    end
+
+    context 'with nil and blank inputs' do
       it 'returns [] for nil' do
         expect(detector.call(nil)).to eq([])
       end
@@ -103,31 +135,79 @@ RSpec.describe SecId::Detector do
       it 'returns [] for whitespace-only string' do
         expect(detector.call('   ')).to eq([])
       end
+    end
 
-      it 'detects lowercase input' do
-        expect(detector.call('us5949181045')).to include(:isin)
-      end
-
-      it 'returns [] for very long string' do
-        expect(detector.call('A' * 36)).to eq([])
-      end
-
-      it 'detects single digit as CIK' do
+    context 'with boundary lengths' do
+      it 'detects single digit as CIK (min length 1)' do
         expect(detector.call('5')).to eq([:cik])
+      end
+
+      it 'detects 10-digit number as CIK (max length 10)' do
+        expect(detector.call('1234567890')).to eq([:cik])
+      end
+
+      it 'detects 5-digit number as Valoren and CIK (Valoren min length 5)' do
+        expect(detector.call('12345')).to eq(%i[valoren cik])
+      end
+
+      it 'returns [] for string exceeding all max lengths' do
+        expect(detector.call('A' * 36)).to eq([])
       end
     end
 
-    context 'with no-match inputs' do
-      it 'returns [] for INVALID (vowels reject SEDOL, letters reject CIK/Valoren)' do
-        expect(detector.call('INVALID')).to eq([])
+    context 'with wrong check digits' do
+      it 'rejects ISIN with wrong check digit' do
+        expect(detector.call('US5949181040')).to eq([])
       end
 
-      it 'returns [] for 12 Z characters (ISIN check digit fails, FIGI rejects structure)' do
+      it 'rejects SEDOL with wrong check digit' do
+        expect(detector.call('B0YBKJ0')).to eq([])
+      end
+
+      it 'excludes CUSIP but keeps overlapping types for wrong CUSIP check digit' do
+        result = detector.call('037833105')
+        expect(result).not_to include(:cusip)
+        expect(result).to include(:valoren, :cik)
+      end
+
+      it 'rejects LEI with wrong check digit' do
+        expect(detector.call('5493006MHB84DD0ZWV99')).to eq([])
+      end
+    end
+
+    context 'with type-specific structural rejection' do
+      it 'rejects FIGI with restricted prefix' do
+        expect(detector.call('BSG000BLNNH6')).to eq([])
+      end
+
+      it 'rejects 12 all-Z characters (ISIN check digit fails, FIGI structure fails)' do
         expect(detector.call('ZZZZZZZZZZZZ')).to eq([])
       end
 
-      it 'returns [] for LEI with wrong check digit' do
-        expect(detector.call('5493006MHB84DD0ZWV99')).to eq([])
+      it 'rejects 12 all-digit string (ISIN needs country code, FIGI needs consonants)' do
+        expect(detector.call('123456789012')).to eq([])
+      end
+    end
+
+    context 'with non-matching inputs' do
+      it 'rejects letters at SEDOL length (vowels fail SEDOL, letters fail CIK/Valoren)' do
+        expect(detector.call('INVALID')).to eq([])
+      end
+
+      it 'rejects unicode characters' do
+        expect(detector.call("\u00C9SVUFR")).to eq([])
+      end
+
+      it 'rejects strings with tabs' do
+        expect(detector.call("AAPL\t210917C00150000")).to eq([])
+      end
+
+      it 'rejects strings with newlines' do
+        expect(detector.call("US594\n9181045")).to eq([])
+      end
+
+      it 'rejects special characters not accepted by any type' do
+        expect(detector.call('ABC$DEF')).to eq([])
       end
     end
 
