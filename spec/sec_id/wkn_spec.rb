@@ -35,8 +35,8 @@ RSpec.describe SecId::WKN do
       expect(wkn.identifier).to eq('514000')
     end
 
-    it 'returns the full number' do
-      expect(wkn.full_number).to eq('514000')
+    it 'returns the full id' do
+      expect(wkn.full_id).to eq('514000')
     end
 
     describe '#to_s' do
@@ -135,14 +135,14 @@ RSpec.describe SecId::WKN do
       it 'returns an ISIN instance for default DE country code' do
         result = wkn.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('DE0007164600')
+        expect(result.full_id).to eq('DE0007164600')
         expect(result.country_code).to eq('DE')
       end
 
       it 'returns an ISIN instance for explicit DE country code' do
         result = wkn.to_isin('DE')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('DE0007164600')
+        expect(result.full_id).to eq('DE0007164600')
       end
 
       it 'raises InvalidFormatError for invalid country code' do
@@ -158,7 +158,7 @@ RSpec.describe SecId::WKN do
       it 'returns valid ISIN' do
         result = wkn.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('DE000CBK1001')
+        expect(result.full_id).to eq('DE000CBK1001')
       end
     end
 
@@ -178,7 +178,7 @@ RSpec.describe SecId::WKN do
       it 'preserves WKN value' do
         isin = wkn.to_isin
         wkn2 = isin.to_wkn
-        expect(wkn.full_number).to eq(wkn2.full_number)
+        expect(wkn.full_id).to eq(wkn2.full_id)
       end
     end
   end

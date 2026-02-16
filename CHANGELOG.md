@@ -20,7 +20,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
 - `#normalized` and `#normalize` instance methods on all identifier types returning the canonical string form
-- `#normalize!` instance method on all identifier types that mutates `full_number` to canonical form and returns `self`
+- `#normalize!` instance method on all identifier types that mutates `full_id` to canonical form and returns `self`
 - `.normalize(id)` class method on all identifier types that strips separators, upcases, validates, and returns the canonical string
 - `SEPARATORS` constant on `Base` (`/[\s-]/`) with type-specific overrides for OCC and FISN (`/-/`)
 
@@ -36,6 +36,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** `ValidationResult#error_codes` removed; use `details.map { |d| d[:error] }`
 - **BREAKING:** `ValidationResult#to_a` now returns `messages` (array of strings) instead of raw error hashes
 - **BREAKING:** `#validation_errors` and `.validation_errors` removed from public API
+- **BREAKING:** `#full_number` renamed to `#full_id` on all identifier types
 
 ### Removed
 
@@ -47,6 +48,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - `#valid_check_digit?` instance method and `.valid_check_digit?` class method
 - `#validation_errors` instance method (now private)
 - `.validation_errors` class method
+- `OCC#full_symbol` method — use `#full_id` instead
 
 ### Fixed
 
@@ -168,9 +170,9 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** API for accessing full number is unified across all classes:
 
     ```
-    SecId::ISIN#full_number  # previously SecId::ISIN#isin
-    SecId::CUSIP#full_number # previously SecId::CUSIP#cusip
-    SecId::SEDOL#full_number
+    SecId::ISIN#full_id  # previously SecId::ISIN#isin
+    SecId::CUSIP#full_id # previously SecId::CUSIP#cusip
+    SecId::SEDOL#full_id
     ```
 
 ### Fixed

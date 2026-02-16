@@ -36,7 +36,7 @@ module SecId
     # @raise [InvalidFormatError] if the WKN format is invalid
     def to_isin(country_code = 'DE')
       raise InvalidFormatError, "'#{country_code}' is not a valid WKN country code!" unless country_code == 'DE'
-      raise InvalidFormatError, "WKN '#{full_number}' is invalid!" unless valid_format?
+      raise InvalidFormatError, "WKN '#{full_id}' is invalid!" unless valid_format?
 
       isin = ISIN.new("#{country_code}000#{identifier}")
       isin.restore!

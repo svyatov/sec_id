@@ -49,7 +49,7 @@ module SecId
       end
 
       normalize!
-      isin = ISIN.new(country_code + full_number)
+      isin = ISIN.new(country_code + full_id)
       isin.restore!
       isin
     end
@@ -65,13 +65,13 @@ module SecId
     # @raise [InvalidFormatError]
     def normalize!
       super
-      @padding = @full_number[0, self.class::ID_LENGTH.max - @identifier.length]
+      @padding = @full_id[0, self.class::ID_LENGTH.max - @identifier.length]
       self
     end
 
     # @return [String]
     def to_s
-      full_number
+      full_id
     end
   end
 end

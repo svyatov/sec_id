@@ -34,7 +34,7 @@ RSpec.describe SecId::OCC do
     let(:occ_symbol) { 'EQX   260116C00005500' }
 
     it 'parses OCC symbol correctly' do
-      expect(occ.full_symbol).to eq(occ_symbol)
+      expect(occ.full_id).to eq(occ_symbol)
       expect(occ.underlying).to eq('EQX')
       expect(occ.date_str).to eq('260116')
       expect(occ.type).to eq('C')
@@ -193,9 +193,9 @@ RSpec.describe SecId::OCC do
     context 'with component strings in canonical form' do
       it 'composes OCC symbol' do
         components = { underlying: "X\s\s\s\s\s", date: '250620', type: 'C', strike: '00050000' }
-        full_symbol = components.values.join
+        full_id = components.values.join
         occ = described_class.build(**components)
-        expect(occ.full_symbol).to eq(full_symbol)
+        expect(occ.full_id).to eq(full_id)
       end
     end
 
@@ -203,7 +203,7 @@ RSpec.describe SecId::OCC do
       it 'composes OCC symbol' do
         components = { underlying: 'X', date: Date.new(2025, 6, 20), type: :C, strike: 50 }
         occ = described_class.build(**components)
-        expect(occ.full_symbol).to eq("X\s\s\s\s\s250620C00050000")
+        expect(occ.full_id).to eq("X\s\s\s\s\s250620C00050000")
       end
     end
 
@@ -211,7 +211,7 @@ RSpec.describe SecId::OCC do
       it 'composes OCC symbol with padded underlying' do
         occ = described_class.build(underlying: 'X', date: '250620', type: 'C', strike: 50)
         expect(occ.underlying).to eq('X')
-        expect(occ.full_symbol).to eq('X     250620C00050000')
+        expect(occ.full_id).to eq('X     250620C00050000')
       end
 
       it 'composes OCC symbol when date is a Date object' do
@@ -221,7 +221,7 @@ RSpec.describe SecId::OCC do
         expect(occ.date_str).to eq('260116')
         expect(occ.type).to eq('C')
         expect(occ.strike).to eq(5.5)
-        expect(occ.full_symbol).to eq('EQX   260116C00005500')
+        expect(occ.full_id).to eq('EQX   260116C00005500')
       end
 
       it 'composes OCC symbol when date is a string' do
@@ -230,7 +230,7 @@ RSpec.describe SecId::OCC do
         expect(occ.date_str).to eq('250919')
         expect(occ.type).to eq('P')
         expect(occ.strike).to eq(150.0)
-        expect(occ.full_symbol).to eq('AAPL  250919P00150000')
+        expect(occ.full_id).to eq('AAPL  250919P00150000')
       end
 
       it 'composes OCC symbol when date is an arbitrary parseable string' do
@@ -243,13 +243,13 @@ RSpec.describe SecId::OCC do
       it 'composes OCC symbol with decimal strike prices' do
         occ = described_class.build(underlying: '2DJX', date: '250321', type: 'C', strike: 415.3)
         expect(occ.strike).to eq(415.3)
-        expect(occ.full_symbol).to eq('2DJX  250321C00415300')
+        expect(occ.full_id).to eq('2DJX  250321C00415300')
       end
 
       it 'composes OCC symbol with rational strike prices' do
         occ = described_class.build(underlying: 'EQX', date: '260116', type: 'C', strike: Rational(11, 2))
         expect(occ.strike).to eq(5.5)
-        expect(occ.full_symbol).to eq('EQX   260116C00005500')
+        expect(occ.full_id).to eq('EQX   260116C00005500')
       end
     end
 

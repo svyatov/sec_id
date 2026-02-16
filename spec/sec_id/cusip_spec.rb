@@ -101,8 +101,8 @@ RSpec.describe SecId::CUSIP do
       it 'returns valid ISIN without mutating source CUSIP' do
         result = cusip.to_isin('US')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('US5949181045')
-        expect(cusip.full_number).to eq('59491810')
+        expect(result.full_id).to eq('US5949181045')
+        expect(cusip.full_id).to eq('59491810')
         expect(cusip.check_digit).to be_nil
       end
     end

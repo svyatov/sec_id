@@ -36,7 +36,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns self for #restore!' do
         expect(instance.restore!).to equal(instance)
-        expect(instance.full_number).to eq(valid_id)
+        expect(instance.full_id).to eq(valid_id)
       end
 
       it 'returns an Integer for #calculate_check_digit' do
@@ -59,7 +59,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'does not mutate instance for #restore' do
         instance.restore
-        expect(instance.full_number).to eq(valid_id_without_check)
+        expect(instance.full_id).to eq(valid_id_without_check)
       end
 
       it 'does not mutate check_digit for #restore' do
@@ -70,7 +70,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns self for #restore!' do
         expect(instance.restore!).to equal(instance)
-        expect(instance.full_number).to eq(restored_id)
+        expect(instance.full_id).to eq(restored_id)
       end
 
       it 'sets check_digit for #restore!' do
@@ -96,7 +96,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns self for #restore!' do
         expect(instance.restore!).to be(instance)
-        expect(instance.full_number).to eq(restored_id)
+        expect(instance.full_id).to eq(restored_id)
       end
     end
 

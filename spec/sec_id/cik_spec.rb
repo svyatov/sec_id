@@ -39,13 +39,13 @@ RSpec.describe SecId::CIK do
     it 'parses CIK correctly' do
       expect(cik.padding).to eq('000')
       expect(cik.identifier).to eq('1521365')
-      expect(cik.full_number).to eq(cik_number)
+      expect(cik.full_id).to eq(cik_number)
     end
 
     describe '#normalize!' do
-      it 'updates full_number and returns self' do
+      it 'updates full_id and returns self' do
         expect(cik.normalize!).to be(cik)
-        expect(cik.full_number).to eq(cik_number)
+        expect(cik.full_id).to eq(cik_number)
       end
     end
 
@@ -61,13 +61,13 @@ RSpec.describe SecId::CIK do
 
     it 'parses CIK number correctly' do
       expect(cik.identifier).to eq(cik_number)
-      expect(cik.full_number).to eq(cik_number)
+      expect(cik.full_id).to eq(cik_number)
     end
 
     describe '#normalize!' do
       it 'returns self and sets padding' do
         expect(cik.normalize!).to be(cik)
-        expect(cik.full_number).to eq('0000010624')
+        expect(cik.full_id).to eq('0000010624')
         expect(cik.padding).to eq('00000')
       end
     end

@@ -299,11 +299,11 @@ RSpec.describe SecId::CFI do
     end
   end
 
-  describe '#full_number' do
+  describe '#full_id' do
     let(:cfi_code) { 'esvufr' }
 
-    it 'returns the normalized (uppercased) full number' do
-      expect(cfi.full_number).to eq('ESVUFR')
+    it 'returns the normalized (uppercased) full id' do
+      expect(cfi.full_id).to eq('ESVUFR')
     end
   end
 

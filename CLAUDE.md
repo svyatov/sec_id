@@ -23,7 +23,7 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
 - Core API: `valid?`, `errors` (memoized, returns `ValidationResult`), `validate!` (returns self or raises)
-- Normalization API: `#normalized` / `#normalize` (canonical string), `#normalize!` (mutates `full_number`, returns self), `.normalize(id)` (class-level with separator stripping)
+- Normalization API: `#normalized` / `#normalize` (canonical string), `#normalize!` (mutates `full_id`, returns self), `.normalize(id)` (class-level with separator stripping)
 - Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`), `validate!` (returns instance or raises)
 - `parse` helper method for extracting identifier components (always strips and upcases)
 - `SEPARATORS` constant (`/[\s-]/` by default) for class-level `.normalize` input sanitization
@@ -223,7 +223,7 @@ feat: add WKN support
 fix: correct CUSIP check-digit for alphanumeric input
 docs: update README with LEI usage examples
 refactor: extract shared Normalizable module
-feat!: rename full_number to identifier across all classes
+feat!: rename full_id to identifier across all classes
 chore: bump version to 4.4.0
 ```
 
