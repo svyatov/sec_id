@@ -108,6 +108,11 @@ module SecId
 
     private
 
+    # @return [Integer]
+    def check_digit_width
+      2
+    end
+
     # @return [Boolean]
     def valid_format?
       return false unless identifier

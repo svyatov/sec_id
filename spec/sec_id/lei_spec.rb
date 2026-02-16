@@ -44,6 +44,36 @@ RSpec.describe SecId::LEI do
                   invalid_check_digit_id: '5493006MHB84DD0ZWV99',
                   expected_check_digit: 18
 
+  describe '#check_digit_width' do
+    it 'returns 2' do
+      lei = described_class.new('5493006MHB84DD0ZWV18')
+      expect(lei.__send__(:check_digit_width)).to eq(2)
+    end
+  end
+
+  describe '#restore' do
+    it 'always produces a 20-character string' do
+      # Test with a LEI where check digit is < 10 (single digit)
+      lei = described_class.new('7ZW8QJWVPR4P1J1KQY')
+      restored = lei.restore
+      expect(restored.length).to eq(20)
+    end
+
+    it 'pads single-digit check digit' do
+      # 549300TRUWO2CD2G56 has check digit 92
+      lei = described_class.new('549300TRUWO2CD2G56')
+      expect(lei.restore).to eq('549300TRUWO2CD2G5692')
+      expect(lei.restore.length).to eq(20)
+    end
+  end
+
+  describe '#to_s' do
+    it 'always produces a 20-character string for valid LEI' do
+      lei = described_class.new('5493006MHB84DD0ZWV18')
+      expect(lei.to_s.length).to eq(20)
+    end
+  end
+
   context 'when LEI is valid' do
     let(:lei_number) { '5493006MHB84DD0ZWV18' }
 

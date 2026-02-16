@@ -20,6 +20,35 @@ module CheckableSpecHelper
     end
   end
 
+  # Test class with 2-digit check digit (like LEI)
+  class TwoDigitCheckClass < SecId::Base
+    include SecId::Checkable
+
+    FULL_NAME = 'Two Digit Check Test'
+    ID_LENGTH = 5
+    VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
+    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d{2})?\z/
+
+    def initialize(id) # rubocop:disable Lint/MissingSuper
+      parts = parse(id)
+      @identifier = parts[:identifier]
+      @check_digit = parts[:check_digit]&.to_i
+    end
+
+    def calculate_check_digit
+      validate_format_for_calculation!
+      # Returns a value that can be single-digit (e.g. 5) to test padding
+      sum = identifier.chars.sum { |c| c.ord - 'A'.ord }
+      (sum % 98) + 1
+    end
+
+    private
+
+    def check_digit_width
+      2
+    end
+  end
+
   # Test class that doesn't implement calculate_check_digit
   class IncompleteClass < SecId::Base
     include SecId::Checkable
@@ -184,6 +213,47 @@ RSpec.describe SecId::Checkable do
   describe '.check_digit' do
     it 'creates instance and returns calculated check digit' do
       expect(test_class.check_digit('ABC')).to eq(7)
+    end
+  end
+
+  describe 'two-digit check digit padding' do
+    let(:two_digit_class) { CheckableSpecHelper::TwoDigitCheckClass }
+
+    # ABC: A=0, B=1, C=2, sum=3, 3%98+1=4 → single digit, must pad to "04"
+    describe '#to_s' do
+      it 'pads single-digit check digit to width 2' do
+        instance = two_digit_class.new('ABC04')
+        expect(instance.to_s).to eq('ABC04')
+      end
+
+      it 'returns identifier only when check digit is nil' do
+        instance = two_digit_class.new('ABC')
+        expect(instance.to_s).to eq('ABC')
+      end
+    end
+
+    describe '#restore' do
+      it 'pads single-digit check digit to width 2' do
+        instance = two_digit_class.new('ABC')
+        expect(instance.restore).to eq('ABC04')
+        expect(instance.restore.length).to eq(5)
+      end
+    end
+
+    describe '#restore!' do
+      it 'pads single-digit check digit to width 2' do
+        instance = two_digit_class.new('ABC')
+        instance.restore!
+        expect(instance.full_id).to eq('ABC04')
+      end
+    end
+
+    describe 'validation_message' do
+      it 'shows padded check digit values' do
+        instance = two_digit_class.new('ABC99')
+        result = instance.errors
+        expect(result.messages.first).to include("'99'", "'04'")
+      end
     end
   end
 

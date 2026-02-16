@@ -94,7 +94,7 @@ module SecId
     #
     # @return [Boolean]
     def valid?
-      valid_format? && check_digit == calculate_check_digit
+      super && check_digit == calculate_check_digit
     end
 
     # Returns the full identifier string with correct check digit without mutation.
@@ -102,7 +102,7 @@ module SecId
     # @return [String] the full identifier with correct check digit
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore
-      "#{identifier}#{calculate_check_digit}"
+      "#{identifier}#{calculate_check_digit.to_s.rjust(check_digit_width, '0')}"
     end
 
     # Calculates and sets the check digit, updating full_id.
@@ -126,7 +126,7 @@ module SecId
 
     # @return [String]
     def to_s
-      "#{identifier}#{check_digit}"
+      "#{identifier}#{check_digit&.to_s&.rjust(check_digit_width, '0')}"
     end
 
     # CUSIP/CEI style: "Double Add Double" algorithm.
@@ -207,7 +207,8 @@ module SecId
     # @return [String]
     def validation_message(code)
       if code == :invalid_check_digit
-        return "Check digit '#{check_digit}' is invalid, expected '#{calculate_check_digit}'"
+        fmt = ->(cd) { cd.to_s.rjust(check_digit_width, '0') }
+        return "Check digit '#{fmt[check_digit]}' is invalid, expected '#{fmt[calculate_check_digit]}'"
       end
 
       super

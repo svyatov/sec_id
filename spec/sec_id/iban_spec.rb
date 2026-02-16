@@ -44,6 +44,13 @@ RSpec.describe SecId::IBAN do
                   invalid_check_digit_id: 'DE99370400440532013000',
                   expected_check_digit: 89
 
+  describe '#check_digit_width' do
+    it 'returns 2' do
+      iban = described_class.new('DE89370400440532013000')
+      expect(iban.__send__(:check_digit_width)).to eq(2)
+    end
+  end
+
   context 'when IBAN is valid (Germany)' do
     let(:iban_number) { 'DE89370400440532013000' }
 

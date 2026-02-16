@@ -57,13 +57,6 @@ module SecId
       mod97("#{numeric_identifier}00")
     end
 
-    # @return [String]
-    def to_s
-      return full_id unless check_digit
-
-      "#{identifier}#{check_digit.to_s.rjust(2, '0')}"
-    end
-
     private
 
     # @return [Integer]
