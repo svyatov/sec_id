@@ -9,6 +9,19 @@
 RSpec.shared_examples 'a validatable identifier' do |params|
   let(:identifier_class) { described_class }
 
+  describe '#to_s' do
+    it 'returns a String' do
+      expect(identifier_class.new(params[:valid_id]).to_s).to be_a(String)
+    end
+  end
+
+  describe '#to_str' do
+    it 'returns the same value as to_s' do
+      instance = identifier_class.new(params[:valid_id])
+      expect(instance.to_str).to eq(instance.to_s)
+    end
+  end
+
   describe '#errors' do
     context 'when identifier is valid' do
       it 'returns a valid ValidationResult' do
@@ -136,7 +149,7 @@ RSpec.shared_examples 'a validate! identifier' do |params|
   end
 
   describe '.validate!' do
-    it 'returns the instance when valid' do
+    it 'returns an instance of the identifier class when valid' do
       result = identifier_class.validate!(params[:valid_id])
       expect(result).to be_a(identifier_class)
       expect(result).to be_valid

@@ -128,7 +128,6 @@ module SecId
     def to_s
       "#{identifier}#{check_digit}"
     end
-    alias to_str to_s
 
     # CUSIP/CEI style: "Double Add Double" algorithm.
     # Processes pairs of digits, doubling the first (even-positioned from right),

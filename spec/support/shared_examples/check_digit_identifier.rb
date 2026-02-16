@@ -28,17 +28,21 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(true)
       end
 
-      it 'returns full identifier string for #restore' do
-        expect(instance.restore).to eq(valid_id)
+      it 'returns a String for #restore' do
+        result = instance.restore
+        expect(result).to be_a(String)
+        expect(result).to eq(valid_id)
       end
 
       it 'returns self for #restore!' do
-        expect(instance.restore!).to be(instance)
+        expect(instance.restore!).to equal(instance)
         expect(instance.full_number).to eq(valid_id)
       end
 
-      it 'calculates correct check-digit' do
-        expect(instance.calculate_check_digit).to eq(expected_check_digit)
+      it 'returns an Integer for #calculate_check_digit' do
+        result = instance.calculate_check_digit
+        expect(result).to be_a(Integer)
+        expect(result).to eq(expected_check_digit)
       end
     end
 
@@ -58,9 +62,20 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.full_number).to eq(valid_id_without_check)
       end
 
+      it 'does not mutate check_digit for #restore' do
+        original_check_digit = instance.check_digit
+        instance.restore
+        expect(instance.check_digit).to eq(original_check_digit)
+      end
+
       it 'returns self for #restore!' do
-        expect(instance.restore!).to be(instance)
+        expect(instance.restore!).to equal(instance)
         expect(instance.full_number).to eq(restored_id)
+      end
+
+      it 'sets check_digit for #restore!' do
+        instance.restore!
+        expect(instance.check_digit).to eq(expected_check_digit)
       end
 
       it 'calculates correct check-digit' do
@@ -126,6 +141,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
     end
 
     describe '.restore' do
+      it 'returns a String' do
+        expect(identifier_class.restore(valid_id)).to be_a(String)
+      end
+
       it 'restores valid identifier to itself' do
         expect(identifier_class.restore(valid_id)).to eq(restored_id)
       end
@@ -168,6 +187,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
     end
 
     describe '.check_digit' do
+      it 'returns an Integer' do
+        expect(identifier_class.check_digit(valid_id)).to be_a(Integer)
+      end
+
       it 'calculates check-digit for valid identifier' do
         expect(identifier_class.check_digit(valid_id)).to eq(expected_check_digit)
       end

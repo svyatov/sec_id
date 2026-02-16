@@ -55,4 +55,3 @@ RSpec/ExampleLength:
 RSpec/SpecFilePathFormat:
   CustomTransform:
     Checkable: concerns/checkable
-    Normalizable: concerns/normalizable

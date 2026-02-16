@@ -58,14 +58,14 @@ module SecId
     # @raise [InvalidFormatError]
     def normalized
       validate!
-      @identifier.rjust(9, '0')
+      @identifier.rjust(self.class::ID_LENGTH.max, '0')
     end
 
     # @return [self]
     # @raise [InvalidFormatError]
     def normalize!
       super
-      @padding = @full_number[0, 9 - @identifier.length]
+      @padding = @full_number[0, self.class::ID_LENGTH.max - @identifier.length]
       self
     end
 
@@ -73,6 +73,5 @@ module SecId
     def to_s
       full_number
     end
-    alias to_str to_s
   end
 end

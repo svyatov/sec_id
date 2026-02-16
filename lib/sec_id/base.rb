@@ -206,7 +206,11 @@ module SecId
     def to_s
       identifier.to_s
     end
-    alias to_str to_s
+
+    # @return [String]
+    def to_str
+      to_s
+    end
 
     private
 

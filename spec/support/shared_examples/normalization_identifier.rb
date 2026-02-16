@@ -15,6 +15,10 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
   let(:invalid_id) { params[:invalid_id] }
 
   describe '#normalized' do
+    it 'returns a String' do
+      expect(identifier_class.new(valid_id).normalized).to be_a(String)
+    end
+
     it 'returns canonical string for valid input' do
       expect(identifier_class.new(valid_id).normalized).to eq(canonical_id)
     end
@@ -34,7 +38,7 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
   describe '#normalize!' do
     it 'returns self' do
       instance = identifier_class.new(valid_id)
-      expect(instance.normalize!).to be(instance)
+      expect(instance.normalize!).to equal(instance)
     end
 
     it 'mutates full_number to canonical form' do
@@ -43,12 +47,24 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
       expect(instance.full_number).to eq(canonical_id)
     end
 
+    it 'is idempotent' do
+      instance = identifier_class.new(valid_id)
+      instance.normalize!
+      first_full_number = instance.full_number
+      instance.normalize!
+      expect(instance.full_number).to eq(first_full_number)
+    end
+
     it 'raises for invalid input' do
       expect { identifier_class.new(invalid_id).normalize! }.to raise_error(SecId::Error)
     end
   end
 
   describe '.normalize' do
+    it 'returns a String' do
+      expect(identifier_class.normalize(valid_id)).to be_a(String)
+    end
+
     it 'returns canonical string for valid input' do
       expect(identifier_class.normalize(valid_id)).to eq(canonical_id)
     end
