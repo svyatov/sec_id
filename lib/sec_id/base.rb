@@ -53,6 +53,8 @@ module SecId
       invalid_date: InvalidStructureError
     }.freeze
 
+    SEPARATORS = /[\s-]/
+
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_number
 
@@ -128,9 +130,22 @@ module SecId
         ancestors.include?(SecId::Checkable)
       end
 
-      # @return [Boolean] true if this identifier type supports normalization
-      def has_normalization?
-        ancestors.include?(SecId::Normalizable)
+      # Normalizes the identifier to its canonical format.
+      #
+      # @param id [String, #to_s] the identifier to normalize
+      # @return [String] the normalized identifier
+      # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+      def normalize(id)
+        cleaned = sanitize_for_normalization(id)
+        new(cleaned).normalized
+      end
+
+      private
+
+      # @param id [String, #to_s] the raw identifier input
+      # @return [String] stripped, upcased input with separators removed
+      def sanitize_for_normalization(id)
+        id.to_s.strip.upcase.gsub(self::SEPARATORS, '')
       end
     end
 
@@ -166,6 +181,25 @@ module SecId
 
       detail = errors.details.first
       raise self.class.exception_for_error(detail[:error]), detail[:message]
+    end
+
+    # Returns the canonical normalized form of this identifier.
+    #
+    # @return [String]
+    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    def normalized
+      validate!
+      to_s
+    end
+    alias normalize normalized
+
+    # Normalizes this identifier in place, updating {#full_number}.
+    #
+    # @return [self]
+    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    def normalize!
+      @full_number = normalized
+      self
     end
 
     # @return [String]
@@ -243,11 +277,9 @@ module SecId
     end
 
     # @param sec_id_number [String, #to_s] the identifier to parse
-    # @param upcase [Boolean] whether to upcase the input
     # @return [MatchData, Hash] the regex match data or empty hash if no match
-    def parse(sec_id_number, upcase: true)
-      @full_number = sec_id_number.to_s.strip
-      @full_number.upcase! if upcase
+    def parse(sec_id_number)
+      @full_number = sec_id_number.to_s.strip.upcase
       @full_number.match(self.class::ID_REGEX) || {}
     end
   end

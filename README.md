@@ -56,12 +56,14 @@ gem install sec_id
 
 All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` methods at both class and instance levels.
 
+**All identifiers** support normalization:
+- `.normalize(id)` - strips separators, upcases, validates, and returns the canonical string
+- `#normalized` / `#normalize` - returns the canonical string for a valid instance
+- `#normalize!` - mutates `full_number` to canonical form, returns `self`
+
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore!` - restores check-digit and returns the full number
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
-
-**Normalization based identifiers** (CIK, OCC, Valoren) provide instead:
-- `normalize!` - pads/formats the identifier to its standard form
 
 ### Metadata Registry
 
@@ -82,14 +84,10 @@ SecId::ISIN.full_name                     # => "International Securities Identif
 SecId::ISIN.id_length                     # => 12
 SecId::ISIN.example                       # => "US5949181045"
 SecId::ISIN.has_check_digit?              # => true
-SecId::ISIN.has_normalization?            # => false
 
 # Filter with standard Ruby
 SecId.identifiers.select(&:has_check_digit?).map(&:short_name)
 # => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI"]
-
-SecId.identifiers.select(&:has_normalization?).map(&:short_name)
-# => ["CIK", "OCC", "Valoren"]
 
 # Detect identifier type from an unknown string
 # Results are sorted by specificity: check-digit types first, then by length precision
@@ -352,8 +350,8 @@ Full BBAN structural validation is supported for EU/EEA countries. Other countri
 
 ```ruby
 # class level
-SecId::CIK.valid?('0001094517')  # => true
-SecId::CIK.normalize!('1094517') # => '0001094517'
+SecId::CIK.valid?('0001094517')    # => true
+SecId::CIK.normalize('1094517')    # => '0001094517'
 
 # instance level
 cik = SecId::CIK.new('0001094517')
@@ -361,8 +359,8 @@ cik.full_number   # => '0001094517'
 cik.padding       # => '000'
 cik.identifier    # => '1094517'
 cik.valid?        # => true
-cik.normalize!    # => '0001094517'
-cik.to_s          # => '0001094517'
+cik.normalized    # => '0001094517'
+cik.normalize!    # => #<SecId::CIK> (mutates full_number, returns self)
 ```
 
 ### OCC
@@ -371,8 +369,8 @@ cik.to_s          # => '0001094517'
 
 ```ruby
 # class level
-SecId::OCC.valid?('BRKB  100417C00090000')   # => true
-SecId::OCC.normalize!('BRKB100417C00090000') # => 'BRKB  100417C00090000'
+SecId::OCC.valid?('BRKB  100417C00090000')    # => true
+SecId::OCC.normalize('BRKB100417C00090000')   # => 'BRKB  100417C00090000'
 SecId::OCC.build(
   underlying: 'BRKB',
   date: Date.new(2010, 4, 17),
@@ -389,12 +387,12 @@ occ.date_obj      # => #<Date: 2010-04-17>
 occ.type          # => 'C'
 occ.strike        # => 90.0
 occ.valid?        # => true
-occ.normalize!    # => 'BRKB  100417C00090000'
+occ.normalized    # => 'BRKB  100417C00090000'
 
 occ = SecId::OCC.new('X 250620C00050000')
 occ.full_symbol   # => 'X 250620C00050000'
 occ.valid?        # => true
-occ.normalize!    # => 'X     250620C00050000'
+occ.normalize!    # => #<SecId::OCC> (mutates full_number, returns self)
 occ.full_symbol   # => 'X     250620C00050000'
 ```
 
@@ -428,7 +426,7 @@ SecId::Valoren.valid?('3886335')        # => true
 SecId::Valoren.valid?('24476758')       # => true
 SecId::Valoren.valid?('35514757')       # => true
 SecId::Valoren.valid?('97429325')       # => true
-SecId::Valoren.normalize!('3886335')    # => '003886335'
+SecId::Valoren.normalize('3886335')     # => '003886335'
 
 # instance level
 valoren = SecId::Valoren.new('3886335')
@@ -436,8 +434,8 @@ valoren.full_number   # => '3886335'
 valoren.padding       # => ''
 valoren.identifier    # => '3886335'
 valoren.valid?        # => true
-valoren.normalize!    # => '003886335'
-valoren.to_s          # => '003886335'
+valoren.normalized    # => '003886335'
+valoren.normalize!    # => #<SecId::Valoren> (mutates full_number, returns self)
 valoren.to_isin       # => #<SecId::ISIN> (CH ISIN by default)
 valoren.to_isin('LI') # => #<SecId::ISIN> (LI ISIN)
 ```

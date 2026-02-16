@@ -1,83 +1,64 @@
 # frozen_string_literal: true
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers
-
-# Shared examples for normalization-based identifiers (CIK, OCC).
-# Validates the core API: valid?, normalize!.
+# Shared examples for normalization across all identifier types.
+# Validates instance methods (#normalized, #normalize, #normalize!) and class-level .normalize.
 #
-# @param valid_id [String] a valid, normalized identifier
-# @param unnormalized_id [String] a valid but unnormalized identifier
-# @param normalized_id [String] the expected normalized form
+# @param valid_id [String] a valid identifier
+# @param canonical_id [String] the expected canonical form (defaults to valid_id)
+# @param dirty_id [String] a valid identifier with separators/whitespace/case issues
 # @param invalid_id [String] an invalid identifier
-RSpec.shared_examples 'a normalization identifier' do |params|
+RSpec.shared_examples 'a normalizable identifier' do |params|
   let(:identifier_class) { described_class }
   let(:valid_id) { params[:valid_id] }
-  let(:unnormalized_id) { params[:unnormalized_id] }
-  let(:normalized_id) { params[:normalized_id] }
+  let(:canonical_id) { params.fetch(:canonical_id, params[:valid_id]) }
+  let(:dirty_id) { params[:dirty_id] }
   let(:invalid_id) { params[:invalid_id] }
 
-  describe 'instance methods' do
-    context 'when identifier is valid and normalized' do
-      let(:instance) { identifier_class.new(valid_id) }
-
-      it 'returns true for #valid?' do
-        expect(instance.valid?).to be(true)
-      end
+  describe '#normalized' do
+    it 'returns canonical string for valid input' do
+      expect(identifier_class.new(valid_id).normalized).to eq(canonical_id)
     end
 
-    context 'when identifier is valid but unnormalized' do
-      let(:instance) { identifier_class.new(unnormalized_id) }
-
-      it 'returns true for #valid?' do
-        expect(instance.valid?).to be(true)
-      end
-
-      it 'normalizes with #normalize!' do
-        expect(instance.normalize!).to eq(normalized_id)
-      end
-    end
-
-    context 'when identifier is invalid' do
-      let(:instance) { identifier_class.new(invalid_id) }
-
-      it 'returns false for #valid?' do
-        expect(instance.valid?).to be(false)
-      end
-
-      it 'raises error for #normalize!' do
-        expect { instance.normalize! }.to raise_error(SecId::InvalidFormatError)
-      end
+    it 'raises for invalid input' do
+      expect { identifier_class.new(invalid_id).normalized }.to raise_error(SecId::Error)
     end
   end
 
-  describe 'class methods' do
-    describe '.valid?' do
-      it 'returns true for valid normalized identifier' do
-        expect(identifier_class.valid?(valid_id)).to be(true)
-      end
+  describe '#normalize' do
+    it 'returns the same value as #normalized' do
+      instance = identifier_class.new(valid_id)
+      expect(instance.normalize).to eq(instance.normalized)
+    end
+  end
 
-      it 'returns true for valid unnormalized identifier' do
-        expect(identifier_class.valid?(unnormalized_id)).to be(true)
-      end
-
-      it 'returns false for invalid identifier' do
-        expect(identifier_class.valid?(invalid_id)).to be(false)
-      end
+  describe '#normalize!' do
+    it 'returns self' do
+      instance = identifier_class.new(valid_id)
+      expect(instance.normalize!).to be(instance)
     end
 
-    describe '.normalize!' do
-      it 'normalizes valid identifier' do
-        expect(identifier_class.normalize!(valid_id)).to eq(normalized_id)
-      end
+    it 'mutates full_number to canonical form' do
+      instance = identifier_class.new(valid_id)
+      instance.normalize!
+      expect(instance.full_number).to eq(canonical_id)
+    end
 
-      it 'normalizes unnormalized identifier' do
-        expect(identifier_class.normalize!(unnormalized_id)).to eq(normalized_id)
-      end
+    it 'raises for invalid input' do
+      expect { identifier_class.new(invalid_id).normalize! }.to raise_error(SecId::Error)
+    end
+  end
 
-      it 'raises error for invalid identifier' do
-        expect { identifier_class.normalize!(invalid_id) }.to raise_error(SecId::InvalidFormatError)
-      end
+  describe '.normalize' do
+    it 'returns canonical string for valid input' do
+      expect(identifier_class.normalize(valid_id)).to eq(canonical_id)
+    end
+
+    it 'handles separator-dirty input' do
+      expect(identifier_class.normalize(dirty_id)).to eq(canonical_id)
+    end
+
+    it 'raises for invalid input' do
+      expect { identifier_class.normalize(invalid_id) }.to raise_error(SecId::Error)
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers

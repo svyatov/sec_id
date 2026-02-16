@@ -10,8 +10,12 @@ RSpec.describe SecId::LEI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Legal Entity Identifier',
                   id_length: 20,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: '529900T8BM49AURSDO55',
+                  dirty_id: '5299 00t8 bm49 aurs do55',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

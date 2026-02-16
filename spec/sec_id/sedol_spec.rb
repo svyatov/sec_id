@@ -10,8 +10,12 @@ RSpec.describe SecId::SEDOL do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Stock Exchange Daily Official List',
                   id_length: 7,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'B0YBKJ7',
+                  dirty_id: 'b0y bkj7',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

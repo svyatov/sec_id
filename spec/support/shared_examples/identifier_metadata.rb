@@ -6,7 +6,6 @@
 # @param full_name [String] expected full human-readable name
 # @param id_length [Integer, Range] expected identifier length
 # @param has_check_digit [Boolean] whether the class includes Checkable
-# @param has_normalization [Boolean] whether the class includes Normalizable
 RSpec.shared_examples 'an identifier with metadata' do |params|
   describe 'metadata class methods' do
     it '.short_name returns the unqualified class name' do
@@ -39,10 +38,6 @@ RSpec.shared_examples 'an identifier with metadata' do |params|
 
     it '.has_check_digit? returns the expected value' do
       expect(described_class.has_check_digit?).to be(params[:has_check_digit])
-    end
-
-    it '.has_normalization? returns the expected value' do
-      expect(described_class.has_normalization?).to be(params[:has_normalization])
     end
   end
 end

@@ -10,8 +10,12 @@ RSpec.describe SecId::IBAN do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'International Bank Account Number',
                   id_length: 15..34,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'GB29NWBK60161331926819',
+                  dirty_id: 'GB29 NWBK 6016 1331 9268 19',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

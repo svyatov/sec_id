@@ -10,8 +10,12 @@ RSpec.describe SecId::CUSIP do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Committee on Uniform Securities Identification Procedures',
                   id_length: 9,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: '037833100',
+                  dirty_id: '037-833-100',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

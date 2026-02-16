@@ -10,8 +10,7 @@ RSpec.describe SecId::CIK do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Central Index Key',
                   id_length: 1..10,
-                  has_check_digit: false,
-                  has_normalization: true
+                  has_check_digit: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',
@@ -27,11 +26,11 @@ RSpec.describe SecId::CIK do
   it_behaves_like 'detects invalid format',
                   invalid_format_id: '0000000000'
 
-  # Core normalization identifier behavior
-  it_behaves_like 'a normalization identifier',
+  # Normalization
+  it_behaves_like 'a normalizable identifier',
                   valid_id: '0001521365',
-                  unnormalized_id: '1521365',
-                  normalized_id: '0001521365',
+                  canonical_id: '0001521365',
+                  dirty_id: '  1521365  ',
                   invalid_id: '0000000000'
 
   context 'when CIK is valid' do
@@ -44,8 +43,8 @@ RSpec.describe SecId::CIK do
     end
 
     describe '#normalize!' do
-      it 'returns full CIK number' do
-        expect(cik.normalize!).to eq(cik_number)
+      it 'updates full_number and returns self' do
+        expect(cik.normalize!).to be(cik)
         expect(cik.full_number).to eq(cik_number)
       end
     end
@@ -66,8 +65,8 @@ RSpec.describe SecId::CIK do
     end
 
     describe '#normalize!' do
-      it 'returns full CIK number and sets padding' do
-        expect(cik.normalize!).to eq('0000010624')
+      it 'returns self and sets padding' do
+        expect(cik.normalize!).to be(cik)
         expect(cik.full_number).to eq('0000010624')
         expect(cik.padding).to eq('00000')
       end
@@ -103,22 +102,22 @@ RSpec.describe SecId::CIK do
     end
   end
 
-  describe '.normalize!' do
+  describe '.normalize' do
     context 'when CIK is malformed' do
       it 'raises an error' do
-        expect { described_class.normalize!('X9') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('0000000000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('09876543210') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('X9') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('0000000000') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('09876543210') }.to raise_error(SecId::InvalidFormatError)
       end
     end
 
     context 'when CIK is valid' do
       it 'normalizes padding and returns full CIK number' do
-        expect(described_class.normalize!('3')).to eq('0000000003')
-        expect(described_class.normalize!('0000000003')).to eq('0000000003')
-        expect(described_class.normalize!('1072424')).to eq('0001072424')
-        expect(described_class.normalize!('001072424')).to eq('0001072424')
-        expect(described_class.normalize!('0001072424')).to eq('0001072424')
+        expect(described_class.normalize('3')).to eq('0000000003')
+        expect(described_class.normalize('0000000003')).to eq('0000000003')
+        expect(described_class.normalize('1072424')).to eq('0001072424')
+        expect(described_class.normalize('001072424')).to eq('0001072424')
+        expect(described_class.normalize('0001072424')).to eq('0001072424')
       end
     end
   end

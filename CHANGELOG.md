@@ -16,9 +16,17 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success
 - Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
-- Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
+- Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
+- `#normalized` and `#normalize` instance methods on all identifier types returning the canonical string form
+- `#normalize!` instance method on all identifier types that mutates `full_number` to canonical form and returns `self`
+- `.normalize(id)` class method on all identifier types that strips separators, upcases, validates, and returns the canonical string
+- `SEPARATORS` constant on `Base` (`/[\s-]/`) with type-specific overrides for OCC and FISN (`/-/`)
+
 ### Changed
 
+- **BREAKING:** `#normalize!` on CIK, OCC, and Valoren now returns `self` instead of a string; use `#normalized` to get the canonical string
+- **BREAKING:** Class-level `.normalize!` on CIK, OCC, and Valoren replaced by `.normalize` (non-bang) which returns the canonical string
+- **BREAKING:** `Base#parse` always upcases input; the `upcase` keyword parameter is removed
 - **BREAKING:** `#validate` renamed to `#errors` (memoized); class-level `.validate` still available
 - **BREAKING:** `ValidationResult#errors` renamed to `#details`; each hash uses `:error` key instead of `:code`
 - **BREAKING:** `ValidationResult#error_codes` removed; use `details.map { |d| d[:error] }`
@@ -27,6 +35,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Removed
 
+- `has_normalization?` class method — all types now support normalization
+- `Normalizable` concern (`lib/sec_id/concerns/normalizable.rb`) — normalization is now built into `Base`
+- Class-level `.normalize!` on CIK, OCC, and Valoren — replaced by `.normalize`
+- `upcase` keyword parameter from `Base#parse`
 - `#valid_format?` instance method (now private) and `.valid_format?` class method
 - `#valid_check_digit?` instance method and `.valid_check_digit?` class method
 - `#validation_errors` instance method (now private)

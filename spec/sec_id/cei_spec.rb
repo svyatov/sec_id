@@ -9,8 +9,12 @@ RSpec.describe SecId::CEI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'CUSIP Entity Identifier',
                   id_length: 10,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'A0BCDEFGH1',
+                  dirty_id: 'a0-bcde-fgh1',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

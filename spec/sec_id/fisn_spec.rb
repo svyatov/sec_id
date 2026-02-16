@@ -10,8 +10,12 @@ RSpec.describe SecId::FISN do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Financial Instrument Short Name',
                   id_length: 3..35,
-                  has_check_digit: false,
-                  has_normalization: false
+                  has_check_digit: false
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'APPLE INC/SH',
+                  dirty_id: 'apple inc/sh',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

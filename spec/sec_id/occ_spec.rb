@@ -10,8 +10,7 @@ RSpec.describe SecId::OCC do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'OCC Option Symbol',
                   id_length: (16..21),
-                  has_check_digit: false,
-                  has_normalization: true
+                  has_check_digit: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',
@@ -24,11 +23,11 @@ RSpec.describe SecId::OCC do
                   invalid_length_id: 'AAPL',
                   invalid_chars_id: 'AAPL!!210917C00150000'
 
-  # Core normalization identifier behavior
-  it_behaves_like 'a normalization identifier',
+  # Normalization
+  it_behaves_like 'a normalizable identifier',
                   valid_id: 'EQX   260116C00005500',
-                  unnormalized_id: 'EQX260116C00005500',
-                  normalized_id: 'EQX   260116C00005500',
+                  canonical_id: 'EQX   260116C00005500',
+                  dirty_id: 'eqx   260116c00005500',
                   invalid_id: 'ZVZZT'
 
   context 'when OCC symbol is in canonical form' do
@@ -154,14 +153,14 @@ RSpec.describe SecId::OCC do
     end
   end
 
-  describe '.normalize!' do
+  describe '.normalize' do
     context 'when OCC symbol is valid' do
       it 'normalizes padding for various OCC symbols' do
-        expect(described_class.normalize!('PAAS1250919C00022500')).to eq('PAAS1 250919C00022500')
-        expect(described_class.normalize!('X 250620C00050000')).to eq('X     250620C00050000')
-        expect(described_class.normalize!('X250620C00050000')).to eq('X     250620C00050000')
-        expect(described_class.normalize!('1AMD 250919P00085010')).to eq('1AMD  250919P00085010')
-        expect(described_class.normalize!('1AMD250919P00085010')).to eq('1AMD  250919P00085010')
+        expect(described_class.normalize('PAAS1250919C00022500')).to eq('PAAS1 250919C00022500')
+        expect(described_class.normalize('X 250620C00050000')).to eq('X     250620C00050000')
+        expect(described_class.normalize('X250620C00050000')).to eq('X     250620C00050000')
+        expect(described_class.normalize('1AMD 250919P00085010')).to eq('1AMD  250919P00085010')
+        expect(described_class.normalize('1AMD250919P00085010')).to eq('1AMD  250919P00085010')
       end
     end
   end

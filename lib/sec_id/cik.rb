@@ -13,10 +13,8 @@ module SecId
   #   SecId::CIK.valid?('1521365')     #=> true
   #
   # @example Normalize a CIK to 10 digits
-  #   SecId::CIK.normalize!('1521365')  #=> '0001521365'
+  #   SecId::CIK.normalize('1521365')  #=> '0001521365'
   class CIK < Base
-    include Normalizable
-
     FULL_NAME = 'Central Index Key'
     ID_LENGTH = (1..10)
     EXAMPLE = '0001521365'
@@ -37,17 +35,19 @@ module SecId
       @identifier = cik_parts[:identifier]
     end
 
-    # Normalizes the CIK to a 10-digit zero-padded format.
-    # Updates both @full_number and @padding to reflect the normalized state.
-    #
     # @return [String] the normalized 10-digit CIK
-    # @raise [InvalidFormatError] if the CIK format is invalid
-    def normalize!
-      raise InvalidFormatError, "CIK '#{full_number}' is invalid and cannot be normalized!" unless valid_format?
+    # @raise [InvalidFormatError]
+    def normalized
+      validate!
+      @identifier.rjust(10, '0')
+    end
 
-      @full_number = @identifier.rjust(10, '0')
+    # @return [self]
+    # @raise [InvalidFormatError]
+    def normalize!
+      super
       @padding = @full_number[0, 10 - @identifier.length]
-      @full_number
+      self
     end
 
     # @return [String]
