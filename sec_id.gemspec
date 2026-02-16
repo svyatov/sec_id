@@ -23,4 +23,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/**/*.rb'] + %w[CHANGELOG.md LICENSE.txt README.md sec_id.gemspec]
 
   spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.metadata['source_code_uri'] = 'https://github.com/svyatov/sec_id'
+  spec.metadata['changelog_uri'] = 'https://github.com/svyatov/sec_id/blob/main/CHANGELOG.md'
+  spec.metadata['bug_tracker_uri'] = 'https://github.com/svyatov/sec_id/issues'
 end

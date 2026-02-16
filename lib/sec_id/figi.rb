@@ -15,7 +15,7 @@ module SecId
   #   SecId::FIGI.valid?('BBG000BLNQ16')  #=> true
   #
   # @example Restore check digit
-  #   SecId::FIGI.restore!('BBG000BLNQ1')  #=> 'BBG000BLNQ16'
+  #   SecId::FIGI.restore!('BBG000BLNQ1')  #=> #<SecId::FIGI>
   class FIGI < Base
     include Checkable
 

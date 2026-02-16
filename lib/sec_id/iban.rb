@@ -16,7 +16,7 @@ module SecId
   #   SecId::IBAN.valid?('DE89370400440532013000')  #=> true
   #
   # @example Restore check digits
-  #   SecId::IBAN.restore!('DE00370400440532013000')  #=> 'DE89370400440532013000'
+  #   SecId::IBAN.restore!('DE00370400440532013000')  #=> #<SecId::IBAN>
   class IBAN < Base
     include Checkable
     include IBANCountryRules

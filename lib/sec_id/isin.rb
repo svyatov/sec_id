@@ -12,7 +12,7 @@ module SecId
   #   SecId::ISIN.valid?('US5949181045')  #=> true
   #
   # @example Restore check digit
-  #   SecId::ISIN.restore!('US594918104')  #=> 'US5949181045'
+  #   SecId::ISIN.restore!('US594918104')  #=> #<SecId::ISIN>
   class ISIN < Base
     include Checkable
 
