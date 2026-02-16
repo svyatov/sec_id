@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module SecId
-  # Country-specific BBAN validation rules for IBAN
+  # Country-specific BBAN validation rules for IBAN.
+  #
+  # @api private
   # rubocop:disable Metrics/ModuleLength
   module IBANCountryRules
     # Country-specific BBAN rules for EU/EEA countries

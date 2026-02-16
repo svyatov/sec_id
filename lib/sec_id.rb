@@ -4,9 +4,16 @@ require 'set'
 require 'sec_id/version'
 
 module SecId
+  # Base error class for all SecId errors.
   class Error < StandardError; end
+
+  # Raised for invalid format, length, or characters.
   class InvalidFormatError < Error; end
+
+  # Raised when the check digit does not match the calculated value.
   class InvalidCheckDigitError < Error; end
+
+  # Raised for type-specific structural errors (invalid prefix, category, group, BBAN, or date).
   class InvalidStructureError < Error; end
 
   class << self
