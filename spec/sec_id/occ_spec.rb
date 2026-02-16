@@ -106,6 +106,30 @@ RSpec.describe SecId::OCC do
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
       end
     end
+
+    context 'when date day is impossible (Feb 30)' do
+      it 'returns :invalid_date error' do
+        result = described_class.new('AAPL  210230C00150000').errors
+        expect(result.valid?).to be(false)
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
+      end
+    end
+  end
+
+  describe '#date' do
+    context 'when date is unparseable' do
+      let(:occ_symbol) { 'AAPL  210230C00150000' }
+
+      it 'returns nil' do
+        expect(occ.date).to be_nil
+      end
+
+      it 'memoizes the nil result' do
+        occ.date
+        occ.date
+        expect(occ.date).to be_nil
+      end
+    end
   end
 
   describe '#validate!' do

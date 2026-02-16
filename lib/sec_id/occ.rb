@@ -85,7 +85,7 @@ module SecId
         case strike
         when Numeric
           format('%08d', (strike * 1000).to_i)
-        when String && /\A\d{8}\z/
+        when /\A\d{8}\z/
           strike
         else
           raise ArgumentError, 'Strike must be numeric or an 8-char string!'
@@ -117,24 +117,26 @@ module SecId
 
     # @return [Date, nil] the parsed date or nil if invalid
     def date
-      return nil unless date_str
+      return @date if defined?(@date)
+      return unless date_str
 
-      @date ||= Date.strptime(date_str, '%y%m%d')
+      @date = Date.strptime(date_str, '%y%m%d')
     rescue ArgumentError
-      nil
+      @date = nil
     end
     alias date_obj date
 
-    # @return [Float] strike price in dollars
+    # @return [Float, nil] strike price in dollars
     def strike
-      @strike ||= strike_mills.to_i / 1000.0
+      return @strike if defined?(@strike)
+
+      @strike = strike_mills&.then { |m| m.to_i / 1000.0 }
     end
 
     # @return [String]
     def to_s
       full_number
     end
-    alias to_str to_s
 
     # @deprecated Use {#full_number} instead
     # @return [String]

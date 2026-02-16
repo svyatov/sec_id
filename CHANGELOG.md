@@ -50,6 +50,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Fixed
 
+- `to_str` now always returns the same value as `to_s` across all identifier types — previously LEI, IBAN, and Checkable identifiers could return divergent strings due to Ruby `alias` resolving to the parent class method
+- OCC `#date` memoization for invalid dates — previously re-attempted parsing on every call instead of caching `nil`
 - OCC `ID_LENGTH` changed from `21` to `(16..21)` to correctly reflect that valid OCC symbols range from 16 to 21 characters
 
 ## [4.4.1] - 2026-02-05

@@ -336,7 +336,7 @@ module SecId
 
     # @return [Boolean]
     def valid_group?
-      GROUPS.dig(category_code, group_code) != nil
+      !GROUPS.dig(category_code, group_code).nil?
     end
   end
 end
