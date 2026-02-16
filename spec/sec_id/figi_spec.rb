@@ -10,8 +10,12 @@ RSpec.describe SecId::FIGI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Financial Instrument Global Identifier',
                   id_length: 12,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'BBG000BLNNH6',
+                  dirty_id: 'bbg-000-blnnh6',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

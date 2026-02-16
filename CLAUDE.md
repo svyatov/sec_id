@@ -23,9 +23,11 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 
 All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
 - Core API: `valid?`, `errors` (memoized, returns `ValidationResult`), `validate!` (returns self or raises)
+- Normalization API: `#normalized` / `#normalize` (canonical string), `#normalize!` (mutates `full_number`, returns self), `.normalize(id)` (class-level with separator stripping)
 - Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`), `validate!` (returns instance or raises)
-- `parse` helper method for extracting identifier components
-- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, `has_normalization?`
+- `parse` helper method for extracting identifier components (always strips and upcases)
+- `SEPARATORS` constant (`/[\s-]/` by default) for class-level `.normalize` input sanitization
+- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
 - Private validation helpers: `valid_format?`, `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
 
 Each identifier class defines these metadata constants:
@@ -86,10 +88,6 @@ Helper methods:
 - `char_to_digit`, `char_to_digits` - Character conversion helpers
 - `validate_format_for_calculation!` - Raises error if format invalid
 
-#### Normalizable (`normalizable.rb`)
-
-Provides `normalize!` class method delegation for identifiers that support normalization (CIK, OCC, Valoren)
-
 ### Identifier Classes
 
 Each identifier type (`lib/sec_id/*.rb`) implements:
@@ -105,6 +103,12 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 **Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN):
 - Do not include `Checkable`
 - Validation based solely on format
+
+**Type-specific normalization overrides:**
+- CIK: `normalized` returns `@identifier.rjust(10, '0')`; `normalize!` also updates `@padding`
+- Valoren: `normalized` returns `@identifier.rjust(9, '0')`; `normalize!` also updates `@padding`
+- OCC: `normalized` returns `compose_symbol(underlying, date_str, type, strike_mills)` (pads underlying to 6 chars)
+- OCC, FISN: override `SEPARATORS = /-/` (spaces are structural in these formats)
 
 **Type-specific validation overrides:**
 - FIGI: `format_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)

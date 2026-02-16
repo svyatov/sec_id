@@ -10,8 +10,12 @@ RSpec.describe SecId::ISIN do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'International Securities Identification Number',
                   id_length: 12,
-                  has_check_digit: true,
-                  has_normalization: false
+                  has_check_digit: true
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'US5949181045',
+                  dirty_id: 'us-5949-1810-45',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

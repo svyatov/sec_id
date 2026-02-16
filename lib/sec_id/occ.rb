@@ -19,12 +19,11 @@ module SecId
   #   occ = SecId::OCC.build(underlying: 'AAPL', date: '2021-09-17', type: 'C', strike: 150.0)
   #   occ.to_s  #=> 'AAPL  210917C00150000'
   class OCC < Base
-    include Normalizable
-
     FULL_NAME = 'OCC Option Symbol'
     ID_LENGTH = (16..21)
     EXAMPLE = 'AAPL  210917C00150000'
     VALID_CHARS_REGEX = /\A[A-Z0-9 ]+\z/
+    SEPARATORS = /-/
 
     # Regular expression for parsing OCC symbol components.
     ID_REGEX = /\A
@@ -96,7 +95,7 @@ module SecId
 
     # @param symbol [String] the OCC symbol string to parse
     def initialize(symbol)
-      symbol_parts = parse(symbol, upcase: false)
+      symbol_parts = parse(symbol)
       @identifier = symbol_parts[:initial]
       @underlying = symbol_parts[:underlying]
       @date_str = symbol_parts[:date]
@@ -104,14 +103,11 @@ module SecId
       @strike_mills = symbol_parts[:strike_mills]
     end
 
-    # Normalizes the OCC symbol to standard format with 6-char padded underlying and 8-digit strike.
-    #
     # @return [String] the normalized OCC symbol
-    # @raise [InvalidFormatError] if the OCC symbol is invalid
-    def normalize!
-      raise InvalidFormatError, "OCC '#{full_number}' is invalid and cannot be normalized!" unless valid?
-
-      @full_number = self.class.compose_symbol(underlying, date_str, type, strike_mills)
+    # @raise [InvalidFormatError, InvalidStructureError]
+    def normalized
+      validate!
+      self.class.compose_symbol(underlying, date_str, type, strike_mills)
     end
 
     # @return [Boolean]

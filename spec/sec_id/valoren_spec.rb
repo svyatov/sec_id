@@ -10,8 +10,7 @@ RSpec.describe SecId::Valoren do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Valoren Number',
                   id_length: 5..9,
-                  has_check_digit: false,
-                  has_normalization: true
+                  has_check_digit: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',
@@ -24,11 +23,11 @@ RSpec.describe SecId::Valoren do
                   invalid_length_id: '12',
                   invalid_chars_id: 'ABCDE'
 
-  # Core normalization identifier behavior
-  it_behaves_like 'a normalization identifier',
+  # Normalization
+  it_behaves_like 'a normalizable identifier',
                   valid_id: '003886335',
-                  unnormalized_id: '3886335',
-                  normalized_id: '003886335',
+                  canonical_id: '003886335',
+                  dirty_id: '  3886335  ',
                   invalid_id: '0000'
 
   context 'when Valoren is valid' do
@@ -41,8 +40,8 @@ RSpec.describe SecId::Valoren do
     end
 
     describe '#normalize!' do
-      it 'returns full Valoren number' do
-        expect(valoren.normalize!).to eq(valoren_number)
+      it 'updates full_number and returns self' do
+        expect(valoren.normalize!).to be(valoren)
         expect(valoren.full_number).to eq(valoren_number)
       end
     end
@@ -63,8 +62,8 @@ RSpec.describe SecId::Valoren do
     end
 
     describe '#normalize!' do
-      it 'returns full Valoren number and sets padding' do
-        expect(valoren.normalize!).to eq('003886335')
+      it 'returns self and sets padding' do
+        expect(valoren.normalize!).to be(valoren)
         expect(valoren.full_number).to eq('003886335')
         expect(valoren.padding).to eq('00')
       end
@@ -118,22 +117,22 @@ RSpec.describe SecId::Valoren do
     end
   end
 
-  describe '.normalize!' do
+  describe '.normalize' do
     context 'when Valoren is malformed' do
       it 'raises an error' do
-        expect { described_class.normalize!('X9') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('0000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize!('0123456789') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('X9') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('0000') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('0123456789') }.to raise_error(SecId::InvalidFormatError)
       end
     end
 
     context 'when Valoren is valid' do
       it 'normalizes padding and returns full Valoren number' do
-        expect(described_class.normalize!('3886335')).to eq('003886335')
-        expect(described_class.normalize!('003886335')).to eq('003886335')
-        expect(described_class.normalize!('24476758')).to eq('024476758')
-        expect(described_class.normalize!('35514757')).to eq('035514757')
-        expect(described_class.normalize!('97429325')).to eq('097429325')
+        expect(described_class.normalize('3886335')).to eq('003886335')
+        expect(described_class.normalize('003886335')).to eq('003886335')
+        expect(described_class.normalize('24476758')).to eq('024476758')
+        expect(described_class.normalize('35514757')).to eq('035514757')
+        expect(described_class.normalize('97429325')).to eq('097429325')
       end
     end
   end

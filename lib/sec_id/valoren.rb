@@ -15,10 +15,8 @@ module SecId
   #   SecId::Valoren.valid?('003886335')  #=> true
   #
   # @example Normalize a Valoren to 9 digits
-  #   SecId::Valoren.normalize!('3886335')  #=> '003886335'
+  #   SecId::Valoren.normalize('3886335')  #=> '003886335'
   class Valoren < Base
-    include Normalizable
-
     FULL_NAME = 'Valoren Number'
     ID_LENGTH = (5..9)
     EXAMPLE = '3886335'
@@ -56,17 +54,19 @@ module SecId
       isin
     end
 
-    # Normalizes the Valoren to a 9-digit zero-padded format.
-    # Updates both @full_number and @padding to reflect the normalized state.
-    #
     # @return [String] the normalized 9-digit Valoren
-    # @raise [InvalidFormatError] if the Valoren format is invalid
-    def normalize!
-      raise InvalidFormatError, "Valoren '#{full_number}' is invalid and cannot be normalized!" unless valid_format?
+    # @raise [InvalidFormatError]
+    def normalized
+      validate!
+      @identifier.rjust(9, '0')
+    end
 
-      @full_number = @identifier.rjust(9, '0')
+    # @return [self]
+    # @raise [InvalidFormatError]
+    def normalize!
+      super
       @padding = @full_number[0, 9 - @identifier.length]
-      @full_number
+      self
     end
 
     # @return [String]

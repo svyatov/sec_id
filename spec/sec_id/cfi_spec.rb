@@ -10,8 +10,12 @@ RSpec.describe SecId::CFI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Classification of Financial Instruments',
                   id_length: 6,
-                  has_check_digit: false,
-                  has_normalization: false
+                  has_check_digit: false
+
+  it_behaves_like 'a normalizable identifier',
+                  valid_id: 'ESVUFR',
+                  dirty_id: 'esvufr',
+                  invalid_id: 'INVALID'
 
   # Validation API
   it_behaves_like 'a validatable identifier',

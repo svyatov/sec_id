@@ -25,6 +25,7 @@ module SecId
     ID_LENGTH = (3..35)
     EXAMPLE = 'APPLE INC/SH'
     VALID_CHARS_REGEX = %r{\A[A-Z0-9 /]+\z}
+    SEPARATORS = /-/
 
     # Regular expression for parsing FISN components.
     # Issuer: 1-15 chars, Description: 1-19 chars, Total: max 35 chars
