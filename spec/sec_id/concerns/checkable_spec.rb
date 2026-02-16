@@ -93,10 +93,10 @@ RSpec.describe SecId::Checkable do
       expect(instance.check_digit).to be_nil
     end
 
-    it 'does not mutate full_number' do
+    it 'does not mutate full_id' do
       instance = test_class.new('ABC')
       instance.restore
-      expect(instance.full_number).to eq('ABC')
+      expect(instance.full_id).to eq('ABC')
     end
 
     context 'when format is invalid' do
@@ -117,13 +117,13 @@ RSpec.describe SecId::Checkable do
       instance = test_class.new('ABC')
       instance.restore!
       expect(instance.check_digit).to eq(7)
-      expect(instance.full_number).to eq('ABC7')
+      expect(instance.full_id).to eq('ABC7')
     end
 
     it 'corrects an incorrect check digit' do
       instance = test_class.new('ABC0')
       instance.restore!
-      expect(instance.full_number).to eq('ABC7')
+      expect(instance.full_id).to eq('ABC7')
     end
 
     context 'when format is invalid' do

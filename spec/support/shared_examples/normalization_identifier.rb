@@ -41,18 +41,18 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
       expect(instance.normalize!).to equal(instance)
     end
 
-    it 'mutates full_number to canonical form' do
+    it 'mutates full_id to canonical form' do
       instance = identifier_class.new(valid_id)
       instance.normalize!
-      expect(instance.full_number).to eq(canonical_id)
+      expect(instance.full_id).to eq(canonical_id)
     end
 
     it 'is idempotent' do
       instance = identifier_class.new(valid_id)
       instance.normalize!
-      first_full_number = instance.full_number
+      first_full_id = instance.full_id
       instance.normalize!
-      expect(instance.full_number).to eq(first_full_number)
+      expect(instance.full_id).to eq(first_full_id)
     end
 
     it 'raises for invalid input' do

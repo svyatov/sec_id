@@ -36,13 +36,13 @@ RSpec.describe SecId::Valoren do
     it 'parses Valoren correctly' do
       expect(valoren.padding).to eq('00')
       expect(valoren.identifier).to eq('3886335')
-      expect(valoren.full_number).to eq(valoren_number)
+      expect(valoren.full_id).to eq(valoren_number)
     end
 
     describe '#normalize!' do
-      it 'updates full_number and returns self' do
+      it 'updates full_id and returns self' do
         expect(valoren.normalize!).to be(valoren)
-        expect(valoren.full_number).to eq(valoren_number)
+        expect(valoren.full_id).to eq(valoren_number)
       end
     end
 
@@ -58,13 +58,13 @@ RSpec.describe SecId::Valoren do
 
     it 'parses Valoren correctly' do
       expect(valoren.identifier).to eq(valoren_number)
-      expect(valoren.full_number).to eq(valoren_number)
+      expect(valoren.full_id).to eq(valoren_number)
     end
 
     describe '#normalize!' do
       it 'returns self and sets padding' do
         expect(valoren.normalize!).to be(valoren)
-        expect(valoren.full_number).to eq('003886335')
+        expect(valoren.full_id).to eq('003886335')
         expect(valoren.padding).to eq('00')
       end
     end
@@ -144,14 +144,14 @@ RSpec.describe SecId::Valoren do
       it 'returns an ISIN instance for default CH country code' do
         result = valoren.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('CH0012221716')
+        expect(result.full_id).to eq('CH0012221716')
         expect(result.country_code).to eq('CH')
       end
 
       it 'returns an ISIN instance for LI country code' do
         result = valoren.to_isin('LI')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('LI0012221714')
+        expect(result.full_id).to eq('LI0012221714')
         expect(result.country_code).to eq('LI')
       end
 
@@ -168,8 +168,8 @@ RSpec.describe SecId::Valoren do
       it 'normalizes and returns valid ISIN' do
         result = valoren.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('CH0038863350')
-        expect(valoren.full_number).to eq('003886335')
+        expect(result.full_id).to eq('CH0038863350')
+        expect(valoren.full_id).to eq('003886335')
       end
     end
 

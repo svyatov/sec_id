@@ -259,11 +259,11 @@ RSpec.describe SecId::FISN do
     end
   end
 
-  describe '#full_number' do
+  describe '#full_id' do
     let(:fisn_code) { 'apple inc/sh' }
 
-    it 'returns the normalized (uppercased) full number' do
-      expect(fisn.full_number).to eq('APPLE INC/SH')
+    it 'returns the normalized (uppercased) full id' do
+      expect(fisn.full_id).to eq('APPLE INC/SH')
     end
   end
 end

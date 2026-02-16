@@ -101,7 +101,7 @@ module SecId
 
     # @return [String]
     def to_s
-      return full_number unless check_digit
+      return full_id unless check_digit
 
       "#{country_code}#{check_digit.to_s.rjust(2, '0')}#{bban}"
     end

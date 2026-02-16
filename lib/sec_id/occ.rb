@@ -135,13 +135,7 @@ module SecId
 
     # @return [String]
     def to_s
-      full_number
-    end
-
-    # @deprecated Use {#full_number} instead
-    # @return [String]
-    def full_symbol
-      full_number
+      full_id
     end
 
     private

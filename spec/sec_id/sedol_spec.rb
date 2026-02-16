@@ -105,14 +105,14 @@ RSpec.describe SecId::SEDOL do
       it 'returns an ISIN instance for default GB country code' do
         result = sedol.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('GB00B02H2F76')
+        expect(result.full_id).to eq('GB00B02H2F76')
         expect(result.country_code).to eq('GB')
       end
 
       it 'returns an ISIN instance for IE country code' do
         result = sedol.to_isin('IE')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('IE00B02H2F76')
+        expect(result.full_id).to eq('IE00B02H2F76')
         expect(result.country_code).to eq('IE')
       end
 
@@ -129,7 +129,7 @@ RSpec.describe SecId::SEDOL do
       it 'returns an ISIN instance for IM country code' do
         result = sedol.to_isin('IM')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('IM00B7S9G985')
+        expect(result.full_id).to eq('IM00B7S9G985')
         expect(result.country_code).to eq('IM')
       end
     end
@@ -140,7 +140,7 @@ RSpec.describe SecId::SEDOL do
       it 'returns an ISIN instance for JE country code' do
         result = sedol.to_isin('JE')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('JE00B4T3BW64')
+        expect(result.full_id).to eq('JE00B4T3BW64')
         expect(result.country_code).to eq('JE')
       end
     end
@@ -151,7 +151,7 @@ RSpec.describe SecId::SEDOL do
       it 'returns an ISIN instance for GG country code' do
         result = sedol.to_isin('GG')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('GG00BPFJTF46')
+        expect(result.full_id).to eq('GG00BPFJTF46')
         expect(result.country_code).to eq('GG')
       end
     end
@@ -162,7 +162,7 @@ RSpec.describe SecId::SEDOL do
       it 'returns an ISIN instance for FK country code' do
         result = sedol.to_isin('FK')
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('FK00B030JM18')
+        expect(result.full_id).to eq('FK00B030JM18')
         expect(result.country_code).to eq('FK')
       end
     end
@@ -173,8 +173,8 @@ RSpec.describe SecId::SEDOL do
       it 'returns valid ISIN without mutating source SEDOL' do
         result = sedol.to_isin
         expect(result).to be_a(SecId::ISIN)
-        expect(result.full_number).to eq('GB00B02H2F76')
-        expect(sedol.full_number).to eq('B02H2F')
+        expect(result.full_id).to eq('GB00B02H2F76')
+        expect(sedol.full_id).to eq('B02H2F')
         expect(sedol.check_digit).to be_nil
       end
     end
@@ -185,7 +185,7 @@ RSpec.describe SecId::SEDOL do
       it 'preserves SEDOL value' do
         isin = sedol.to_isin
         sedol2 = isin.to_sedol
-        expect(sedol.full_number).to eq(sedol2.full_number)
+        expect(sedol.full_id).to eq(sedol2.full_id)
       end
     end
   end

@@ -105,13 +105,13 @@ module SecId
       "#{identifier}#{calculate_check_digit}"
     end
 
-    # Calculates and sets the check digit, updating full_number.
+    # Calculates and sets the check digit, updating full_id.
     #
     # @return [self]
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore!
       @check_digit = calculate_check_digit
-      @full_number = to_s
+      @full_id = to_s
       self
     end
 
@@ -218,7 +218,7 @@ module SecId
     def validate_format_for_calculation!
       return if valid_format?
 
-      raise InvalidFormatError, "#{self.class.name} '#{full_number}' is invalid and check-digit cannot be calculated!"
+      raise InvalidFormatError, "#{self.class.name} '#{full_id}' is invalid and check-digit cannot be calculated!"
     end
 
     # @param sum [Integer] the sum to calculate check digit from

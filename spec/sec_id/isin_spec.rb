@@ -111,7 +111,7 @@ RSpec.describe SecId::ISIN do
       it 'preserves ISIN value' do
         cusip = isin.to_cusip
         isin2 = cusip.to_isin('US')
-        expect(isin.full_number).to eq(isin2.full_number)
+        expect(isin.full_id).to eq(isin2.full_id)
       end
     end
   end
@@ -189,7 +189,7 @@ RSpec.describe SecId::ISIN do
       it 'returns CUSIP instance with correct value' do
         result = isin.to_nsin
         expect(result).to be_a(SecId::CUSIP)
-        expect(result.full_number).to eq('037833100')
+        expect(result.full_id).to eq('037833100')
       end
     end
 
@@ -199,7 +199,7 @@ RSpec.describe SecId::ISIN do
       it 'returns SEDOL instance with correct value' do
         result = isin.to_nsin
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B02H2F7')
+        expect(result.full_id).to eq('B02H2F7')
       end
     end
 
@@ -209,7 +209,7 @@ RSpec.describe SecId::ISIN do
       it 'returns WKN instance with correct value' do
         result = isin.to_nsin
         expect(result).to be_a(SecId::WKN)
-        expect(result.full_number).to eq('716460')
+        expect(result.full_id).to eq('716460')
       end
     end
 
@@ -319,7 +319,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B02H2F7')
+        expect(result.full_id).to eq('B02H2F7')
       end
     end
 
@@ -329,7 +329,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B296YR7')
+        expect(result.full_id).to eq('B296YR7')
       end
     end
 
@@ -339,7 +339,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B7S9G98')
+        expect(result.full_id).to eq('B7S9G98')
       end
     end
 
@@ -349,7 +349,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B4T3BW6')
+        expect(result.full_id).to eq('B4T3BW6')
       end
     end
 
@@ -359,7 +359,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('BJVDZ94')
+        expect(result.full_id).to eq('BJVDZ94')
       end
     end
 
@@ -369,7 +369,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
         expect(result).to be_a(SecId::SEDOL)
-        expect(result.full_number).to eq('B030JM1')
+        expect(result.full_id).to eq('B030JM1')
       end
     end
 
@@ -389,7 +389,7 @@ RSpec.describe SecId::ISIN do
       it 'returns a WKN instance' do
         result = isin.to_wkn
         expect(result).to be_a(SecId::WKN)
-        expect(result.full_number).to eq('716460')
+        expect(result.full_id).to eq('716460')
       end
     end
 

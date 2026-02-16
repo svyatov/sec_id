@@ -56,7 +56,7 @@ module SecId
     SEPARATORS = /[\s-]/
 
     # @return [String] the original input after normalization (stripped and uppercased)
-    attr_reader :full_number
+    attr_reader :full_id
 
     # @return [String, nil] the main identifier portion (without check digit)
     attr_reader :identifier
@@ -193,12 +193,12 @@ module SecId
     end
     alias normalize normalized
 
-    # Normalizes this identifier in place, updating {#full_number}.
+    # Normalizes this identifier in place, updating {#full_id}.
     #
     # @return [self]
     # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
     def normalize!
-      @full_number = normalized
+      @full_id = normalized
       self
     end
 
@@ -242,16 +242,16 @@ module SecId
 
     # @return [Boolean]
     def valid_length?
-      return false if full_number.empty?
+      return false if full_id.empty?
 
       id_length = self.class::ID_LENGTH
       expected = id_length.is_a?(Range) ? id_length : ((id_length - check_digit_width)..id_length)
-      expected.cover?(full_number.length)
+      expected.cover?(full_id.length)
     end
 
     # @return [Boolean]
     def valid_characters?
-      full_number.match?(self.class::VALID_CHARS_REGEX)
+      full_id.match?(self.class::VALID_CHARS_REGEX)
     end
 
     # @return [Integer] width of the check digit (0 for non-checkable, overridden in Checkable)
@@ -265,7 +265,7 @@ module SecId
       case code
       when :invalid_length
         expected = self.class::ID_LENGTH
-        "Expected #{expected} characters, got #{full_number.length}"
+        "Expected #{expected} characters, got #{full_id.length}"
       when :invalid_characters
         "Contains invalid characters for #{self.class.short_name}"
       when :invalid_format
@@ -283,8 +283,8 @@ module SecId
     # @param sec_id_number [String, #to_s] the identifier to parse
     # @return [MatchData, Hash] the regex match data or empty hash if no match
     def parse(sec_id_number)
-      @full_number = sec_id_number.to_s.strip.upcase
-      @full_number.match(self.class::ID_REGEX) || {}
+      @full_id = sec_id_number.to_s.strip.upcase
+      @full_id.match(self.class::ID_REGEX) || {}
     end
   end
 end

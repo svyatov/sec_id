@@ -59,7 +59,7 @@ All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` 
 **All identifiers** support normalization:
 - `.normalize(id)` - strips separators, upcases, validates, and returns the canonical string
 - `#normalized` / `#normalize` - returns the canonical string for a valid instance
-- `#normalize!` - mutates `full_number` to canonical form, returns `self`
+- `#normalize!` - mutates `full_id` to canonical form, returns `self`
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
@@ -181,7 +181,7 @@ SecId::ISIN.check_digit('US594918104')  # => 5
 
 # instance level
 isin = SecId::ISIN.new('US5949181045')
-isin.full_number           # => 'US5949181045'
+isin.full_id               # => 'US5949181045'
 isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
 isin.check_digit           # => 5
@@ -225,7 +225,7 @@ SecId::CUSIP.check_digit('59491810')  # => 4
 
 # instance level
 cusip = SecId::CUSIP.new('594918104')
-cusip.full_number           # => '594918104'
+cusip.full_id               # => '594918104'
 cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
 cusip.check_digit           # => 4
@@ -250,7 +250,7 @@ SecId::CEI.check_digit('A0BCDEFGH')  # => 1
 
 # instance level
 cei = SecId::CEI.new('A0BCDEFGH1')
-cei.full_number           # => 'A0BCDEFGH1'
+cei.full_id               # => 'A0BCDEFGH1'
 cei.prefix                # => 'A'
 cei.numeric               # => '0'
 cei.entity_id             # => 'BCDEFGH'
@@ -274,7 +274,7 @@ SecId::SEDOL.check_digit('B0Z52W')  # => 5
 
 # instance level
 sedol = SecId::SEDOL.new('B0Z52W5')
-sedol.full_number           # => 'B0Z52W5'
+sedol.full_id               # => 'B0Z52W5'
 sedol.check_digit           # => 5
 sedol.valid?                # => true
 sedol.restore               # => 'B0Z52W5'
@@ -297,7 +297,7 @@ SecId::FIGI.check_digit('BBG000DMBXR') # => 2
 
 # instance level
 figi = SecId::FIGI.new('BBG000DMBXR2')
-figi.full_number           # => 'BBG000DMBXR2'
+figi.full_id               # => 'BBG000DMBXR2'
 figi.prefix                # => 'BB'
 figi.random_part           # => '000DMBXR'
 figi.check_digit           # => 2
@@ -320,7 +320,7 @@ SecId::LEI.check_digit('5493006MHB84DD0ZWV') # => 18
 
 # instance level
 lei = SecId::LEI.new('5493006MHB84DD0ZWV18')
-lei.full_number           # => '5493006MHB84DD0ZWV18'
+lei.full_id               # => '5493006MHB84DD0ZWV18'
 lei.lou_id                # => '5493'
 lei.reserved              # => '00'
 lei.entity_id             # => '6MHB84DD0ZWV'
@@ -344,7 +344,7 @@ SecId::IBAN.check_digit('DE370400440532013000') # => 89
 
 # instance level
 iban = SecId::IBAN.new('DE89370400440532013000')
-iban.full_number           # => 'DE89370400440532013000'
+iban.full_id               # => 'DE89370400440532013000'
 iban.country_code          # => 'DE'
 iban.bban                  # => '370400440532013000'
 iban.bank_code             # => '37040044'
@@ -370,12 +370,12 @@ SecId::CIK.normalize('1094517')    # => '0001094517'
 
 # instance level
 cik = SecId::CIK.new('0001094517')
-cik.full_number   # => '0001094517'
+cik.full_id       # => '0001094517'
 cik.padding       # => '000'
 cik.identifier    # => '1094517'
 cik.valid?        # => true
 cik.normalized    # => '0001094517'
-cik.normalize!    # => #<SecId::CIK> (mutates full_number, returns self)
+cik.normalize!    # => #<SecId::CIK> (mutates full_id, returns self)
 ```
 
 ### OCC
@@ -395,7 +395,7 @@ SecId::OCC.build(
 
 # instance level
 occ = SecId::OCC.new('BRKB  100417C00090000')
-occ.full_symbol   # => 'BRKB  100417C00090000'
+occ.full_id       # => 'BRKB  100417C00090000'
 occ.underlying    # => 'BRKB'
 occ.date_str      # => '100417'
 occ.date_obj      # => #<Date: 2010-04-17>
@@ -405,10 +405,10 @@ occ.valid?        # => true
 occ.normalized    # => 'BRKB  100417C00090000'
 
 occ = SecId::OCC.new('X 250620C00050000')
-occ.full_symbol   # => 'X 250620C00050000'
+occ.full_id       # => 'X 250620C00050000'
 occ.valid?        # => true
-occ.normalize!    # => #<SecId::OCC> (mutates full_number, returns self)
-occ.full_symbol   # => 'X     250620C00050000'
+occ.normalize!    # => #<SecId::OCC> (mutates full_id, returns self)
+occ.full_id       # => 'X     250620C00050000'
 ```
 
 ### WKN
@@ -422,7 +422,7 @@ SecId::WKN.valid?('CBK100')  # => true
 
 # instance level
 wkn = SecId::WKN.new('514000')
-wkn.full_number   # => '514000'
+wkn.full_id       # => '514000'
 wkn.identifier    # => '514000'
 wkn.valid?        # => true
 wkn.to_s          # => '514000'
@@ -445,12 +445,12 @@ SecId::Valoren.normalize('3886335')     # => '003886335'
 
 # instance level
 valoren = SecId::Valoren.new('3886335')
-valoren.full_number   # => '3886335'
+valoren.full_id       # => '3886335'
 valoren.padding       # => ''
 valoren.identifier    # => '3886335'
 valoren.valid?        # => true
 valoren.normalized    # => '003886335'
-valoren.normalize!    # => #<SecId::Valoren> (mutates full_number, returns self)
+valoren.normalize!    # => #<SecId::Valoren> (mutates full_id, returns self)
 valoren.to_isin       # => #<SecId::ISIN> (CH ISIN by default)
 valoren.to_isin('LI') # => #<SecId::ISIN> (LI ISIN)
 ```
@@ -465,7 +465,7 @@ SecId::CFI.valid?('ESXXXX')        # => true
 SecId::CFI.valid?('ESVUFR')        # => true
 # instance level
 cfi = SecId::CFI.new('ESVUFR')
-cfi.full_number    # => 'ESVUFR'
+cfi.full_id        # => 'ESVUFR'
 cfi.identifier     # => 'ESVUFR'
 cfi.category_code  # => 'E'
 cfi.group_code     # => 'S'
@@ -493,7 +493,7 @@ SecId::FISN.valid?('APPLE INC/SH')        # => true
 SecId::FISN.valid?('apple inc/sh')        # => true (normalized to uppercase)
 # instance level
 fisn = SecId::FISN.new('APPLE INC/SH')
-fisn.full_number   # => 'APPLE INC/SH'
+fisn.full_id       # => 'APPLE INC/SH'
 fisn.identifier    # => 'APPLE INC/SH'
 fisn.issuer        # => 'APPLE INC'
 fisn.description   # => 'SH'
