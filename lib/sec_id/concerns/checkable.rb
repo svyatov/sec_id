@@ -129,6 +129,8 @@ module SecId
       "#{identifier}#{check_digit&.to_s&.rjust(check_digit_width, '0')}"
     end
 
+    private
+
     # CUSIP/CEI style: "Double Add Double" algorithm.
     # Processes pairs of digits, doubling the first (even-positioned from right),
     # then summing both digit's div10mod10 values.
@@ -185,8 +187,6 @@ module SecId
     def reversed_digits_multi(id)
       id.each_char.flat_map { |c| CHAR_TO_DIGITS.fetch(c) }.reverse!
     end
-
-    private
 
     # Returns error codes including check digit validation.
     #

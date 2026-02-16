@@ -257,15 +257,22 @@ RSpec.describe SecId::Checkable do
     end
   end
 
-  describe 'Luhn algorithms' do
+  describe 'Luhn algorithms (private)' do
     let(:instance) { test_class.new('ABC') }
+
+    it 'methods are private' do
+      %i[luhn_sum_double_add_double luhn_sum_indexed luhn_sum_standard
+         reversed_digits_single reversed_digits_multi].each do |method|
+        expect(instance.private_methods).to include(method)
+      end
+    end
 
     describe '#luhn_sum_double_add_double' do
       it 'calculates CUSIP/CEI style sum' do
         # [1, 2, 3, 4] -> even positions (from right): 1, 3; odd: 2, 4
         # (1*2=2, div10mod10=2) + (2, div10mod10=2) + (3*2=6, div10mod10=6) + (4, div10mod10=4) = 14
         digits = [1, 2, 3, 4]
-        expect(instance.luhn_sum_double_add_double(digits)).to eq(14)
+        expect(instance.__send__(:luhn_sum_double_add_double, digits)).to eq(14)
       end
     end
 
@@ -274,7 +281,7 @@ RSpec.describe SecId::Checkable do
         # [1, 2, 3, 4] -> index 0: 1, index 1: 2*2=4, index 2: 3, index 3: 4*2=8
         # div10mod10: 1 + 4 + 3 + 8 = 16
         digits = [1, 2, 3, 4]
-        expect(instance.luhn_sum_indexed(digits)).to eq(16)
+        expect(instance.__send__(:luhn_sum_indexed, digits)).to eq(16)
       end
     end
 
@@ -283,27 +290,27 @@ RSpec.describe SecId::Checkable do
         # [1, 2, 3, 4] -> pairs: (1*2=2, 2), (3*2=6, 4)
         # 2 + 2 + 6 + 4 = 14
         digits = [1, 2, 3, 4]
-        expect(instance.luhn_sum_standard(digits)).to eq(14)
+        expect(instance.__send__(:luhn_sum_standard, digits)).to eq(14)
       end
 
       it 'subtracts 9 when doubled value exceeds 9' do
         # [5, 2, 6, 4] -> pairs: (5*2=10-9=1, 2), (6*2=12-9=3, 4)
         # 1 + 2 + 3 + 4 = 10
         digits = [5, 2, 6, 4]
-        expect(instance.luhn_sum_standard(digits)).to eq(10)
+        expect(instance.__send__(:luhn_sum_standard, digits)).to eq(10)
       end
     end
 
     describe '#reversed_digits_single' do
       it 'converts identifier to reversed digit array' do
-        expect(instance.reversed_digits_single('AB')).to eq([11, 10])
+        expect(instance.__send__(:reversed_digits_single, 'AB')).to eq([11, 10])
       end
     end
 
     describe '#reversed_digits_multi' do
       it 'converts identifier to reversed digit array with multi-digit expansion' do
         # A = [1, 0], B = [1, 1], reversed = [1, 1, 0, 1]
-        expect(instance.reversed_digits_multi('AB')).to eq([1, 1, 0, 1])
+        expect(instance.__send__(:reversed_digits_multi, 'AB')).to eq([1, 1, 0, 1])
       end
     end
   end
