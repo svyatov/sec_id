@@ -38,9 +38,9 @@ Each identifier class defines these metadata constants:
 
 Classes with check digits include the `Checkable` concern, which adds:
 - `valid?` override that validates format and check digit
-- `restore!`, `check_digit`, `calculate_check_digit` methods
+- `restore` (returns full identifier string without mutation), `restore!` (mutates and returns `self`), `check_digit`, `calculate_check_digit` methods
 - Character-to-digit conversion maps and Luhn algorithm variants
-- Class-level `restore!` and `check_digit` methods
+- Class-level `restore`, `restore!`, and `check_digit` methods
 
 ### Registry (`lib/sec_id.rb`)
 

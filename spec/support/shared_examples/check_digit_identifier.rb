@@ -3,7 +3,7 @@
 # rubocop:disable RSpec/MultipleMemoizedHelpers
 
 # Shared examples for check-digit based identifiers (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN).
-# Validates the core API: valid?, restore!, check_digit.
+# Validates the core API: valid?, restore, restore!, check_digit.
 #
 # @param valid_id [String] a valid identifier with correct check-digit
 # @param valid_id_without_check [String] a valid identifier without check-digit (for restoration)
@@ -28,8 +28,12 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(true)
       end
 
-      it 'restores to itself with #restore!' do
-        expect(instance.restore!).to eq(valid_id)
+      it 'returns full identifier string for #restore' do
+        expect(instance.restore).to eq(valid_id)
+      end
+
+      it 'returns self for #restore!' do
+        expect(instance.restore!).to be(instance)
         expect(instance.full_number).to eq(valid_id)
       end
 
@@ -45,8 +49,17 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(false)
       end
 
-      it 'restores check-digit with #restore!' do
-        expect(instance.restore!).to eq(restored_id)
+      it 'returns restored identifier string for #restore' do
+        expect(instance.restore).to eq(restored_id)
+      end
+
+      it 'does not mutate instance for #restore' do
+        instance.restore
+        expect(instance.full_number).to eq(valid_id_without_check)
+      end
+
+      it 'returns self for #restore!' do
+        expect(instance.restore!).to be(instance)
         expect(instance.full_number).to eq(restored_id)
       end
 
@@ -62,8 +75,12 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.valid?).to be(false)
       end
 
-      it 'restores to correct check-digit with #restore!' do
-        expect(instance.restore!).to eq(restored_id)
+      it 'returns restored identifier string for #restore' do
+        expect(instance.restore).to eq(restored_id)
+      end
+
+      it 'returns self for #restore!' do
+        expect(instance.restore!).to be(instance)
         expect(instance.full_number).to eq(restored_id)
       end
     end
@@ -73,6 +90,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
 
       it 'returns false for #valid?' do
         expect(instance.valid?).to be(false)
+      end
+
+      it 'raises error for #restore' do
+        expect { instance.restore }.to raise_error(SecId::InvalidFormatError)
       end
 
       it 'raises error for #restore!' do
@@ -104,17 +125,41 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
     end
 
-    describe '.restore!' do
+    describe '.restore' do
       it 'restores valid identifier to itself' do
-        expect(identifier_class.restore!(valid_id)).to eq(restored_id)
+        expect(identifier_class.restore(valid_id)).to eq(restored_id)
       end
 
       it 'restores identifier without check-digit' do
-        expect(identifier_class.restore!(valid_id_without_check)).to eq(restored_id)
+        expect(identifier_class.restore(valid_id_without_check)).to eq(restored_id)
       end
 
       it 'restores identifier with invalid check-digit' do
-        expect(identifier_class.restore!(invalid_check_digit_id)).to eq(restored_id)
+        expect(identifier_class.restore(invalid_check_digit_id)).to eq(restored_id)
+      end
+
+      it 'raises error for invalid format' do
+        expect { identifier_class.restore(invalid_format_id) }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
+
+    describe '.restore!' do
+      it 'returns an instance for valid identifier' do
+        result = identifier_class.restore!(valid_id)
+        expect(result).to be_a(identifier_class)
+        expect(result.to_s).to eq(restored_id)
+      end
+
+      it 'returns an instance for identifier without check-digit' do
+        result = identifier_class.restore!(valid_id_without_check)
+        expect(result).to be_a(identifier_class)
+        expect(result.to_s).to eq(restored_id)
+      end
+
+      it 'returns an instance for identifier with invalid check-digit' do
+        result = identifier_class.restore!(invalid_check_digit_id)
+        expect(result).to be_a(identifier_class)
+        expect(result.to_s).to eq(restored_id)
       end
 
       it 'raises error for invalid format' do

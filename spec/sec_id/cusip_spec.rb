@@ -129,11 +129,11 @@ RSpec.describe SecId::CUSIP do
   describe '.restore!' do
     context 'when CUSIP is valid' do
       it 'restores check-digit for various CUSIPs' do
-        expect(described_class.restore!('03783310')).to eq('037833100')
-        expect(described_class.restore!('17275R10')).to eq('17275R102')
-        expect(described_class.restore!('38259P50')).to eq('38259P508')
-        expect(described_class.restore!('59491810')).to eq('594918104')
-        expect(described_class.restore!('68389X10')).to eq('68389X105')
+        expect(described_class.restore!('03783310').to_s).to eq('037833100')
+        expect(described_class.restore!('17275R10').to_s).to eq('17275R102')
+        expect(described_class.restore!('38259P50').to_s).to eq('38259P508')
+        expect(described_class.restore!('59491810').to_s).to eq('594918104')
+        expect(described_class.restore!('68389X10').to_s).to eq('68389X105')
       end
     end
   end

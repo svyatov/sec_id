@@ -409,10 +409,10 @@ RSpec.describe SecId::IBAN do
   describe '.restore!' do
     context 'when IBAN format is valid' do
       it 'restores check-digit for various IBANs' do
-        expect(described_class.restore!('DE370400440532013000')).to eq('DE89370400440532013000')
-        expect(described_class.restore!('DE99370400440532013000')).to eq('DE89370400440532013000')
-        expect(described_class.restore!('NLABNA0417164300')).to eq('NL91ABNA0417164300')
-        expect(described_class.restore!('GB29NWBK60161331926819')).to eq('GB29NWBK60161331926819')
+        expect(described_class.restore!('DE370400440532013000').to_s).to eq('DE89370400440532013000')
+        expect(described_class.restore!('DE99370400440532013000').to_s).to eq('DE89370400440532013000')
+        expect(described_class.restore!('NLABNA0417164300').to_s).to eq('NL91ABNA0417164300')
+        expect(described_class.restore!('GB29NWBK60161331926819').to_s).to eq('GB29NWBK60161331926819')
       end
     end
   end

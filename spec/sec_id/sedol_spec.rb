@@ -77,11 +77,11 @@ RSpec.describe SecId::SEDOL do
   describe '.restore!' do
     context 'when SEDOL is valid' do
       it 'restores check-digit for various SEDOLs' do
-        expect(described_class.restore!('B09CBL')).to eq('B09CBL4')
-        expect(described_class.restore!('219071')).to eq('2190716')
-        expect(described_class.restore!('B923455')).to eq('B923452')
-        expect(described_class.restore!('B99876')).to eq('B998762')
-        expect(described_class.restore!('2307380')).to eq('2307389')
+        expect(described_class.restore!('B09CBL').to_s).to eq('B09CBL4')
+        expect(described_class.restore!('219071').to_s).to eq('2190716')
+        expect(described_class.restore!('B923455').to_s).to eq('B923452')
+        expect(described_class.restore!('B99876').to_s).to eq('B998762')
+        expect(described_class.restore!('2307380').to_s).to eq('2307389')
       end
     end
   end
