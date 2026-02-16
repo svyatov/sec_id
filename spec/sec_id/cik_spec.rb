@@ -85,6 +85,13 @@ RSpec.describe SecId::CIK do
   end
 
   describe '.valid?' do
+    context 'when CIK is all zeros' do
+      it 'returns false because regex requires non-zero start in identifier' do
+        expect(described_class.valid?('0')).to be(false)
+        expect(described_class.valid?('0000000000')).to be(false)
+      end
+    end
+
     context 'when CIK is malformed' do
       it 'returns false' do
         expect(described_class.valid?('X9')).to be(false)

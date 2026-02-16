@@ -189,7 +189,48 @@ RSpec.describe SecId::OCC do
     end
   end
 
+  describe '.compose_symbol' do
+    it 'pads underlying to 6 characters' do
+      result = described_class.compose_symbol('X', '250620', 'C', '00050000')
+      expect(result).to eq('X     250620C00050000')
+    end
+
+    it 'does not pad 6-character underlying' do
+      result = described_class.compose_symbol('1GOOGL', '251219', 'P', '00131000')
+      expect(result).to eq('1GOOGL251219P00131000')
+    end
+
+    it 'formats strike to 8 digits' do
+      result = described_class.compose_symbol('AAPL', '250919', 'C', 150_000)
+      expect(result).to eq('AAPL  250919C00150000')
+    end
+  end
+
   describe '.build' do
+    context 'with 1-character underlying' do
+      it 'pads to 6 characters' do
+        occ = described_class.build(underlying: 'X', date: '250620', type: 'C', strike: 50)
+        expect(occ.full_id).to eq('X     250620C00050000')
+        expect(occ.underlying).to eq('X')
+      end
+    end
+
+    context 'with 6-character underlying' do
+      it 'uses full width without extra padding' do
+        occ = described_class.build(underlying: '1GOOGL', date: '251219', type: 'P', strike: 131)
+        expect(occ.full_id).to eq('1GOOGL251219P00131000')
+        expect(occ.underlying).to eq('1GOOGL')
+      end
+    end
+
+    context 'with high precision decimal strike' do
+      it 'truncates to mills (thousandths)' do
+        occ = described_class.build(underlying: 'SPY', date: '250321', type: 'C', strike: 0.001)
+        expect(occ.strike).to eq(0.001)
+        expect(occ.full_id).to eq('SPY   250321C00000001')
+      end
+    end
+
     context 'with component strings in canonical form' do
       it 'composes OCC symbol' do
         components = { underlying: "X\s\s\s\s\s", date: '250620', type: 'C', strike: '00050000' }

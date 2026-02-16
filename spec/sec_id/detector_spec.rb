@@ -211,6 +211,31 @@ RSpec.describe SecId::Detector do
       end
     end
 
+    context 'with cache invalidation' do
+      # rubocop:disable RSpec/ExampleLength
+      it 'recreates detector when a new identifier type is registered' do
+        # Warm up the detector cache
+        SecId.detect('US5949181045')
+        original_detector = SecId.__send__(:detector)
+
+        # Simulate registration of a new type
+        stub_class = Class.new(SecId::Base)
+        allow(stub_class).to receive_messages(name: 'SecId::STUB', const_defined?: false)
+        stub_class.const_set(:ID_LENGTH, 99)
+        stub_class.const_set(:VALID_CHARS_REGEX, /\A[A-Z]+\z/)
+        SecId.__send__(:register_identifier, stub_class)
+
+        new_detector = SecId.__send__(:detector)
+        expect(new_detector).not_to equal(original_detector)
+      ensure
+        # Clean up: remove stub from registry
+        SecId.__send__(:identifier_map).delete(:stub)
+        SecId.__send__(:identifier_list).delete(stub_class)
+        SecId.instance_variable_set(:@detector, nil)
+      end
+      # rubocop:enable RSpec/ExampleLength
+    end
+
     context 'with performance' do
       it 'detects within acceptable time' do
         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)

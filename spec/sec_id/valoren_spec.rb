@@ -93,6 +93,11 @@ RSpec.describe SecId::Valoren do
         expect(described_class.valid?('000000000')).to be(false)
         expect(described_class.valid?('00000')).to be(false)
       end
+
+      it 'returns false for identifiers with only leading zeros (no significant digits)' do
+        # "00001" is only 5 chars but identifier portion is "1" which is too short
+        expect(described_class.valid?('00001')).to be(false)
+      end
     end
 
     context 'when Valoren is valid' do

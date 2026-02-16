@@ -314,4 +314,49 @@ RSpec.describe SecId::Checkable do
       end
     end
   end
+
+  describe 'check digit helpers (private)' do
+    let(:instance) { test_class.new('ABC') }
+
+    describe '#mod10' do
+      it 'returns 0 for sum 0' do
+        # (10 - 0%10) % 10 = 0
+        expect(instance.__send__(:mod10, 0)).to eq(0)
+      end
+
+      it 'returns 0 for sum 10' do
+        # (10 - 10%10) % 10 = 0
+        expect(instance.__send__(:mod10, 10)).to eq(0)
+      end
+
+      it 'returns 7 for sum 13' do
+        # (10 - 13%10) % 10 = 7
+        expect(instance.__send__(:mod10, 13)).to eq(7)
+      end
+    end
+
+    describe '#div10mod10' do
+      it 'returns 0 for 0' do
+        # 0/10 + 0%10 = 0
+        expect(instance.__send__(:div10mod10, 0)).to eq(0)
+      end
+
+      it 'returns 9 for 18' do
+        # 18/10 + 18%10 = 1+8 = 9
+        expect(instance.__send__(:div10mod10, 18)).to eq(9)
+      end
+
+      it 'returns 7 for 7' do
+        # 7/10 + 7%10 = 0+7 = 7
+        expect(instance.__send__(:div10mod10, 7)).to eq(7)
+      end
+    end
+
+    describe '#mod97' do
+      it 'calculates known value' do
+        # 98 - (3704004405320130001314 00 % 97) = 89 (DE IBAN check digit)
+        expect(instance.__send__(:mod97, '370400440532013000131400')).to eq(89)
+      end
+    end
+  end
 end
