@@ -179,6 +179,17 @@ RSpec.describe SecId::SEDOL do
       end
     end
 
+    context 'when SEDOL has wrong check digit' do
+      let(:sedol_number) { 'B02H2F0' }
+
+      it 'produces valid ISIN with correct check digit' do
+        result = sedol.to_isin
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.valid?).to be(true)
+        expect(result.full_id).to eq('GB00B02H2F76')
+      end
+    end
+
     context 'when round-trip conversion' do
       let(:sedol_number) { 'B02H2F7' }
 

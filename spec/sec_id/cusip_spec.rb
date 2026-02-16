@@ -106,6 +106,17 @@ RSpec.describe SecId::CUSIP do
         expect(cusip.check_digit).to be_nil
       end
     end
+
+    context 'when CUSIP has wrong check digit' do
+      let(:cusip_number) { '594918109' }
+
+      it 'produces valid ISIN with correct check digit' do
+        result = cusip.to_isin('US')
+        expect(result).to be_a(SecId::ISIN)
+        expect(result.valid?).to be(true)
+        expect(result.full_id).to eq('US5949181045')
+      end
+    end
   end
 
   describe '#cins?' do
