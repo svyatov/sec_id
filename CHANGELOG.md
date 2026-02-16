@@ -37,6 +37,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** `ValidationResult#to_a` now returns `messages` (array of strings) instead of raw error hashes
 - **BREAKING:** `#validation_errors` and `.validation_errors` removed from public API
 - **BREAKING:** `#full_number` renamed to `#full_id` on all identifier types
+- Luhn helper methods in Checkable are now private (implementation detail)
 
 ### Removed
 
@@ -55,6 +56,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - `to_str` now always returns the same value as `to_s` across all identifier types — previously LEI, IBAN, and Checkable identifiers could return divergent strings due to Ruby `alias` resolving to the parent class method
 - OCC `#date` memoization for invalid dates — previously re-attempted parsing on every call instead of caching `nil`
 - OCC `ID_LENGTH` changed from `21` to `(16..21)` to correctly reflect that valid OCC symbols range from 16 to 21 characters
+- LEI `restore` and `to_s` now correctly pad single-digit check digits to 2 characters
+- CUSIP and SEDOL `to_isin` now always embed the correct check digit
 
 ## [4.4.1] - 2026-02-05
 

@@ -72,7 +72,7 @@ Constants:
 - `CHAR_TO_DIGITS` - Multi-digit mapping for ISIN (letters expand to two digits)
 - `CHAR_TO_DIGIT` - Single-digit mapping (A=10, B=11, ..., Z=35)
 
-Luhn algorithm variants:
+Luhn algorithm variants (private):
 - `luhn_sum_double_add_double(digits)` - Used by CUSIP and CEI
 - `luhn_sum_indexed(digits)` - Used by FIGI
 - `luhn_sum_standard(digits)` - Used by ISIN
@@ -81,11 +81,12 @@ Luhn algorithm variants:
 
 Validation overrides (private):
 - `validation_errors` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
-- `check_digit_width` - Returns `1` (used by `Base#valid_length?` to allow optional check digit in length check)
+- `check_digit_width` - Returns `1` (used by `Base#valid_length?` to allow optional check digit in length check; LEI and IBAN override → `2`)
 
-Helper methods:
+`restore` and `to_s` use `check_digit_width` to right-justify the check digit string (e.g. `5` → `"05"` for width 2). IBAN overrides `restore`/`to_s` because its check digit is mid-string.
+
+Helper methods (private):
 - `mod10`, `div10mod10`, `mod97` - Check digit calculation helpers
-- `char_to_digit`, `char_to_digits` - Character conversion helpers
 - `validate_format_for_calculation!` - Raises error if format invalid
 
 ### Identifier Classes
@@ -98,7 +99,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 **Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI):
 - Include `Checkable` concern
 - Implement `calculate_check_digit` with standard-specific algorithm
-- LEI overrides `check_digit_width` → `2` (two-character check digit)
+- LEI and IBAN override `check_digit_width` → `2` (two-character check digit)
 
 **Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN):
 - Do not include `Checkable`
