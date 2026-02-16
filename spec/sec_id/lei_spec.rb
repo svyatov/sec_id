@@ -134,10 +134,10 @@ RSpec.describe SecId::LEI do
   describe '.restore!' do
     context 'when LEI format is valid' do
       it 'restores check-digit for various LEIs' do
-        expect(described_class.restore!('5493006MHB84DD0ZWV')).to eq('5493006MHB84DD0ZWV18')
-        expect(described_class.restore!('5493006MHB84DD0ZWV99')).to eq('5493006MHB84DD0ZWV18')
-        expect(described_class.restore!('529900T8BM49AURSDO')).to eq('529900T8BM49AURSDO55')
-        expect(described_class.restore!('HWUPKR0MPOU8FGXBT3')).to eq('HWUPKR0MPOU8FGXBT394')
+        expect(described_class.restore!('5493006MHB84DD0ZWV').to_s).to eq('5493006MHB84DD0ZWV18')
+        expect(described_class.restore!('5493006MHB84DD0ZWV99').to_s).to eq('5493006MHB84DD0ZWV18')
+        expect(described_class.restore!('529900T8BM49AURSDO').to_s).to eq('529900T8BM49AURSDO55')
+        expect(described_class.restore!('HWUPKR0MPOU8FGXBT3').to_s).to eq('HWUPKR0MPOU8FGXBT394')
       end
     end
   end

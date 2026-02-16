@@ -44,6 +44,7 @@ RSpec.describe SecId::Checkable do
     end
 
     it 'adds class methods' do
+      expect(test_class).to respond_to(:restore)
       expect(test_class).to respond_to(:restore!)
       expect(test_class).to respond_to(:check_digit)
     end
@@ -80,17 +81,49 @@ RSpec.describe SecId::Checkable do
     end
   end
 
+  describe '#restore' do
+    it 'returns the full identifier string with correct check digit' do
+      instance = test_class.new('ABC')
+      expect(instance.restore).to eq('ABC7')
+    end
+
+    it 'does not mutate check_digit' do
+      instance = test_class.new('ABC')
+      instance.restore
+      expect(instance.check_digit).to be_nil
+    end
+
+    it 'does not mutate full_number' do
+      instance = test_class.new('ABC')
+      instance.restore
+      expect(instance.full_number).to eq('ABC')
+    end
+
+    context 'when format is invalid' do
+      it 'raises InvalidFormatError' do
+        instance = test_class.new('INVALID')
+        expect { instance.restore }.to raise_error(SecId::InvalidFormatError)
+      end
+    end
+  end
+
   describe '#restore!' do
+    it 'returns self' do
+      instance = test_class.new('ABC')
+      expect(instance.restore!).to be(instance)
+    end
+
     it 'calculates and sets the check digit' do
       instance = test_class.new('ABC')
-      expect(instance.restore!).to eq('ABC7')
+      instance.restore!
       expect(instance.check_digit).to eq(7)
       expect(instance.full_number).to eq('ABC7')
     end
 
     it 'corrects an incorrect check digit' do
       instance = test_class.new('ABC0')
-      expect(instance.restore!).to eq('ABC7')
+      instance.restore!
+      expect(instance.full_number).to eq('ABC7')
     end
 
     context 'when format is invalid' do
@@ -134,9 +167,17 @@ RSpec.describe SecId::Checkable do
     end
   end
 
+  describe '.restore' do
+    it 'returns the full identifier string with correct check digit' do
+      expect(test_class.restore('ABC')).to eq('ABC7')
+    end
+  end
+
   describe '.restore!' do
-    it 'creates instance, calculates check digit, and returns full identifier' do
-      expect(test_class.restore!('ABC')).to eq('ABC7')
+    it 'returns an instance of the class' do
+      result = test_class.restore!('ABC')
+      expect(result).to be_a(test_class)
+      expect(result.to_s).to eq('ABC7')
     end
   end
 

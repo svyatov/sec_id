@@ -62,7 +62,8 @@ All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` 
 - `#normalize!` - mutates `full_number` to canonical form, returns `self`
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
-- `restore!` - restores check-digit and returns the full number
+- `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
+- `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
 
 ### Metadata Registry
@@ -174,7 +175,8 @@ isin = SecId::ISIN.validate!('US5949181045')  # => #<SecId::ISIN>
 ```ruby
 # class level
 SecId::ISIN.valid?('US5949181045')      # => true
-SecId::ISIN.restore!('US594918104')     # => 'US5949181045'
+SecId::ISIN.restore('US594918104')      # => 'US5949181045'
+SecId::ISIN.restore!('US594918104')     # => #<SecId::ISIN>
 SecId::ISIN.check_digit('US594918104')  # => 5
 
 # instance level
@@ -184,7 +186,8 @@ isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
 isin.check_digit           # => 5
 isin.valid?                # => true
-isin.restore!              # => 'US5949181045'
+isin.restore               # => 'US5949181045'
+isin.restore!              # => #<SecId::ISIN> (mutates instance)
 isin.calculate_check_digit # => 5
 isin.to_cusip              # => #<SecId::CUSIP>
 isin.nsin_type             # => :cusip
@@ -216,7 +219,8 @@ SecId::ISIN.new('CH0012221716').to_valoren # => #<SecId::Valoren>
 ```ruby
 # class level
 SecId::CUSIP.valid?('594918104')      # => true
-SecId::CUSIP.restore!('59491810')     # => '594918104'
+SecId::CUSIP.restore('59491810')      # => '594918104'
+SecId::CUSIP.restore!('59491810')     # => #<SecId::CUSIP>
 SecId::CUSIP.check_digit('59491810')  # => 4
 
 # instance level
@@ -226,7 +230,8 @@ cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
 cusip.check_digit           # => 4
 cusip.valid?                # => true
-cusip.restore!              # => '594918104'
+cusip.restore               # => '594918104'
+cusip.restore!              # => #<SecId::CUSIP> (mutates instance)
 cusip.calculate_check_digit # => 4
 cusip.to_isin('US')         # => #<SecId::ISIN>
 cusip.cins?                 # => false
@@ -239,7 +244,8 @@ cusip.cins?                 # => false
 ```ruby
 # class level
 SecId::CEI.valid?('A0BCDEFGH1')      # => true
-SecId::CEI.restore!('A0BCDEFGH')     # => 'A0BCDEFGH1'
+SecId::CEI.restore('A0BCDEFGH')      # => 'A0BCDEFGH1'
+SecId::CEI.restore!('A0BCDEFGH')     # => #<SecId::CEI>
 SecId::CEI.check_digit('A0BCDEFGH')  # => 1
 
 # instance level
@@ -250,7 +256,8 @@ cei.numeric               # => '0'
 cei.entity_id             # => 'BCDEFGH'
 cei.check_digit           # => 1
 cei.valid?                # => true
-cei.restore!              # => 'A0BCDEFGH1'
+cei.restore               # => 'A0BCDEFGH1'
+cei.restore!              # => #<SecId::CEI> (mutates instance)
 cei.calculate_check_digit # => 1
 ```
 
@@ -261,7 +268,8 @@ cei.calculate_check_digit # => 1
 ```ruby
 # class level
 SecId::SEDOL.valid?('B0Z52W5')      # => true
-SecId::SEDOL.restore!('B0Z52W')     # => 'B0Z52W5'
+SecId::SEDOL.restore('B0Z52W')      # => 'B0Z52W5'
+SecId::SEDOL.restore!('B0Z52W')     # => #<SecId::SEDOL>
 SecId::SEDOL.check_digit('B0Z52W')  # => 5
 
 # instance level
@@ -269,7 +277,8 @@ sedol = SecId::SEDOL.new('B0Z52W5')
 sedol.full_number           # => 'B0Z52W5'
 sedol.check_digit           # => 5
 sedol.valid?                # => true
-sedol.restore!              # => 'B0Z52W5'
+sedol.restore               # => 'B0Z52W5'
+sedol.restore!              # => #<SecId::SEDOL> (mutates instance)
 sedol.calculate_check_digit # => 5
 sedol.to_isin               # => #<SecId::ISIN> (GB ISIN by default)
 sedol.to_isin('IE')         # => #<SecId::ISIN> (IE ISIN)
@@ -282,7 +291,8 @@ sedol.to_isin('IE')         # => #<SecId::ISIN> (IE ISIN)
 ```ruby
 # class level
 SecId::FIGI.valid?('BBG000DMBXR2')     # => true
-SecId::FIGI.restore!('BBG000DMBXR')    # => 'BBG000DMBXR2'
+SecId::FIGI.restore('BBG000DMBXR')     # => 'BBG000DMBXR2'
+SecId::FIGI.restore!('BBG000DMBXR')    # => #<SecId::FIGI>
 SecId::FIGI.check_digit('BBG000DMBXR') # => 2
 
 # instance level
@@ -292,7 +302,8 @@ figi.prefix                # => 'BB'
 figi.random_part           # => '000DMBXR'
 figi.check_digit           # => 2
 figi.valid?                # => true
-figi.restore!              # => 'BBG000DMBXR2'
+figi.restore               # => 'BBG000DMBXR2'
+figi.restore!              # => #<SecId::FIGI> (mutates instance)
 figi.calculate_check_digit # => 2
 ```
 
@@ -303,7 +314,8 @@ figi.calculate_check_digit # => 2
 ```ruby
 # class level
 SecId::LEI.valid?('5493006MHB84DD0ZWV18')    # => true
-SecId::LEI.restore!('5493006MHB84DD0ZWV')    # => '5493006MHB84DD0ZWV18'
+SecId::LEI.restore('5493006MHB84DD0ZWV')     # => '5493006MHB84DD0ZWV18'
+SecId::LEI.restore!('5493006MHB84DD0ZWV')    # => #<SecId::LEI>
 SecId::LEI.check_digit('5493006MHB84DD0ZWV') # => 18
 
 # instance level
@@ -314,7 +326,8 @@ lei.reserved              # => '00'
 lei.entity_id             # => '6MHB84DD0ZWV'
 lei.check_digit           # => 18
 lei.valid?                # => true
-lei.restore!              # => '5493006MHB84DD0ZWV18'
+lei.restore               # => '5493006MHB84DD0ZWV18'
+lei.restore!              # => #<SecId::LEI> (mutates instance)
 lei.calculate_check_digit # => 18
 ```
 
@@ -325,7 +338,8 @@ lei.calculate_check_digit # => 18
 ```ruby
 # class level
 SecId::IBAN.valid?('DE89370400440532013000')    # => true
-SecId::IBAN.restore!('DE370400440532013000')    # => 'DE89370400440532013000'
+SecId::IBAN.restore('DE370400440532013000')     # => 'DE89370400440532013000'
+SecId::IBAN.restore!('DE370400440532013000')    # => #<SecId::IBAN>
 SecId::IBAN.check_digit('DE370400440532013000') # => 89
 
 # instance level
@@ -337,7 +351,8 @@ iban.bank_code             # => '37040044'
 iban.account_number        # => '0532013000'
 iban.check_digit           # => 89
 iban.valid?                # => true
-iban.restore!              # => 'DE89370400440532013000'
+iban.restore               # => 'DE89370400440532013000'
+iban.restore!              # => #<SecId::IBAN> (mutates instance)
 iban.calculate_check_digit # => 89
 iban.known_country?        # => true
 ```

@@ -10,6 +10,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `#restore` instance method on check-digit identifiers returning the full identifier string without mutation
+- `.restore` class method on check-digit identifiers returning the full identifier string
 - `SecId.parse(str, types: nil)` and `SecId.parse!(str, types: nil)` methods that return a typed identifier instance for the most specific match, with optional type filtering
 - `SecId.valid?(str, types: nil)` method for quick boolean validation against all or specific identifier types
 - `SecId.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
@@ -24,6 +26,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- **BREAKING:** `#restore!` now returns `self` instead of a string; use `#restore` for the string return value
+- **BREAKING:** `.restore!` now returns the restored instance instead of a string; use `.restore` for the string return value
 - **BREAKING:** `#normalize!` on CIK, OCC, and Valoren now returns `self` instead of a string; use `#normalized` to get the canonical string
 - **BREAKING:** Class-level `.normalize!` on CIK, OCC, and Valoren replaced by `.normalize` (non-bang) which returns the canonical string
 - **BREAKING:** `Base#parse` always upcases input; the `upcase` keyword parameter is removed

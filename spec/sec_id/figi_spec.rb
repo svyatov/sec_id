@@ -113,11 +113,11 @@ RSpec.describe SecId::FIGI do
   describe '.restore!' do
     context 'when FIGI is valid' do
       it 'restores check-digit for various FIGIs' do
-        expect(described_class.restore!('BBG000HY4HW')).to eq('BBG000HY4HW9')
-        expect(described_class.restore!('BBG000HY4HW9')).to eq('BBG000HY4HW9')
-        expect(described_class.restore!('BBG000BCK0D')).to eq('BBG000BCK0D3')
-        expect(described_class.restore!('BBG000BCK0D3')).to eq('BBG000BCK0D3')
-        expect(described_class.restore!('BBG000BKRK3')).to eq('BBG000BKRK35')
+        expect(described_class.restore!('BBG000HY4HW').to_s).to eq('BBG000HY4HW9')
+        expect(described_class.restore!('BBG000HY4HW9').to_s).to eq('BBG000HY4HW9')
+        expect(described_class.restore!('BBG000BCK0D').to_s).to eq('BBG000BCK0D3')
+        expect(described_class.restore!('BBG000BCK0D3').to_s).to eq('BBG000BCK0D3')
+        expect(described_class.restore!('BBG000BKRK3').to_s).to eq('BBG000BKRK35')
       end
     end
   end

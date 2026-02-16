@@ -450,12 +450,12 @@ RSpec.describe SecId::ISIN do
 
   describe '.restore!' do
     context 'when ISIN is valid' do
-      it 'restores check-digit and returns full ISIN number' do
-        expect(described_class.restore!('AU0000XVGZA')).to eq('AU0000XVGZA3')
-        expect(described_class.restore!('AU0000VXGZA7')).to eq('AU0000VXGZA3')
-        expect(described_class.restore!('GB000263494')).to eq('GB0002634946')
-        expect(described_class.restore!('US037833104')).to eq('US0378331047')
-        expect(described_class.restore!('US0378331004')).to eq('US0378331005')
+      it 'restores check-digit and returns instance' do
+        expect(described_class.restore!('AU0000XVGZA').to_s).to eq('AU0000XVGZA3')
+        expect(described_class.restore!('AU0000VXGZA7').to_s).to eq('AU0000VXGZA3')
+        expect(described_class.restore!('GB000263494').to_s).to eq('GB0002634946')
+        expect(described_class.restore!('US037833104').to_s).to eq('US0378331047')
+        expect(described_class.restore!('US0378331004').to_s).to eq('US0378331005')
       end
     end
   end

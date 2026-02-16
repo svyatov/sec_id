@@ -11,9 +11,10 @@ module SecId
   # - Character-to-digit mapping constants
   # - Luhn algorithm variants for check-digit calculation
   # - `valid?` override that validates format and check digit
-  # - `restore!` method to calculate and set the check digit
+  # - `restore` method returning full identifier string without mutation
+  # - `restore!` method to calculate and set the check digit, returning `self`
   # - `check_digit` attribute
-  # - Class-level convenience methods: `restore!`, `check_digit`
+  # - Class-level convenience methods: `restore`, `restore!`, `check_digit`
   #
   # @example Including in an identifier class
   #   class MyIdentifier < Base
@@ -63,10 +64,19 @@ module SecId
 
     # Class methods added when Checkable is included.
     module ClassMethods
-      # Restores (calculates) the check digit and returns the full identifier.
+      # Returns the full identifier string with correct check digit.
       #
       # @param id_without_check_digit [String] identifier without or with incorrect check digit
       # @return [String] the full identifier with correct check digit
+      # @raise [InvalidFormatError] if the identifier format is invalid
+      def restore(id_without_check_digit)
+        new(id_without_check_digit).restore
+      end
+
+      # Restores (calculates) the check digit and returns the instance.
+      #
+      # @param id_without_check_digit [String] identifier without or with incorrect check digit
+      # @return [self] the restored instance with correct check digit
       # @raise [InvalidFormatError] if the identifier format is invalid
       def restore!(id_without_check_digit)
         new(id_without_check_digit).restore!
@@ -87,13 +97,22 @@ module SecId
       valid_format? && check_digit == calculate_check_digit
     end
 
-    # Calculates and sets the check digit, updating full_number.
+    # Returns the full identifier string with correct check digit without mutation.
     #
     # @return [String] the full identifier with correct check digit
+    # @raise [InvalidFormatError] if the identifier format is invalid
+    def restore
+      "#{identifier}#{calculate_check_digit}"
+    end
+
+    # Calculates and sets the check digit, updating full_number.
+    #
+    # @return [self]
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore!
       @check_digit = calculate_check_digit
       @full_number = to_s
+      self
     end
 
     # Subclasses must override this method to implement their check-digit algorithm.

@@ -65,6 +65,13 @@ module SecId
       extract_bban_components if valid_format?
     end
 
+    # @return [String]
+    # @raise [InvalidFormatError] if the IBAN format is invalid
+    def restore
+      cd = calculate_check_digit
+      "#{country_code}#{cd.to_s.rjust(2, '0')}#{bban}"
+    end
+
     # @return [Integer] the calculated 2-digit check value (1-98)
     # @raise [InvalidFormatError] if the IBAN format is invalid
     def calculate_check_digit

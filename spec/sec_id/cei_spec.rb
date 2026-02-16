@@ -76,9 +76,9 @@ RSpec.describe SecId::CEI do
 
   describe '.restore!' do
     it 'restores check-digit for various CEIs' do
-      expect(described_class.restore!('A0BCDEFGH')).to eq('A0BCDEFGH1')
-      expect(described_class.restore!('A0A0A0A0A')).to eq('A0A0A0A0A0')
-      expect(described_class.restore!('Z9ZZZZZZZ')).to eq('Z9ZZZZZZZ2')
+      expect(described_class.restore!('A0BCDEFGH').to_s).to eq('A0BCDEFGH1')
+      expect(described_class.restore!('A0A0A0A0A').to_s).to eq('A0A0A0A0A0')
+      expect(described_class.restore!('Z9ZZZZZZZ').to_s).to eq('Z9ZZZZZZZ2')
     end
   end
 
