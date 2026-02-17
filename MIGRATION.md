@@ -104,7 +104,7 @@ cik.normalize!                  # mutates and returns self
 
 # Class-level .normalize! removed — use .normalize
 # Before
-SecID::CIK.normalize!('1094517')
+SecId::CIK.normalize!('1094517')
 
 # After
 SecID::CIK.normalize('1094517')   # => '0001094517'
@@ -118,7 +118,7 @@ Note: In v5, all identifier types support normalization, not just CIK/OCC/Valore
 
 ```ruby
 # Before
-SecID::ISIN.valid_format?('US5949181045')
+SecId::ISIN.valid_format?('US5949181045')
 
 # After
 SecID::ISIN.valid?('US5949181045')
@@ -187,7 +187,7 @@ end
 
 ```ruby
 # Before
-result = SecID::ISIN.new('US5949181045').errors
+result = SecId::ISIN.new('US5949181045').errors
 result.valid?  # => true
 
 # After
@@ -207,7 +207,7 @@ grep -rE 'ValidationResult|\.valid\?' app/ lib/ spec/
 
 ```ruby
 # Before (v4)
-result = SecID::ISIN.validate('US5949181045')  # => #<SecID::ValidationResult>
+result = SecId::ISIN.validate('US5949181045')  # => #<SecId::ValidationResult>
 result.valid?
 
 # After (v5)
