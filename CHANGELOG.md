@@ -32,32 +32,22 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** `#normalize!` on CIK, OCC, and Valoren now returns `self` instead of a string; use `#normalized` to get the canonical string
 - **BREAKING:** Class-level `.normalize!` on CIK, OCC, and Valoren replaced by `.normalize` (non-bang) which returns the canonical string
 - **BREAKING:** `Base#parse` always upcases input; the `upcase` keyword parameter is removed
-- **BREAKING:** `#validate` renamed to `#errors` (memoized); class-level `.validate` still available
-- **BREAKING:** `ValidationResult#errors` renamed to `#details`; each hash uses `:error` key instead of `:code`
-- **BREAKING:** `ValidationResult#error_codes` removed; use `details.map { |d| d[:error] }`
-- **BREAKING:** `ValidationResult#to_a` now returns `messages` (array of strings) instead of raw error hashes
-- **BREAKING:** `#validation_errors` and `.validation_errors` removed from public API
 - **BREAKING:** `#full_number` renamed to `#full_id` on all identifier types
 - **BREAKING:** Ruby module renamed from `SecId` to `SecID` (e.g. `SecId::ISIN` → `SecID::ISIN`)
 - Luhn helper methods in Checkable are now private (implementation detail)
 
 ### Removed
 
-- `has_normalization?` class method — all types now support normalization
 - `Normalizable` concern (`lib/sec_id/concerns/normalizable.rb`) — normalization is now built into `Base`
 - Class-level `.normalize!` on CIK, OCC, and Valoren — replaced by `.normalize`
 - `upcase` keyword parameter from `Base#parse`
 - `#valid_format?` instance method (now private) and `.valid_format?` class method
-- `#valid_check_digit?` instance method and `.valid_check_digit?` class method
-- `#validation_errors` instance method (now private)
-- `.validation_errors` class method
 - `OCC#full_symbol` method — use `#full_id` instead
 
 ### Fixed
 
 - `to_str` now always returns the same value as `to_s` across all identifier types — previously LEI, IBAN, and Checkable identifiers could return divergent strings due to Ruby `alias` resolving to the parent class method
 - OCC `#date` memoization for invalid dates — previously re-attempted parsing on every call instead of caching `nil`
-- OCC `ID_LENGTH` changed from `21` to `(16..21)` to correctly reflect that valid OCC symbols range from 16 to 21 characters
 - LEI `restore` and `to_s` now correctly pad single-digit check digits to 2 characters
 - CUSIP and SEDOL `to_isin` now always embed the correct check digit
 

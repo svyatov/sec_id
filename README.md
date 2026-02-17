@@ -52,6 +52,8 @@ Or install it yourself:
 gem install sec_id
 ```
 
+**Upgrading from v4?** See [MIGRATION.md](MIGRATION.md) for a step-by-step guide.
+
 ## Supported Standards and Usage
 
 All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` methods at both class and instance levels.
