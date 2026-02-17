@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 3.2.0'
 
   spec.require_paths = ['lib']
-  spec.files = Dir['lib/**/*.rb'] + %w[CHANGELOG.md LICENSE.txt README.md sec_id.gemspec]
+  spec.files = Dir['lib/**/*.rb'] + %w[CHANGELOG.md LICENSE.txt MIGRATION.md README.md sec_id.gemspec]
 
   spec.metadata['rubygems_mfa_required'] = 'true'
   spec.metadata['source_code_uri'] = 'https://github.com/svyatov/sec_id'
