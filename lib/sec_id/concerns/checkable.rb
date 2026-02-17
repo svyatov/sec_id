@@ -191,8 +191,8 @@ module SecID
     # Returns error codes including check digit validation.
     #
     # @return [Array<Symbol>]
-    def validation_errors
-      return format_errors unless valid_format?
+    def error_codes
+      return detect_errors unless valid_format?
       return [:invalid_check_digit] unless check_digit == calculate_check_digit
 
       []

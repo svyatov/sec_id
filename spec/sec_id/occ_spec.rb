@@ -110,7 +110,7 @@ RSpec.describe SecID::OCC do
     context 'when date day is impossible (Feb 30)' do
       it 'returns :invalid_date error' do
         result = described_class.new('AAPL  210230C00150000').errors
-        expect(result.valid?).to be(false)
+        expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
       end
     end

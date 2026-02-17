@@ -141,8 +141,8 @@ module SecID
     private
 
     # @return [Array<Symbol>]
-    def validation_errors
-      return format_errors unless valid_format?
+    def error_codes
+      return detect_errors unless valid_format?
       return [:invalid_date] if date.nil?
 
       []

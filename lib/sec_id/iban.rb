@@ -121,7 +121,7 @@ module SecID
     end
 
     # @return [Array<Symbol>]
-    def format_errors
+    def detect_errors
       return [:invalid_bban] if identifier && !valid_bban_format?
 
       super

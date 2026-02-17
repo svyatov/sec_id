@@ -10,13 +10,15 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `Validatable`, `Normalizable`, and `IdentifierMetadata` concerns extracted from `Base`, making each responsibility independently includable
+- `#validate` and `.validate` methods on all identifier types that eagerly trigger + cache errors and return `self`/instance
+- `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success
+- Rails-like `#errors` API returning `Errors` with `details`, `messages`, `none?`, `any?`, `empty?`, `size`, `each`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - `#restore` instance method on check-digit identifiers returning the full identifier string without mutation
 - `.restore` class method on check-digit identifiers returning the full identifier string
 - `SecID.parse(str, types: nil)` and `SecID.parse!(str, types: nil)` methods that return a typed identifier instance for the most specific match, with optional type filtering
 - `SecID.valid?(str, types: nil)` method for quick boolean validation against all or specific identifier types
 - `SecID.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
-- `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success
-- Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
 - Metadata registry: `SecID.identifiers` returns all identifier classes, `SecID[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
 - `#normalized` and `#normalize` instance methods on all identifier types returning the canonical string form
@@ -38,7 +40,6 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Removed
 
-- `Normalizable` concern (`lib/sec_id/concerns/normalizable.rb`) — normalization is now built into `Base`
 - Class-level `.normalize!` on CIK, OCC, and Valoren — replaced by `.normalize`
 - `upcase` keyword parameter from `Base#parse`
 - `#valid_format?` instance method (now private) and `.valid_format?` class method
