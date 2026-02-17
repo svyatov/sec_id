@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::CFI do
+RSpec.describe SecID::CFI do
   let(:cfi) { described_class.new(cfi_code) }
 
   # Edge cases - applicable to all identifiers
@@ -279,14 +279,14 @@ RSpec.describe SecId::CFI do
     context 'when category is invalid' do
       it 'raises InvalidStructureError' do
         expect { described_class.new('ZSXXXX').validate! }
-          .to raise_error(SecId::InvalidStructureError, /category/i)
+          .to raise_error(SecID::InvalidStructureError, /category/i)
       end
     end
 
     context 'when group is invalid' do
       it 'raises InvalidStructureError' do
         expect { described_class.new('EZXXXX').validate! }
-          .to raise_error(SecId::InvalidStructureError, /Group/i)
+          .to raise_error(SecID::InvalidStructureError, /Group/i)
       end
     end
   end

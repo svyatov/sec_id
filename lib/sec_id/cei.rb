@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # CUSIP Entity Identifier (CEI) - a 10-character alphanumeric code that identifies
   # legal entities in the syndicated loan market.
   #
@@ -9,7 +9,7 @@ module SecId
   # @see https://www.cusip.com/identifiers.html
   #
   # @example Validate a CEI
-  #   SecId::CEI.valid?('A0BCDEFGH1')  #=> true
+  #   SecID::CEI.valid?('A0BCDEFGH1')  #=> true
   class CEI < Base
     include Checkable
 

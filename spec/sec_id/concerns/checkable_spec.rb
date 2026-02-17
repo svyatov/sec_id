@@ -2,8 +2,8 @@
 
 # Test class for Checkable concern - defined outside RSpec block to avoid redefinition
 module CheckableSpecHelper
-  class TestClass < SecId::Base
-    include SecId::Checkable
+  class TestClass < SecID::Base
+    include SecID::Checkable
 
     ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d)?\z/
 
@@ -21,8 +21,8 @@ module CheckableSpecHelper
   end
 
   # Test class with 2-digit check digit (like LEI)
-  class TwoDigitCheckClass < SecId::Base
-    include SecId::Checkable
+  class TwoDigitCheckClass < SecID::Base
+    include SecID::Checkable
 
     FULL_NAME = 'Two Digit Check Test'
     ID_LENGTH = 5
@@ -50,8 +50,8 @@ module CheckableSpecHelper
   end
 
   # Test class that doesn't implement calculate_check_digit
-  class IncompleteClass < SecId::Base
-    include SecId::Checkable
+  class IncompleteClass < SecID::Base
+    include SecID::Checkable
 
     ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d)?\z/
 
@@ -63,7 +63,7 @@ module CheckableSpecHelper
   end
 end
 
-RSpec.describe SecId::Checkable do
+RSpec.describe SecID::Checkable do
   let(:test_class) { CheckableSpecHelper::TestClass }
 
   describe 'when included in a class' do
@@ -131,7 +131,7 @@ RSpec.describe SecId::Checkable do
     context 'when format is invalid' do
       it 'raises InvalidFormatError' do
         instance = test_class.new('INVALID')
-        expect { instance.restore }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.restore }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -158,7 +158,7 @@ RSpec.describe SecId::Checkable do
     context 'when format is invalid' do
       it 'raises InvalidFormatError' do
         instance = test_class.new('INVALID')
-        expect { instance.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.restore! }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -172,7 +172,7 @@ RSpec.describe SecId::Checkable do
     context 'when format is invalid' do
       it 'raises InvalidFormatError' do
         instance = test_class.new('INVALID')
-        expect { instance.calculate_check_digit }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.calculate_check_digit }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

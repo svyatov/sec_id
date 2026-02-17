@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # International Securities Identification Number (ISIN) - a 12-character alphanumeric code
   # that uniquely identifies a security globally.
   #
@@ -9,10 +9,10 @@ module SecId
   # @see https://en.wikipedia.org/wiki/International_Securities_Identification_Number
   #
   # @example Validate an ISIN
-  #   SecId::ISIN.valid?('US5949181045')  #=> true
+  #   SecID::ISIN.valid?('US5949181045')  #=> true
   #
   # @example Restore check digit
-  #   SecId::ISIN.restore!('US594918104')  #=> #<SecId::ISIN>
+  #   SecID::ISIN.restore!('US594918104')  #=> #<SecID::ISIN>
   class ISIN < Base
     include Checkable
 

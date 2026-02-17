@@ -21,7 +21,7 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 
 ### Class Hierarchy
 
-All identifier classes inherit from `SecId::Base` (`lib/sec_id/base.rb`), which provides:
+All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), which provides:
 - Core API: `valid?`, `errors` (memoized, returns `ValidationResult`), `validate!` (returns self or raises)
 - Normalization API: `#normalized` / `#normalize` (canonical string), `#normalize!` (mutates `full_id`, returns self), `.normalize(id)` (class-level with separator stripping)
 - Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`), `validate!` (returns instance or raises)
@@ -45,11 +45,11 @@ Classes with check digits include the `Checkable` concern, which adds:
 ### Registry (`lib/sec_id.rb`)
 
 Identifier classes auto-register via `Base.inherited`. Access them through:
-- `SecId[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
-- `SecId.identifiers` — all registered classes in load order
-- `SecId.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
-- `SecId.parse(str, types: nil)` — returns a typed instance for the most specific match (or `nil`)
-- `SecId.parse!(str, types: nil)` — like `parse` but raises `InvalidFormatError` on failure
+- `SecID[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
+- `SecID.identifiers` — all registered classes in load order
+- `SecID.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
+- `SecID.parse(str, types: nil)` — returns a typed instance for the most specific match (or `nil`)
+- `SecID.parse!(str, types: nil)` — like `parse` but raises `InvalidFormatError` on failure
 
 ### Detector (`lib/sec_id/detector.rb`)
 
@@ -60,7 +60,7 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 
 Specificity sort: check-digit types first, then smaller length range, then load order.
 
-Lazily instantiated from `SecId.detect`; cache invalidated when new types register.
+Lazily instantiated from `SecID.detect`; cache invalidated when new types register.
 
 ### Concerns (`lib/sec_id/concerns/`)
 
@@ -139,10 +139,10 @@ Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
 
 ### Error Handling
 
-- `SecId::Error` - Base error class
-- `SecId::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
-- `SecId::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
-- `SecId::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
+- `SecID::Error` - Base error class
+- `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
+- `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
+- `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
 - `Base::EXCEPTION_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
 - **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.

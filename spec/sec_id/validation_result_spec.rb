@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::ValidationResult do
+RSpec.describe SecID::ValidationResult do
   describe 'when valid (no errors)' do
     subject(:result) { described_class.new([]) }
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Country-specific BBAN validation rules for IBAN.
   #
   # @api private

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::WKN do
+RSpec.describe SecID::WKN do
   let(:wkn) { described_class.new(wkn_number) }
 
   # Edge cases - applicable to all identifiers
@@ -134,20 +134,20 @@ RSpec.describe SecId::WKN do
 
       it 'returns an ISIN instance for default DE country code' do
         result = wkn.to_isin
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('DE0007164600')
         expect(result.country_code).to eq('DE')
       end
 
       it 'returns an ISIN instance for explicit DE country code' do
         result = wkn.to_isin('DE')
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('DE0007164600')
       end
 
       it 'raises InvalidFormatError for invalid country code' do
         expect { wkn.to_isin('US') }.to raise_error(
-          SecId::InvalidFormatError, "'US' is not a valid WKN country code!"
+          SecID::InvalidFormatError, "'US' is not a valid WKN country code!"
         )
       end
     end
@@ -157,7 +157,7 @@ RSpec.describe SecId::WKN do
 
       it 'returns valid ISIN' do
         result = wkn.to_isin
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('DE000CBK1001')
       end
     end
@@ -167,7 +167,7 @@ RSpec.describe SecId::WKN do
 
       it 'raises InvalidFormatError' do
         expect { wkn.to_isin }.to raise_error(
-          SecId::InvalidFormatError, "WKN '12345' is invalid!"
+          SecID::InvalidFormatError, "WKN '12345' is invalid!"
         )
       end
     end

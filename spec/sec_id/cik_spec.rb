@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::CIK do
+RSpec.describe SecID::CIK do
   let(:cik) { described_class.new(cik_number) }
 
   # Edge cases - applicable to all identifiers
@@ -112,9 +112,9 @@ RSpec.describe SecId::CIK do
   describe '.normalize' do
     context 'when CIK is malformed' do
       it 'raises an error' do
-        expect { described_class.normalize('X9') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize('0000000000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize('09876543210') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('X9') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.normalize('0000000000') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.normalize('09876543210') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 

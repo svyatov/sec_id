@@ -2,21 +2,21 @@
 
 require_relative 'iban/country_rules'
 
-module SecId
+module SecID
   # International Bank Account Number (IBAN) - an international standard for identifying
   # bank accounts across national borders (ISO 13616).
   #
   # Format: 2-letter country code + 2-digit check digits + BBAN (Basic Bank Account Number, 11-30 chars)
-  # Note: Unlike other SecId identifiers, the check digits are in positions 3-4, not at the end.
+  # Note: Unlike other SecID identifiers, the check digits are in positions 3-4, not at the end.
   #
   # @see https://en.wikipedia.org/wiki/International_Bank_Account_Number
   # @see https://www.iban.com/structure
   #
   # @example Validate an IBAN
-  #   SecId::IBAN.valid?('DE89370400440532013000')  #=> true
+  #   SecID::IBAN.valid?('DE89370400440532013000')  #=> true
   #
   # @example Restore check digits
-  #   SecId::IBAN.restore!('DE00370400440532013000')  #=> #<SecId::IBAN>
+  #   SecID::IBAN.restore!('DE00370400440532013000')  #=> #<SecID::IBAN>
   class IBAN < Base
     include Checkable
     include IBANCountryRules

@@ -108,15 +108,15 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
 
       it 'raises error for #restore' do
-        expect { instance.restore }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.restore }.to raise_error(SecID::InvalidFormatError)
       end
 
       it 'raises error for #restore!' do
-        expect { instance.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.restore! }.to raise_error(SecID::InvalidFormatError)
       end
 
       it 'raises error for #calculate_check_digit' do
-        expect { instance.calculate_check_digit }.to raise_error(SecId::InvalidFormatError)
+        expect { instance.calculate_check_digit }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -158,7 +158,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
 
       it 'raises error for invalid format' do
-        expect { identifier_class.restore(invalid_format_id) }.to raise_error(SecId::InvalidFormatError)
+        expect { identifier_class.restore(invalid_format_id) }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -182,7 +182,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
 
       it 'raises error for invalid format' do
-        expect { identifier_class.restore!(invalid_format_id) }.to raise_error(SecId::InvalidFormatError)
+        expect { identifier_class.restore!(invalid_format_id) }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -204,7 +204,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
 
       it 'raises error for invalid format' do
-        expect { identifier_class.check_digit(invalid_format_id) }.to raise_error(SecId::InvalidFormatError)
+        expect { identifier_class.check_digit(invalid_format_id) }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end

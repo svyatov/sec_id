@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Committee on Uniform Securities Identification Procedures (CUSIP) - a 9-character
   # alphanumeric code that identifies North American securities.
   #
@@ -9,11 +9,11 @@ module SecId
   # @see https://en.wikipedia.org/wiki/CUSIP
   #
   # @example Validate a CUSIP
-  #   SecId::CUSIP.valid?('037833100')  #=> true
+  #   SecID::CUSIP.valid?('037833100')  #=> true
   #
   # @example Convert to ISIN
-  #   cusip = SecId::CUSIP.new('037833100')
-  #   cusip.to_isin('US')  #=> #<SecId::ISIN>
+  #   cusip = SecID::CUSIP.new('037833100')
+  #   cusip.to_isin('US')  #=> #<SecID::ISIN>
   class CUSIP < Base
     include Checkable
 

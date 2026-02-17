@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::Valoren do
+RSpec.describe SecID::Valoren do
   let(:valoren) { described_class.new(valoren_number) }
 
   # Edge cases - applicable to all identifiers
@@ -125,9 +125,9 @@ RSpec.describe SecId::Valoren do
   describe '.normalize' do
     context 'when Valoren is malformed' do
       it 'raises an error' do
-        expect { described_class.normalize('X9') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize('0000') }.to raise_error(SecId::InvalidFormatError)
-        expect { described_class.normalize('0123456789') }.to raise_error(SecId::InvalidFormatError)
+        expect { described_class.normalize('X9') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.normalize('0000') }.to raise_error(SecID::InvalidFormatError)
+        expect { described_class.normalize('0123456789') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -148,21 +148,21 @@ RSpec.describe SecId::Valoren do
 
       it 'returns an ISIN instance for default CH country code' do
         result = valoren.to_isin
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('CH0012221716')
         expect(result.country_code).to eq('CH')
       end
 
       it 'returns an ISIN instance for LI country code' do
         result = valoren.to_isin('LI')
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('LI0012221714')
         expect(result.country_code).to eq('LI')
       end
 
       it 'raises InvalidFormatError for invalid country code' do
         expect { valoren.to_isin('US') }.to raise_error(
-          SecId::InvalidFormatError, "'US' is not a valid Valoren country code!"
+          SecID::InvalidFormatError, "'US' is not a valid Valoren country code!"
         )
       end
     end
@@ -172,7 +172,7 @@ RSpec.describe SecId::Valoren do
 
       it 'normalizes and returns valid ISIN' do
         result = valoren.to_isin
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('CH0038863350')
         expect(valoren.full_id).to eq('003886335')
       end

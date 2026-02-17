@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::ISIN do
+RSpec.describe SecID::ISIN do
   let(:isin) { described_class.new(isin_number) }
 
   # Edge cases - applicable to all identifiers
@@ -83,7 +83,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a CUSIP' do
         expect(isin.cgs?).to be(true)
-        expect(isin.to_cusip).to be_a(SecId::CUSIP)
+        expect(isin.to_cusip).to be_a(SecID::CUSIP)
       end
     end
 
@@ -92,7 +92,7 @@ RSpec.describe SecId::ISIN do
 
       it 'raises an error' do
         expect(isin.cgs?).to be(false)
-        expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
+        expect { isin.to_cusip }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe SecId::ISIN do
 
       it 'is not a CGS country and raises an error' do
         expect(isin.cgs?).to be(false)
-        expect { isin.to_cusip }.to raise_error(SecId::InvalidFormatError)
+        expect { isin.to_cusip }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -188,7 +188,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns CUSIP instance with correct value' do
         result = isin.to_nsin
-        expect(result).to be_a(SecId::CUSIP)
+        expect(result).to be_a(SecID::CUSIP)
         expect(result.full_id).to eq('037833100')
       end
     end
@@ -198,7 +198,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns SEDOL instance with correct value' do
         result = isin.to_nsin
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B02H2F7')
       end
     end
@@ -208,7 +208,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns WKN instance with correct value' do
         result = isin.to_nsin
-        expect(result).to be_a(SecId::WKN)
+        expect(result).to be_a(SecID::WKN)
         expect(result.full_id).to eq('716460')
       end
     end
@@ -218,7 +218,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns Valoren instance with correct value' do
         result = isin.to_nsin
-        expect(result).to be_a(SecId::Valoren)
+        expect(result).to be_a(SecID::Valoren)
         expect(result.identifier).to eq('1222171')
       end
     end
@@ -237,7 +237,7 @@ RSpec.describe SecId::ISIN do
       let(:isin_number) { '00B296YR77' }
 
       it 'raises InvalidFormatError' do
-        expect { isin.to_nsin }.to raise_error(SecId::InvalidFormatError, 'Invalid ISIN format')
+        expect { isin.to_nsin }.to raise_error(SecID::InvalidFormatError, 'Invalid ISIN format')
       end
     end
   end
@@ -318,7 +318,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B02H2F7')
       end
     end
@@ -328,7 +328,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B296YR7')
       end
     end
@@ -338,7 +338,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B7S9G98')
       end
     end
@@ -348,7 +348,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B4T3BW6')
       end
     end
@@ -358,7 +358,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('BJVDZ94')
       end
     end
@@ -368,7 +368,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a SEDOL instance' do
         result = isin.to_sedol
-        expect(result).to be_a(SecId::SEDOL)
+        expect(result).to be_a(SecID::SEDOL)
         expect(result.full_id).to eq('B030JM1')
       end
     end
@@ -377,7 +377,7 @@ RSpec.describe SecId::ISIN do
       let(:isin_number) { 'US0378331005' }
 
       it 'raises InvalidFormatError' do
-        expect { isin.to_sedol }.to raise_error(SecId::InvalidFormatError, "'US' is not a SEDOL country code!")
+        expect { isin.to_sedol }.to raise_error(SecID::InvalidFormatError, "'US' is not a SEDOL country code!")
       end
     end
   end
@@ -388,7 +388,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a WKN instance' do
         result = isin.to_wkn
-        expect(result).to be_a(SecId::WKN)
+        expect(result).to be_a(SecID::WKN)
         expect(result.full_id).to eq('716460')
       end
     end
@@ -397,7 +397,7 @@ RSpec.describe SecId::ISIN do
       let(:isin_number) { 'US0378331005' }
 
       it 'raises InvalidFormatError' do
-        expect { isin.to_wkn }.to raise_error(SecId::InvalidFormatError, "'US' is not a WKN country code!")
+        expect { isin.to_wkn }.to raise_error(SecID::InvalidFormatError, "'US' is not a WKN country code!")
       end
     end
   end
@@ -408,7 +408,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a Valoren instance' do
         result = isin.to_valoren
-        expect(result).to be_a(SecId::Valoren)
+        expect(result).to be_a(SecID::Valoren)
         expect(result.identifier).to eq('1222171')
       end
     end
@@ -418,7 +418,7 @@ RSpec.describe SecId::ISIN do
 
       it 'returns a Valoren instance' do
         result = isin.to_valoren
-        expect(result).to be_a(SecId::Valoren)
+        expect(result).to be_a(SecID::Valoren)
         expect(result.identifier).to eq('3886335')
       end
     end
@@ -427,7 +427,7 @@ RSpec.describe SecId::ISIN do
       let(:isin_number) { 'US0378331005' }
 
       it 'raises InvalidFormatError' do
-        expect { isin.to_valoren }.to raise_error(SecId::InvalidFormatError, "'US' is not a Valoren country code!")
+        expect { isin.to_valoren }.to raise_error(SecID::InvalidFormatError, "'US' is not a Valoren country code!")
       end
     end
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Classification of Financial Instruments (CFI) - a 6-character alphabetic code
   # that classifies financial instruments per ISO 10962.
   #
@@ -12,11 +12,11 @@ module SecId
   # @see https://en.wikipedia.org/wiki/ISO_10962
   #
   # @example Validate a CFI code
-  #   SecId::CFI.valid?('ESXXXX')  #=> true
-  #   SecId::CFI.valid?('ESVUFR')  #=> true
+  #   SecID::CFI.valid?('ESXXXX')  #=> true
+  #   SecID::CFI.valid?('ESVUFR')  #=> true
   #
   # @example Access CFI components
-  #   cfi = SecId::CFI.new('ESVUFR')
+  #   cfi = SecID::CFI.new('ESVUFR')
   #   cfi.category        #=> :equity
   #   cfi.group           #=> :common_shares
   #   cfi.voting?         #=> true

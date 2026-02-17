@@ -12,12 +12,12 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 - `#restore` instance method on check-digit identifiers returning the full identifier string without mutation
 - `.restore` class method on check-digit identifiers returning the full identifier string
-- `SecId.parse(str, types: nil)` and `SecId.parse!(str, types: nil)` methods that return a typed identifier instance for the most specific match, with optional type filtering
-- `SecId.valid?(str, types: nil)` method for quick boolean validation against all or specific identifier types
-- `SecId.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
+- `SecID.parse(str, types: nil)` and `SecID.parse!(str, types: nil)` methods that return a typed identifier instance for the most specific match, with optional type filtering
+- `SecID.valid?(str, types: nil)` method for quick boolean validation against all or specific identifier types
+- `SecID.detect(str)` method that identifies all matching identifier types for a given string, returning symbols sorted by specificity
 - `#validate!` and `.validate!` methods that raise `InvalidFormatError`, `InvalidCheckDigitError`, or `InvalidStructureError` on validation failure, returning self/instance on success
 - Rails-like `#errors` API returning `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`, `valid?`, and `to_a` on all identifier classes, with type-specific error detection for check digits, FIGI prefixes, CFI categories/groups, IBAN BBAN format, and OCC dates
-- Metadata registry: `SecId.identifiers` returns all identifier classes, `SecId[:isin]` looks up by symbol key
+- Metadata registry: `SecID.identifiers` returns all identifier classes, `SecID[:isin]` looks up by symbol key
 - Metadata class methods on all identifiers: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
 - `#normalized` and `#normalize` instance methods on all identifier types returning the canonical string form
 - `#normalize!` instance method on all identifier types that mutates `full_id` to canonical form and returns `self`
@@ -37,6 +37,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** `ValidationResult#to_a` now returns `messages` (array of strings) instead of raw error hashes
 - **BREAKING:** `#validation_errors` and `.validation_errors` removed from public API
 - **BREAKING:** `#full_number` renamed to `#full_id` on all identifier types
+- **BREAKING:** Ruby module renamed from `SecId` to `SecID` (e.g. `SecId::ISIN` → `SecID::ISIN`)
 - Luhn helper methods in Checkable are now private (implementation detail)
 
 ### Removed
@@ -166,16 +167,16 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- SEDOL numbers support: `SecId::SEDOL`
+- SEDOL numbers support: `SecID::SEDOL`
 
 ### Changed
 
 - **BREAKING:** API for accessing full number is unified across all classes:
 
     ```
-    SecId::ISIN#full_id  # previously SecId::ISIN#isin
-    SecId::CUSIP#full_id # previously SecId::CUSIP#cusip
-    SecId::SEDOL#full_id
+    SecID::ISIN#full_id  # previously SecID::ISIN#isin
+    SecID::CUSIP#full_id # previously SecID::CUSIP#cusip
+    SecID::SEDOL#full_id
     ```
 
 ### Fixed
@@ -186,7 +187,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- CUSIP numbers support: `SecId::CUSIP`
+- CUSIP numbers support: `SecID::CUSIP`
 - CHANGELOG.md file added
 
 ### Changed
@@ -197,4 +198,4 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- ISIN numbers support: `SecId::ISIN`
+- ISIN numbers support: `SecID::ISIN`

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::FISN do
+RSpec.describe SecID::FISN do
   let(:fisn) { described_class.new(fisn_code) }
 
   # Edge cases - applicable to all identifiers

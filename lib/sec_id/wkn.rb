@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Wertpapierkennnummer (WKN) - a 6-character alphanumeric code
   # used to identify securities in Germany.
   #
@@ -10,8 +10,8 @@ module SecId
   # @see https://en.wikipedia.org/wiki/Wertpapierkennnummer
   #
   # @example Validate a WKN
-  #   SecId::WKN.valid?('514000')  #=> true
-  #   SecId::WKN.valid?('CBK100')  #=> true
+  #   SecID::WKN.valid?('514000')  #=> true
+  #   SecID::WKN.valid?('CBK100')  #=> true
   class WKN < Base
     FULL_NAME = 'Wertpapierkennnummer'
     ID_LENGTH = 6

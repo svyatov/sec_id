@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Legal Entity Identifier (LEI) - a 20-character alphanumeric code that
   # uniquely identifies legal entities participating in financial transactions.
   #
@@ -10,10 +10,10 @@ module SecId
   # @see https://www.gleif.org/en/about-lei/iso-17442-the-lei-code-structure
   #
   # @example Validate a LEI
-  #   SecId::LEI.valid?('529900T8BM49AURSDO55')  #=> true
+  #   SecID::LEI.valid?('529900T8BM49AURSDO55')  #=> true
   #
   # @example Calculate check digit
-  #   SecId::LEI.check_digit('529900T8BM49AURSDO')  #=> 55
+  #   SecID::LEI.check_digit('529900T8BM49AURSDO')  #=> 55
   class LEI < Base
     include Checkable
 

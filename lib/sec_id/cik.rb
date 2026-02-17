@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Central Index Key (CIK) - SEC identifier for entities filing with the SEC.
   # A 1-10 digit number that uniquely identifies entities in SEC systems.
   #
@@ -9,11 +9,11 @@ module SecId
   # @see https://en.wikipedia.org/wiki/Central_Index_Key
   #
   # @example Validate a CIK
-  #   SecId::CIK.valid?('0001521365')  #=> true
-  #   SecId::CIK.valid?('1521365')     #=> true
+  #   SecID::CIK.valid?('0001521365')  #=> true
+  #   SecID::CIK.valid?('1521365')     #=> true
   #
   # @example Normalize a CIK to 10 digits
-  #   SecId::CIK.normalize('1521365')  #=> '0001521365'
+  #   SecID::CIK.normalize('1521365')  #=> '0001521365'
   class CIK < Base
     FULL_NAME = 'Central Index Key'
     ID_LENGTH = (1..10)

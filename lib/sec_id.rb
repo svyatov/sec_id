@@ -3,8 +3,8 @@
 require 'set'
 require 'sec_id/version'
 
-module SecId
-  # Base error class for all SecId errors.
+module SecID
+  # Base error class for all SecID errors.
   class Error < StandardError; end
 
   # Raised for invalid format, length, or characters.
@@ -59,7 +59,7 @@ module SecId
     #
     # @param str [String, nil] the identifier string to parse
     # @param types [Array<Symbol>, nil] restrict to specific types (e.g. [:isin, :cusip])
-    # @return [SecId::Base, nil] a valid identifier instance, or nil if no match
+    # @return [SecID::Base, nil] a valid identifier instance, or nil if no match
     # @raise [ArgumentError] if any key in types is unknown
     def parse(str, types: nil)
       types.nil? ? parse_any(str) : parse_from(str, types)
@@ -69,7 +69,7 @@ module SecId
     #
     # @param str [String, nil] the identifier string to parse
     # @param types [Array<Symbol>, nil] restrict to specific types (e.g. [:isin, :cusip])
-    # @return [SecId::Base] a valid identifier instance
+    # @return [SecID::Base] a valid identifier instance
     # @raise [InvalidFormatError] if no matching identifier type is found
     # @raise [ArgumentError] if any key in types is unknown
     def parse!(str, types: nil)
@@ -87,13 +87,13 @@ module SecId
       @detector = nil
     end
 
-    # @return [SecId::Base, nil]
+    # @return [SecID::Base, nil]
     def parse_any(str)
       key = detect(str).first
       key && self[key].new(str)
     end
 
-    # @return [SecId::Base, nil]
+    # @return [SecID::Base, nil]
     def parse_from(str, types)
       types.each do |key|
         instance = self[key].new(str)

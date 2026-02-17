@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::IBAN do
+RSpec.describe SecID::IBAN do
   let(:iban) { described_class.new(iban_number) }
 
   # Edge cases - applicable to all identifiers
@@ -383,7 +383,7 @@ RSpec.describe SecId::IBAN do
     context 'when BBAN format is invalid' do
       it 'raises InvalidStructureError' do
         expect { described_class.new('DE89ABCD00440532013000').validate! }
-          .to raise_error(SecId::InvalidStructureError, /BBAN/)
+          .to raise_error(SecID::InvalidStructureError, /BBAN/)
       end
     end
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::OCC do
+RSpec.describe SecID::OCC do
   let(:occ) { described_class.new(occ_symbol) }
 
   # Edge cases - applicable to all identifiers
@@ -136,7 +136,7 @@ RSpec.describe SecId::OCC do
     context 'when date is unparseable' do
       it 'raises InvalidStructureError' do
         expect { described_class.new('SPX   141199P01950000').validate! }
-          .to raise_error(SecId::InvalidStructureError, /cannot be parsed/)
+          .to raise_error(SecID::InvalidStructureError, /cannot be parsed/)
       end
     end
   end

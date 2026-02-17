@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Detects which identifier types match a given string using a three-stage
   # pipeline that eliminates most candidates before calling `valid?`.
   #

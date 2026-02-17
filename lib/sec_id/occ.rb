@@ -2,7 +2,7 @@
 
 require 'date'
 
-module SecId
+module SecID
   # OCC Option Symbol - standardized option symbol format used by Option Clearing Corporation.
   # Format: 6-char underlying (padded) + 6-char date (YYMMDD) + type (C/P) + 8-digit strike (in mills).
   #
@@ -13,10 +13,10 @@ module SecId
   # @see https://web.archive.org/web/20120507220143/http://www.theocc.com/components/docs/initiatives/symbology/symbology_initiative_v1_8.pdf
   #
   # @example Validate an OCC symbol
-  #   SecId::OCC.valid?('AAPL  210917C00150000')  #=> true
+  #   SecID::OCC.valid?('AAPL  210917C00150000')  #=> true
   #
   # @example Build an OCC symbol from components
-  #   occ = SecId::OCC.build(underlying: 'AAPL', date: '2021-09-17', type: 'C', strike: 150.0)
+  #   occ = SecID::OCC.build(underlying: 'AAPL', date: '2021-09-17', type: 'C', strike: 150.0)
   #   occ.to_s  #=> 'AAPL  210917C00150000'
   class OCC < Base
     FULL_NAME = 'OCC Option Symbol'

@@ -24,7 +24,7 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
     end
 
     it 'raises for invalid input' do
-      expect { identifier_class.new(invalid_id).normalized }.to raise_error(SecId::Error)
+      expect { identifier_class.new(invalid_id).normalized }.to raise_error(SecID::Error)
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
     end
 
     it 'raises for invalid input' do
-      expect { identifier_class.new(invalid_id).normalize! }.to raise_error(SecId::Error)
+      expect { identifier_class.new(invalid_id).normalize! }.to raise_error(SecID::Error)
     end
   end
 
@@ -74,7 +74,7 @@ RSpec.shared_examples 'a normalizable identifier' do |params|
     end
 
     it 'raises for invalid input' do
-      expect { identifier_class.normalize(invalid_id) }.to raise_error(SecId::Error)
+      expect { identifier_class.normalize(invalid_id) }.to raise_error(SecID::Error)
     end
   end
 end

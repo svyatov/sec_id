@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::CUSIP do
+RSpec.describe SecID::CUSIP do
   # Edge cases - applicable to all identifiers
   let(:cusip) { described_class.new(cusip_number) }
 
@@ -83,7 +83,7 @@ RSpec.describe SecId::CUSIP do
       let(:cusip_number) { '02153X108' }
 
       it 'returns an ISIN' do
-        expect(cusip.to_isin('VI')).to be_a(SecId::ISIN)
+        expect(cusip.to_isin('VI')).to be_a(SecID::ISIN)
       end
     end
 
@@ -91,7 +91,7 @@ RSpec.describe SecId::CUSIP do
       let(:cusip_number) { '00B296YR7' }
 
       it 'raises an error' do
-        expect { cusip.to_isin('IE') }.to raise_error(SecId::InvalidFormatError)
+        expect { cusip.to_isin('IE') }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
@@ -100,7 +100,7 @@ RSpec.describe SecId::CUSIP do
 
       it 'returns valid ISIN without mutating source CUSIP' do
         result = cusip.to_isin('US')
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('US5949181045')
         expect(cusip.full_id).to eq('59491810')
         expect(cusip.check_digit).to be_nil
@@ -112,7 +112,7 @@ RSpec.describe SecId::CUSIP do
 
       it 'produces valid ISIN with correct check digit' do
         result = cusip.to_isin('US')
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result.valid?).to be(true)
         expect(result.full_id).to eq('US5949181045')
       end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Valoren (Swiss Security Number) - a numeric identifier for securities
   # in Switzerland, Liechtenstein, and Belgium.
   #
@@ -11,11 +11,11 @@ module SecId
   # @see https://en.wikipedia.org/wiki/Valoren_number
   #
   # @example Validate a Valoren
-  #   SecId::Valoren.valid?('3886335')    #=> true
-  #   SecId::Valoren.valid?('003886335')  #=> true
+  #   SecID::Valoren.valid?('3886335')    #=> true
+  #   SecID::Valoren.valid?('003886335')  #=> true
   #
   # @example Normalize a Valoren to 9 digits
-  #   SecId::Valoren.normalize('3886335')  #=> '003886335'
+  #   SecID::Valoren.normalize('3886335')  #=> '003886335'
   class Valoren < Base
     FULL_NAME = 'Valoren Number'
     ID_LENGTH = (5..9)

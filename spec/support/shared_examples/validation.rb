@@ -26,7 +26,7 @@ RSpec.shared_examples 'a validatable identifier' do |params|
     context 'when identifier is valid' do
       it 'returns a valid ValidationResult' do
         result = identifier_class.new(params[:valid_id]).errors
-        expect(result).to be_a(SecId::ValidationResult)
+        expect(result).to be_a(SecID::ValidationResult)
         expect(result.valid?).to be(true)
         expect(result.details).to be_empty
       end
@@ -78,13 +78,13 @@ RSpec.shared_examples 'a validatable identifier' do |params|
   describe '.validate' do
     it 'delegates to instance method' do
       result = identifier_class.validate(params[:valid_id])
-      expect(result).to be_a(SecId::ValidationResult)
+      expect(result).to be_a(SecID::ValidationResult)
       expect(result.valid?).to be(true)
     end
 
     it 'returns invalid result for invalid input' do
       result = identifier_class.validate(params[:invalid_length_id])
-      expect(result).to be_a(SecId::ValidationResult)
+      expect(result).to be_a(SecID::ValidationResult)
       expect(result.valid?).to be(false)
     end
   end
@@ -136,14 +136,14 @@ RSpec.shared_examples 'a validate! identifier' do |params|
     context 'when identifier has invalid length' do
       it 'raises InvalidFormatError with message' do
         instance = identifier_class.new(params[:invalid_length_id])
-        expect { instance.validate! }.to raise_error(SecId::InvalidFormatError, /Expected .+ characters, got \d+/)
+        expect { instance.validate! }.to raise_error(SecID::InvalidFormatError, /Expected .+ characters, got \d+/)
       end
     end
 
     context 'when identifier has invalid characters' do
       it 'raises InvalidFormatError with message' do
         instance = identifier_class.new(params[:invalid_chars_id])
-        expect { instance.validate! }.to raise_error(SecId::InvalidFormatError, /Contains invalid characters for/)
+        expect { instance.validate! }.to raise_error(SecID::InvalidFormatError, /Contains invalid characters for/)
       end
     end
   end
@@ -156,7 +156,7 @@ RSpec.shared_examples 'a validate! identifier' do |params|
     end
 
     it 'raises for invalid input' do
-      expect { identifier_class.validate!(params[:invalid_length_id]) }.to raise_error(SecId::InvalidFormatError)
+      expect { identifier_class.validate!(params[:invalid_length_id]) }.to raise_error(SecID::InvalidFormatError)
     end
   end
 end
@@ -169,7 +169,7 @@ RSpec.shared_examples 'validate! detects invalid check digit' do |params|
     context 'when check digit is wrong' do
       it 'raises InvalidCheckDigitError with message' do
         instance = described_class.new(params[:invalid_check_digit_id])
-        expect { instance.validate! }.to raise_error(SecId::InvalidCheckDigitError, /invalid, expected/)
+        expect { instance.validate! }.to raise_error(SecID::InvalidCheckDigitError, /invalid, expected/)
       end
     end
   end

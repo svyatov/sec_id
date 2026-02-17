@@ -1,4 +1,4 @@
-# SecId [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
+# SecID [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
 
 > Validate securities identification numbers with ease!
 
@@ -72,47 +72,47 @@ All identifier classes are registered automatically and can be enumerated, filte
 
 ```ruby
 # Look up by symbol key
-SecId[:isin]                              # => SecId::ISIN
-SecId[:cusip]                             # => SecId::CUSIP
+SecID[:isin]                              # => SecID::ISIN
+SecID[:cusip]                             # => SecID::CUSIP
 
 # Enumerate all identifier classes
-SecId.identifiers                         # => [SecId::ISIN, SecId::CUSIP, ...]
-SecId.identifiers.map(&:short_name)       # => ["ISIN", "CUSIP", "SEDOL", ...]
+SecID.identifiers                         # => [SecID::ISIN, SecID::CUSIP, ...]
+SecID.identifiers.map(&:short_name)       # => ["ISIN", "CUSIP", "SEDOL", ...]
 
 # Query metadata
-SecId::ISIN.short_name                    # => "ISIN"
-SecId::ISIN.full_name                     # => "International Securities Identification Number"
-SecId::ISIN.id_length                     # => 12
-SecId::ISIN.example                       # => "US5949181045"
-SecId::ISIN.has_check_digit?              # => true
+SecID::ISIN.short_name                    # => "ISIN"
+SecID::ISIN.full_name                     # => "International Securities Identification Number"
+SecID::ISIN.id_length                     # => 12
+SecID::ISIN.example                       # => "US5949181045"
+SecID::ISIN.has_check_digit?              # => true
 
 # Filter with standard Ruby
-SecId.identifiers.select(&:has_check_digit?).map(&:short_name)
+SecID.identifiers.select(&:has_check_digit?).map(&:short_name)
 # => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI"]
 
 # Detect identifier type from an unknown string
 # Results are sorted by specificity: check-digit types first, then by length precision
-SecId.detect('US5949181045')  # => [:isin]
-SecId.detect('037833100')     # => [:cusip, :valoren, :cik]
-SecId.detect('APPLE INC/SH')  # => [:fisn]
-SecId.detect('INVALID')       # => []
+SecID.detect('US5949181045')  # => [:isin]
+SecID.detect('037833100')     # => [:cusip, :valoren, :cik]
+SecID.detect('APPLE INC/SH')  # => [:fisn]
+SecID.detect('INVALID')       # => []
 
 # Quick boolean validation
-SecId.valid?('US5949181045')                      # => true (any type)
-SecId.valid?('INVALID')                           # => false
-SecId.valid?('US5949181045', types: [:isin])      # => true
-SecId.valid?('594918104', types: %i[cusip sedol]) # => true
-SecId.valid?('US5949181045', types: [:cusip])     # => false
+SecID.valid?('US5949181045')                      # => true (any type)
+SecID.valid?('INVALID')                           # => false
+SecID.valid?('US5949181045', types: [:isin])      # => true
+SecID.valid?('594918104', types: %i[cusip sedol]) # => true
+SecID.valid?('US5949181045', types: [:cusip])     # => false
 
 # Parse into a typed instance (returns the most specific match)
-SecId.parse('US5949181045')                       # => #<SecId::ISIN>
-SecId.parse('594918104')                          # => #<SecId::CUSIP>
-SecId.parse('unknown')                            # => nil
-SecId.parse('594918104', types: [:cusip])         # => #<SecId::CUSIP>
+SecID.parse('US5949181045')                       # => #<SecID::ISIN>
+SecID.parse('594918104')                          # => #<SecID::CUSIP>
+SecID.parse('unknown')                            # => nil
+SecID.parse('594918104', types: [:cusip])         # => #<SecID::CUSIP>
 
 # Bang version raises on failure
-SecId.parse!('US5949181045')                      # => #<SecId::ISIN>
-SecId.parse!('unknown')                           # raises SecId::InvalidFormatError
+SecID.parse!('US5949181045')                      # => #<SecID::ISIN>
+SecID.parse!('unknown')                           # raises SecID::InvalidFormatError
 ```
 
 ### Structured Validation
@@ -120,7 +120,7 @@ SecId.parse!('unknown')                           # raises SecId::InvalidFormatE
 All identifier classes provide a Rails-like `#errors` API for detailed error reporting:
 
 ```ruby
-isin = SecId::ISIN.new('US5949181040')
+isin = SecID::ISIN.new('US5949181040')
 isin.errors.valid?    # => false
 isin.errors.messages  # => ["Check digit '0' is invalid, expected '5'"]
 isin.errors.details   # => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
@@ -130,7 +130,7 @@ isin.errors.size      # => 1
 isin.errors.to_a      # => same as messages
 
 # Class-level convenience method
-SecId::ISIN.validate('US5949181040')  # => #<SecId::ValidationResult>
+SecID::ISIN.validate('US5949181040')  # => #<SecID::ValidationResult>
 ```
 
 **Common error codes** (all identifier types):
@@ -152,20 +152,20 @@ Use `validate!` when you want to raise an exception on invalid input instead of 
 
 ```ruby
 # Returns self when valid (enables chaining)
-SecId::ISIN.new('US5949181045').validate!  # => #<SecId::ISIN>
+SecID::ISIN.new('US5949181045').validate!  # => #<SecID::ISIN>
 
 # Raises with a descriptive message when invalid
-SecId::ISIN.new('INVALID').validate!
-# => SecId::InvalidFormatError: Expected 12 characters, got 7
+SecID::ISIN.new('INVALID').validate!
+# => SecID::InvalidFormatError: Expected 12 characters, got 7
 
-SecId::ISIN.new('US5949181040').validate!
-# => SecId::InvalidCheckDigitError: Check digit '0' is invalid, expected '5'
+SecID::ISIN.new('US5949181040').validate!
+# => SecID::InvalidCheckDigitError: Check digit '0' is invalid, expected '5'
 
-SecId::FIGI.new('BSG000BLNNH6').validate!
-# => SecId::InvalidStructureError: Prefix 'BS' is restricted
+SecID::FIGI.new('BSG000BLNNH6').validate!
+# => SecID::InvalidStructureError: Prefix 'BS' is restricted
 
 # Class-level convenience method (returns the instance)
-isin = SecId::ISIN.validate!('US5949181045')  # => #<SecId::ISIN>
+isin = SecID::ISIN.validate!('US5949181045')  # => #<SecID::ISIN>
 ```
 
 ### ISIN
@@ -174,42 +174,42 @@ isin = SecId::ISIN.validate!('US5949181045')  # => #<SecId::ISIN>
 
 ```ruby
 # class level
-SecId::ISIN.valid?('US5949181045')      # => true
-SecId::ISIN.restore('US594918104')      # => 'US5949181045'
-SecId::ISIN.restore!('US594918104')     # => #<SecId::ISIN>
-SecId::ISIN.check_digit('US594918104')  # => 5
+SecID::ISIN.valid?('US5949181045')      # => true
+SecID::ISIN.restore('US594918104')      # => 'US5949181045'
+SecID::ISIN.restore!('US594918104')     # => #<SecID::ISIN>
+SecID::ISIN.check_digit('US594918104')  # => 5
 
 # instance level
-isin = SecId::ISIN.new('US5949181045')
+isin = SecID::ISIN.new('US5949181045')
 isin.full_id               # => 'US5949181045'
 isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
 isin.check_digit           # => 5
 isin.valid?                # => true
 isin.restore               # => 'US5949181045'
-isin.restore!              # => #<SecId::ISIN> (mutates instance)
+isin.restore!              # => #<SecID::ISIN> (mutates instance)
 isin.calculate_check_digit # => 5
-isin.to_cusip              # => #<SecId::CUSIP>
+isin.to_cusip              # => #<SecID::CUSIP>
 isin.nsin_type             # => :cusip
-isin.to_nsin               # => #<SecId::CUSIP>
+isin.to_nsin               # => #<SecID::CUSIP>
 
 # NSIN extraction for different countries
-SecId::ISIN.new('GB00B02H2F76').nsin_type  # => :sedol
-SecId::ISIN.new('GB00B02H2F76').to_nsin    # => #<SecId::SEDOL>
-SecId::ISIN.new('DE0007164600').nsin_type  # => :wkn
-SecId::ISIN.new('DE0007164600').to_nsin    # => #<SecId::WKN>
-SecId::ISIN.new('CH0012221716').nsin_type  # => :valoren
-SecId::ISIN.new('CH0012221716').to_nsin    # => #<SecId::Valoren>
-SecId::ISIN.new('FR0000120271').nsin_type  # => :generic
-SecId::ISIN.new('FR0000120271').to_nsin    # => '000012027' (raw NSIN string)
+SecID::ISIN.new('GB00B02H2F76').nsin_type  # => :sedol
+SecID::ISIN.new('GB00B02H2F76').to_nsin    # => #<SecID::SEDOL>
+SecID::ISIN.new('DE0007164600').nsin_type  # => :wkn
+SecID::ISIN.new('DE0007164600').to_nsin    # => #<SecID::WKN>
+SecID::ISIN.new('CH0012221716').nsin_type  # => :valoren
+SecID::ISIN.new('CH0012221716').to_nsin    # => #<SecID::Valoren>
+SecID::ISIN.new('FR0000120271').nsin_type  # => :generic
+SecID::ISIN.new('FR0000120271').to_nsin    # => '000012027' (raw NSIN string)
 
 # Type-specific conversion methods with validation
-SecId::ISIN.new('GB00B02H2F76').sedol?     # => true
-SecId::ISIN.new('GB00B02H2F76').to_sedol   # => #<SecId::SEDOL>
-SecId::ISIN.new('DE0007164600').wkn?       # => true
-SecId::ISIN.new('DE0007164600').to_wkn     # => #<SecId::WKN>
-SecId::ISIN.new('CH0012221716').valoren?   # => true
-SecId::ISIN.new('CH0012221716').to_valoren # => #<SecId::Valoren>
+SecID::ISIN.new('GB00B02H2F76').sedol?     # => true
+SecID::ISIN.new('GB00B02H2F76').to_sedol   # => #<SecID::SEDOL>
+SecID::ISIN.new('DE0007164600').wkn?       # => true
+SecID::ISIN.new('DE0007164600').to_wkn     # => #<SecID::WKN>
+SecID::ISIN.new('CH0012221716').valoren?   # => true
+SecID::ISIN.new('CH0012221716').to_valoren # => #<SecID::Valoren>
 ```
 
 ### CUSIP
@@ -218,22 +218,22 @@ SecId::ISIN.new('CH0012221716').to_valoren # => #<SecId::Valoren>
 
 ```ruby
 # class level
-SecId::CUSIP.valid?('594918104')      # => true
-SecId::CUSIP.restore('59491810')      # => '594918104'
-SecId::CUSIP.restore!('59491810')     # => #<SecId::CUSIP>
-SecId::CUSIP.check_digit('59491810')  # => 4
+SecID::CUSIP.valid?('594918104')      # => true
+SecID::CUSIP.restore('59491810')      # => '594918104'
+SecID::CUSIP.restore!('59491810')     # => #<SecID::CUSIP>
+SecID::CUSIP.check_digit('59491810')  # => 4
 
 # instance level
-cusip = SecId::CUSIP.new('594918104')
+cusip = SecID::CUSIP.new('594918104')
 cusip.full_id               # => '594918104'
 cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
 cusip.check_digit           # => 4
 cusip.valid?                # => true
 cusip.restore               # => '594918104'
-cusip.restore!              # => #<SecId::CUSIP> (mutates instance)
+cusip.restore!              # => #<SecID::CUSIP> (mutates instance)
 cusip.calculate_check_digit # => 4
-cusip.to_isin('US')         # => #<SecId::ISIN>
+cusip.to_isin('US')         # => #<SecID::ISIN>
 cusip.cins?                 # => false
 ```
 
@@ -243,13 +243,13 @@ cusip.cins?                 # => false
 
 ```ruby
 # class level
-SecId::CEI.valid?('A0BCDEFGH1')      # => true
-SecId::CEI.restore('A0BCDEFGH')      # => 'A0BCDEFGH1'
-SecId::CEI.restore!('A0BCDEFGH')     # => #<SecId::CEI>
-SecId::CEI.check_digit('A0BCDEFGH')  # => 1
+SecID::CEI.valid?('A0BCDEFGH1')      # => true
+SecID::CEI.restore('A0BCDEFGH')      # => 'A0BCDEFGH1'
+SecID::CEI.restore!('A0BCDEFGH')     # => #<SecID::CEI>
+SecID::CEI.check_digit('A0BCDEFGH')  # => 1
 
 # instance level
-cei = SecId::CEI.new('A0BCDEFGH1')
+cei = SecID::CEI.new('A0BCDEFGH1')
 cei.full_id               # => 'A0BCDEFGH1'
 cei.prefix                # => 'A'
 cei.numeric               # => '0'
@@ -257,7 +257,7 @@ cei.entity_id             # => 'BCDEFGH'
 cei.check_digit           # => 1
 cei.valid?                # => true
 cei.restore               # => 'A0BCDEFGH1'
-cei.restore!              # => #<SecId::CEI> (mutates instance)
+cei.restore!              # => #<SecID::CEI> (mutates instance)
 cei.calculate_check_digit # => 1
 ```
 
@@ -267,21 +267,21 @@ cei.calculate_check_digit # => 1
 
 ```ruby
 # class level
-SecId::SEDOL.valid?('B0Z52W5')      # => true
-SecId::SEDOL.restore('B0Z52W')      # => 'B0Z52W5'
-SecId::SEDOL.restore!('B0Z52W')     # => #<SecId::SEDOL>
-SecId::SEDOL.check_digit('B0Z52W')  # => 5
+SecID::SEDOL.valid?('B0Z52W5')      # => true
+SecID::SEDOL.restore('B0Z52W')      # => 'B0Z52W5'
+SecID::SEDOL.restore!('B0Z52W')     # => #<SecID::SEDOL>
+SecID::SEDOL.check_digit('B0Z52W')  # => 5
 
 # instance level
-sedol = SecId::SEDOL.new('B0Z52W5')
+sedol = SecID::SEDOL.new('B0Z52W5')
 sedol.full_id               # => 'B0Z52W5'
 sedol.check_digit           # => 5
 sedol.valid?                # => true
 sedol.restore               # => 'B0Z52W5'
-sedol.restore!              # => #<SecId::SEDOL> (mutates instance)
+sedol.restore!              # => #<SecID::SEDOL> (mutates instance)
 sedol.calculate_check_digit # => 5
-sedol.to_isin               # => #<SecId::ISIN> (GB ISIN by default)
-sedol.to_isin('IE')         # => #<SecId::ISIN> (IE ISIN)
+sedol.to_isin               # => #<SecID::ISIN> (GB ISIN by default)
+sedol.to_isin('IE')         # => #<SecID::ISIN> (IE ISIN)
 ```
 
 ### FIGI
@@ -290,20 +290,20 @@ sedol.to_isin('IE')         # => #<SecId::ISIN> (IE ISIN)
 
 ```ruby
 # class level
-SecId::FIGI.valid?('BBG000DMBXR2')     # => true
-SecId::FIGI.restore('BBG000DMBXR')     # => 'BBG000DMBXR2'
-SecId::FIGI.restore!('BBG000DMBXR')    # => #<SecId::FIGI>
-SecId::FIGI.check_digit('BBG000DMBXR') # => 2
+SecID::FIGI.valid?('BBG000DMBXR2')     # => true
+SecID::FIGI.restore('BBG000DMBXR')     # => 'BBG000DMBXR2'
+SecID::FIGI.restore!('BBG000DMBXR')    # => #<SecID::FIGI>
+SecID::FIGI.check_digit('BBG000DMBXR') # => 2
 
 # instance level
-figi = SecId::FIGI.new('BBG000DMBXR2')
+figi = SecID::FIGI.new('BBG000DMBXR2')
 figi.full_id               # => 'BBG000DMBXR2'
 figi.prefix                # => 'BB'
 figi.random_part           # => '000DMBXR'
 figi.check_digit           # => 2
 figi.valid?                # => true
 figi.restore               # => 'BBG000DMBXR2'
-figi.restore!              # => #<SecId::FIGI> (mutates instance)
+figi.restore!              # => #<SecID::FIGI> (mutates instance)
 figi.calculate_check_digit # => 2
 ```
 
@@ -313,13 +313,13 @@ figi.calculate_check_digit # => 2
 
 ```ruby
 # class level
-SecId::LEI.valid?('5493006MHB84DD0ZWV18')    # => true
-SecId::LEI.restore('5493006MHB84DD0ZWV')     # => '5493006MHB84DD0ZWV18'
-SecId::LEI.restore!('5493006MHB84DD0ZWV')    # => #<SecId::LEI>
-SecId::LEI.check_digit('5493006MHB84DD0ZWV') # => 18
+SecID::LEI.valid?('5493006MHB84DD0ZWV18')    # => true
+SecID::LEI.restore('5493006MHB84DD0ZWV')     # => '5493006MHB84DD0ZWV18'
+SecID::LEI.restore!('5493006MHB84DD0ZWV')    # => #<SecID::LEI>
+SecID::LEI.check_digit('5493006MHB84DD0ZWV') # => 18
 
 # instance level
-lei = SecId::LEI.new('5493006MHB84DD0ZWV18')
+lei = SecID::LEI.new('5493006MHB84DD0ZWV18')
 lei.full_id               # => '5493006MHB84DD0ZWV18'
 lei.lou_id                # => '5493'
 lei.reserved              # => '00'
@@ -327,7 +327,7 @@ lei.entity_id             # => '6MHB84DD0ZWV'
 lei.check_digit           # => 18
 lei.valid?                # => true
 lei.restore               # => '5493006MHB84DD0ZWV18'
-lei.restore!              # => #<SecId::LEI> (mutates instance)
+lei.restore!              # => #<SecID::LEI> (mutates instance)
 lei.calculate_check_digit # => 18
 ```
 
@@ -337,13 +337,13 @@ lei.calculate_check_digit # => 18
 
 ```ruby
 # class level
-SecId::IBAN.valid?('DE89370400440532013000')    # => true
-SecId::IBAN.restore('DE370400440532013000')     # => 'DE89370400440532013000'
-SecId::IBAN.restore!('DE370400440532013000')    # => #<SecId::IBAN>
-SecId::IBAN.check_digit('DE370400440532013000') # => 89
+SecID::IBAN.valid?('DE89370400440532013000')    # => true
+SecID::IBAN.restore('DE370400440532013000')     # => 'DE89370400440532013000'
+SecID::IBAN.restore!('DE370400440532013000')    # => #<SecID::IBAN>
+SecID::IBAN.check_digit('DE370400440532013000') # => 89
 
 # instance level
-iban = SecId::IBAN.new('DE89370400440532013000')
+iban = SecID::IBAN.new('DE89370400440532013000')
 iban.full_id               # => 'DE89370400440532013000'
 iban.country_code          # => 'DE'
 iban.bban                  # => '370400440532013000'
@@ -352,7 +352,7 @@ iban.account_number        # => '0532013000'
 iban.check_digit           # => 89
 iban.valid?                # => true
 iban.restore               # => 'DE89370400440532013000'
-iban.restore!              # => #<SecId::IBAN> (mutates instance)
+iban.restore!              # => #<SecID::IBAN> (mutates instance)
 iban.calculate_check_digit # => 89
 iban.known_country?        # => true
 ```
@@ -365,17 +365,17 @@ Full BBAN structural validation is supported for EU/EEA countries. Other countri
 
 ```ruby
 # class level
-SecId::CIK.valid?('0001094517')    # => true
-SecId::CIK.normalize('1094517')    # => '0001094517'
+SecID::CIK.valid?('0001094517')    # => true
+SecID::CIK.normalize('1094517')    # => '0001094517'
 
 # instance level
-cik = SecId::CIK.new('0001094517')
+cik = SecID::CIK.new('0001094517')
 cik.full_id       # => '0001094517'
 cik.padding       # => '000'
 cik.identifier    # => '1094517'
 cik.valid?        # => true
 cik.normalized    # => '0001094517'
-cik.normalize!    # => #<SecId::CIK> (mutates full_id, returns self)
+cik.normalize!    # => #<SecID::CIK> (mutates full_id, returns self)
 ```
 
 ### OCC
@@ -384,17 +384,17 @@ cik.normalize!    # => #<SecId::CIK> (mutates full_id, returns self)
 
 ```ruby
 # class level
-SecId::OCC.valid?('BRKB  100417C00090000')    # => true
-SecId::OCC.normalize('BRKB100417C00090000')   # => 'BRKB  100417C00090000'
-SecId::OCC.build(
+SecID::OCC.valid?('BRKB  100417C00090000')    # => true
+SecID::OCC.normalize('BRKB100417C00090000')   # => 'BRKB  100417C00090000'
+SecID::OCC.build(
   underlying: 'BRKB',
   date: Date.new(2010, 4, 17),
   type: 'C',
   strike: 90,
-)                                                 # => #<SecId::OCC>
+)                                                 # => #<SecID::OCC>
 
 # instance level
-occ = SecId::OCC.new('BRKB  100417C00090000')
+occ = SecID::OCC.new('BRKB  100417C00090000')
 occ.full_id       # => 'BRKB  100417C00090000'
 occ.underlying    # => 'BRKB'
 occ.date_str      # => '100417'
@@ -404,10 +404,10 @@ occ.strike        # => 90.0
 occ.valid?        # => true
 occ.normalized    # => 'BRKB  100417C00090000'
 
-occ = SecId::OCC.new('X 250620C00050000')
+occ = SecID::OCC.new('X 250620C00050000')
 occ.full_id       # => 'X 250620C00050000'
 occ.valid?        # => true
-occ.normalize!    # => #<SecId::OCC> (mutates full_id, returns self)
+occ.normalize!    # => #<SecID::OCC> (mutates full_id, returns self)
 occ.full_id       # => 'X     250620C00050000'
 ```
 
@@ -417,16 +417,16 @@ occ.full_id       # => 'X     250620C00050000'
 
 ```ruby
 # class level
-SecId::WKN.valid?('514000')  # => true
-SecId::WKN.valid?('CBK100')  # => true
+SecID::WKN.valid?('514000')  # => true
+SecID::WKN.valid?('CBK100')  # => true
 
 # instance level
-wkn = SecId::WKN.new('514000')
+wkn = SecID::WKN.new('514000')
 wkn.full_id       # => '514000'
 wkn.identifier    # => '514000'
 wkn.valid?        # => true
 wkn.to_s          # => '514000'
-wkn.to_isin       # => #<SecId::ISIN> (DE ISIN)
+wkn.to_isin       # => #<SecID::ISIN> (DE ISIN)
 ```
 
 WKN excludes letters I and O to avoid confusion with digits 1 and 0.
@@ -437,22 +437,22 @@ WKN excludes letters I and O to avoid confusion with digits 1 and 0.
 
 ```ruby
 # class level
-SecId::Valoren.valid?('3886335')        # => true
-SecId::Valoren.valid?('24476758')       # => true
-SecId::Valoren.valid?('35514757')       # => true
-SecId::Valoren.valid?('97429325')       # => true
-SecId::Valoren.normalize('3886335')     # => '003886335'
+SecID::Valoren.valid?('3886335')        # => true
+SecID::Valoren.valid?('24476758')       # => true
+SecID::Valoren.valid?('35514757')       # => true
+SecID::Valoren.valid?('97429325')       # => true
+SecID::Valoren.normalize('3886335')     # => '003886335'
 
 # instance level
-valoren = SecId::Valoren.new('3886335')
+valoren = SecID::Valoren.new('3886335')
 valoren.full_id       # => '3886335'
 valoren.padding       # => ''
 valoren.identifier    # => '3886335'
 valoren.valid?        # => true
 valoren.normalized    # => '003886335'
-valoren.normalize!    # => #<SecId::Valoren> (mutates full_id, returns self)
-valoren.to_isin       # => #<SecId::ISIN> (CH ISIN by default)
-valoren.to_isin('LI') # => #<SecId::ISIN> (LI ISIN)
+valoren.normalize!    # => #<SecID::Valoren> (mutates full_id, returns self)
+valoren.to_isin       # => #<SecID::ISIN> (CH ISIN by default)
+valoren.to_isin('LI') # => #<SecID::ISIN> (LI ISIN)
 ```
 
 ### CFI
@@ -461,10 +461,10 @@ valoren.to_isin('LI') # => #<SecId::ISIN> (LI ISIN)
 
 ```ruby
 # class level
-SecId::CFI.valid?('ESXXXX')        # => true
-SecId::CFI.valid?('ESVUFR')        # => true
+SecID::CFI.valid?('ESXXXX')        # => true
+SecID::CFI.valid?('ESVUFR')        # => true
 # instance level
-cfi = SecId::CFI.new('ESVUFR')
+cfi = SecID::CFI.new('ESVUFR')
 cfi.full_id        # => 'ESVUFR'
 cfi.identifier     # => 'ESVUFR'
 cfi.category_code  # => 'E'
@@ -489,10 +489,10 @@ CFI validates the category code (position 1) against 14 valid values and the gro
 
 ```ruby
 # class level
-SecId::FISN.valid?('APPLE INC/SH')        # => true
-SecId::FISN.valid?('apple inc/sh')        # => true (normalized to uppercase)
+SecID::FISN.valid?('APPLE INC/SH')        # => true
+SecID::FISN.valid?('apple inc/sh')        # => true (normalized to uppercase)
 # instance level
-fisn = SecId::FISN.new('APPLE INC/SH')
+fisn = SecID::FISN.new('APPLE INC/SH')
 fisn.full_id       # => 'APPLE INC/SH'
 fisn.identifier    # => 'APPLE INC/SH'
 fisn.issuer        # => 'APPLE INC'

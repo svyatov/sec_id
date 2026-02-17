@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Immutable value object representing the result of identifier validation.
   # Follows Rails/ActiveModel conventions: use {#details} for structured error data
   # and {#messages} for human-readable strings.
   #
   # @example Valid result
-  #   result = SecId::ValidationResult.new([])
+  #   result = SecID::ValidationResult.new([])
   #   result.valid?    #=> true
   #   result.empty?    #=> true
   #   result.messages  #=> []
   #
   # @example Invalid result
   #   errors = [{ error: :invalid_length, message: "Expected 12 characters, got 5" }]
-  #   result = SecId::ValidationResult.new(errors)
+  #   result = SecID::ValidationResult.new(errors)
   #   result.valid?    #=> false
   #   result.details   #=> [{ error: :invalid_length, message: "..." }]
   #   result.messages  #=> ["Expected 12 characters, got 5"]

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Stock Exchange Daily Official List (SEDOL) - a 7-character alphanumeric code
   # that identifies securities traded on the London Stock Exchange and other UK exchanges.
   #
@@ -10,10 +10,10 @@ module SecId
   # @see https://en.wikipedia.org/wiki/SEDOL
   #
   # @example Validate a SEDOL
-  #   SecId::SEDOL.valid?('B19GKT4')  #=> true
+  #   SecID::SEDOL.valid?('B19GKT4')  #=> true
   #
   # @example Calculate check digit
-  #   SecId::SEDOL.check_digit('B19GKT')  #=> 4
+  #   SecID::SEDOL.check_digit('B19GKT')  #=> 4
   class SEDOL < Base
     include Checkable
 

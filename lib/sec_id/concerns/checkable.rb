@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Provides check-digit validation and calculation for securities identifiers.
   # Include this module in classes that have a check digit as part of their format.
   #

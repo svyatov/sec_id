@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe SecId::Detector do
-  subject(:detector) { described_class.new(SecId.__send__(:identifier_list)) }
+RSpec.describe SecID::Detector do
+  subject(:detector) { described_class.new(SecID.__send__(:identifier_list)) }
 
   describe '#call' do
     context 'with single-type detection' do
@@ -27,7 +27,7 @@ RSpec.describe SecId::Detector do
     end
 
     context 'with EXAMPLE constants' do
-      SecId.identifiers.each do |klass|
+      SecID.identifiers.each do |klass|
         it "detects #{klass.short_name} EXAMPLE #{klass.example.inspect}" do
           expected_key = klass.short_name.downcase.to_sym
           expect(detector.call(klass.example)).to include(expected_key)
@@ -215,23 +215,23 @@ RSpec.describe SecId::Detector do
       # rubocop:disable RSpec/ExampleLength
       it 'recreates detector when a new identifier type is registered' do
         # Warm up the detector cache
-        SecId.detect('US5949181045')
-        original_detector = SecId.__send__(:detector)
+        SecID.detect('US5949181045')
+        original_detector = SecID.__send__(:detector)
 
         # Simulate registration of a new type
-        stub_class = Class.new(SecId::Base)
-        allow(stub_class).to receive_messages(name: 'SecId::STUB', const_defined?: false)
+        stub_class = Class.new(SecID::Base)
+        allow(stub_class).to receive_messages(name: 'SecID::STUB', const_defined?: false)
         stub_class.const_set(:ID_LENGTH, 99)
         stub_class.const_set(:VALID_CHARS_REGEX, /\A[A-Z]+\z/)
-        SecId.__send__(:register_identifier, stub_class)
+        SecID.__send__(:register_identifier, stub_class)
 
-        new_detector = SecId.__send__(:detector)
+        new_detector = SecID.__send__(:detector)
         expect(new_detector).not_to equal(original_detector)
       ensure
         # Clean up: remove stub from registry
-        SecId.__send__(:identifier_map).delete(:stub)
-        SecId.__send__(:identifier_list).delete(stub_class)
-        SecId.instance_variable_set(:@detector, nil)
+        SecID.__send__(:identifier_map).delete(:stub)
+        SecID.__send__(:identifier_list).delete(stub_class)
+        SecID.instance_variable_set(:@detector, nil)
       end
       # rubocop:enable RSpec/ExampleLength
     end

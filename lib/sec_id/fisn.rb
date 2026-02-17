@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Financial Instrument Short Name (FISN) - a human-readable short name for financial
   # instruments per ISO 18774.
   #
@@ -13,11 +13,11 @@ module SecId
   # @see https://en.wikipedia.org/wiki/ISO_18774
   #
   # @example Validate a FISN
-  #   SecId::FISN.valid?('APPLE INC/SH')  #=> true
-  #   SecId::FISN.valid?('apple inc/sh')  #=> true (normalized to uppercase)
+  #   SecID::FISN.valid?('APPLE INC/SH')  #=> true
+  #   SecID::FISN.valid?('apple inc/sh')  #=> true (normalized to uppercase)
   #
   # @example Access FISN components
-  #   fisn = SecId::FISN.new('APPLE INC/SH')
+  #   fisn = SecID::FISN.new('APPLE INC/SH')
   #   fisn.issuer       #=> 'APPLE INC'
   #   fisn.description  #=> 'SH'
   class FISN < Base

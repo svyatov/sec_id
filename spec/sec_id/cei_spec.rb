@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::CEI do
+RSpec.describe SecID::CEI do
   let(:cei) { described_class.new(cei_number) }
 
   it_behaves_like 'handles edge case inputs'

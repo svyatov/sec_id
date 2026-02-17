@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SecId
+module SecID
   # Base class for securities identifiers that provides a common interface
   # for validation and parsing.
   #
@@ -40,9 +40,9 @@ module SecId
   #   end
   #
   # @example Querying identifier metadata
-  #   SecId::ISIN.short_name       #=> "ISIN"
-  #   SecId::ISIN.full_name        #=> "International Securities Identification Number"
-  #   SecId::ISIN.has_check_digit? #=> true
+  #   SecID::ISIN.short_name       #=> "ISIN"
+  #   SecID::ISIN.full_name        #=> "International Securities Identification Number"
+  #   SecID::ISIN.has_check_digit? #=> true
   class Base
     EXCEPTION_MAP = {
       invalid_check_digit: InvalidCheckDigitError,
@@ -64,7 +64,7 @@ module SecId
     # @api private
     def self.inherited(subclass)
       super
-      SecId.__send__(:register_identifier, subclass) if subclass.name&.start_with?('SecId::')
+      SecID.__send__(:register_identifier, subclass) if subclass.name&.start_with?('SecID::')
     end
 
     class << self
@@ -127,7 +127,7 @@ module SecId
 
       # @return [Boolean] true if this identifier type uses a check digit
       def has_check_digit?
-        ancestors.include?(SecId::Checkable)
+        ancestors.include?(SecID::Checkable)
       end
 
       # Normalizes the identifier to its canonical format.

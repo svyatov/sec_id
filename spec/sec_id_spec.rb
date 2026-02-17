@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe SecId do
+RSpec.describe SecID do
   it 'has a version number' do
-    expect(SecId::VERSION).not_to be_nil
+    expect(SecID::VERSION).not_to be_nil
   end
 
   describe '.identifiers' do
@@ -14,9 +14,9 @@ RSpec.describe SecId do
 
     it 'includes all expected classes' do
       expected = [
-        SecId::ISIN, SecId::CUSIP, SecId::SEDOL, SecId::FIGI, SecId::LEI,
-        SecId::IBAN, SecId::CIK, SecId::OCC, SecId::WKN, SecId::Valoren,
-        SecId::CEI, SecId::CFI, SecId::FISN,
+        SecID::ISIN, SecID::CUSIP, SecID::SEDOL, SecID::FIGI, SecID::LEI,
+        SecID::IBAN, SecID::CIK, SecID::OCC, SecID::WKN, SecID::Valoren,
+        SecID::CEI, SecID::CFI, SecID::FISN,
       ]
       expect(described_class.identifiers).to match_array(expected)
     end
@@ -30,19 +30,19 @@ RSpec.describe SecId do
 
   describe '.[]' do
     {
-      isin: SecId::ISIN,
-      cusip: SecId::CUSIP,
-      sedol: SecId::SEDOL,
-      figi: SecId::FIGI,
-      lei: SecId::LEI,
-      iban: SecId::IBAN,
-      cik: SecId::CIK,
-      occ: SecId::OCC,
-      wkn: SecId::WKN,
-      valoren: SecId::Valoren,
-      cei: SecId::CEI,
-      cfi: SecId::CFI,
-      fisn: SecId::FISN
+      isin: SecID::ISIN,
+      cusip: SecID::CUSIP,
+      sedol: SecID::SEDOL,
+      figi: SecID::FIGI,
+      lei: SecID::LEI,
+      iban: SecID::IBAN,
+      cik: SecID::CIK,
+      occ: SecID::OCC,
+      wkn: SecID::WKN,
+      valoren: SecID::Valoren,
+      cei: SecID::CEI,
+      cfi: SecID::CFI,
+      fisn: SecID::FISN
     }.each do |key, klass|
       it "looks up #{klass} by :#{key}" do
         expect(described_class[key]).to eq(klass)
@@ -76,18 +76,18 @@ RSpec.describe SecId do
     context 'without types' do
       it 'returns an ISIN instance for a valid ISIN' do
         result = described_class.parse('US5949181045')
-        expect(result).to be_a(SecId::ISIN)
+        expect(result).to be_a(SecID::ISIN)
         expect(result).to be_valid
       end
 
       it 'returns a CUSIP instance for a valid CUSIP' do
         result = described_class.parse('594918104')
-        expect(result).to be_a(SecId::CUSIP)
+        expect(result).to be_a(SecID::CUSIP)
         expect(result).to be_valid
       end
 
       it 'returns the most specific match for ambiguous input' do
-        expect(described_class.parse('514000')).to be_a(SecId::WKN)
+        expect(described_class.parse('514000')).to be_a(SecID::WKN)
       end
 
       it 'returns nil for an invalid string' do
@@ -110,13 +110,13 @@ RSpec.describe SecId do
     context 'with types' do
       it 'returns a matching instance for a single type' do
         result = described_class.parse('594918104', types: [:cusip])
-        expect(result).to be_a(SecId::CUSIP)
+        expect(result).to be_a(SecID::CUSIP)
         expect(result).to be_valid
       end
 
       it 'returns the first matching instance among multiple types' do
         result = described_class.parse('594918104', types: %i[cusip sedol])
-        expect(result).to be_a(SecId::CUSIP)
+        expect(result).to be_a(SecID::CUSIP)
       end
 
       it 'returns nil when identifier does not match specified type' do
@@ -137,45 +137,45 @@ RSpec.describe SecId do
   describe '.parse!' do
     it 'returns an ISIN instance for a valid ISIN' do
       result = described_class.parse!('US5949181045')
-      expect(result).to be_a(SecId::ISIN)
+      expect(result).to be_a(SecID::ISIN)
       expect(result).to be_valid
     end
 
     it 'raises InvalidFormatError for an invalid string' do
-      expect { described_class.parse!('INVALID') }.to raise_error(SecId::InvalidFormatError)
+      expect { described_class.parse!('INVALID') }.to raise_error(SecID::InvalidFormatError)
     end
 
     it 'raises InvalidFormatError for nil' do
-      expect { described_class.parse!(nil) }.to raise_error(SecId::InvalidFormatError)
+      expect { described_class.parse!(nil) }.to raise_error(SecID::InvalidFormatError)
     end
 
     it 'raises InvalidFormatError for empty string' do
-      expect { described_class.parse!('') }.to raise_error(SecId::InvalidFormatError)
+      expect { described_class.parse!('') }.to raise_error(SecID::InvalidFormatError)
     end
 
     it 'raises InvalidFormatError for whitespace-only string' do
-      expect { described_class.parse!('   ') }.to raise_error(SecId::InvalidFormatError)
+      expect { described_class.parse!('   ') }.to raise_error(SecID::InvalidFormatError)
     end
 
     it 'includes the input string in the error message' do
       expect { described_class.parse!('INVALID') }
-        .to raise_error(SecId::InvalidFormatError, /"INVALID"/)
+        .to raise_error(SecID::InvalidFormatError, /"INVALID"/)
     end
 
     it 'includes types in the error message when specified' do
       expect { described_class.parse!('INVALID', types: [:cusip]) }
-        .to raise_error(SecId::InvalidFormatError, /\[:cusip\]/)
+        .to raise_error(SecID::InvalidFormatError, /\[:cusip\]/)
     end
 
     context 'with types' do
       it 'returns a matching instance' do
         result = described_class.parse!('594918104', types: [:cusip])
-        expect(result).to be_a(SecId::CUSIP)
+        expect(result).to be_a(SecID::CUSIP)
       end
 
       it 'raises InvalidFormatError when no type matches' do
         expect { described_class.parse!('594918104', types: [:sedol]) }
-          .to raise_error(SecId::InvalidFormatError)
+          .to raise_error(SecID::InvalidFormatError)
       end
     end
   end

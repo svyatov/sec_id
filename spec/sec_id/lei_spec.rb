@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::LEI do
+RSpec.describe SecID::LEI do
   let(:lei) { described_class.new(lei_number) }
 
   # Edge cases - applicable to all identifiers

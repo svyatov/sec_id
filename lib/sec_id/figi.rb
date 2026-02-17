@@ -2,7 +2,7 @@
 
 require 'set'
 
-module SecId
+module SecID
   # Financial Instrument Global Identifier (FIGI) - a 12-character alphanumeric code
   # that uniquely identifies financial instruments.
   #
@@ -12,10 +12,10 @@ module SecId
   # @see https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier
   #
   # @example Validate a FIGI
-  #   SecId::FIGI.valid?('BBG000BLNQ16')  #=> true
+  #   SecID::FIGI.valid?('BBG000BLNQ16')  #=> true
   #
   # @example Restore check digit
-  #   SecId::FIGI.restore!('BBG000BLNQ1')  #=> #<SecId::FIGI>
+  #   SecID::FIGI.restore!('BBG000BLNQ1')  #=> #<SecID::FIGI>
   class FIGI < Base
     include Checkable
 

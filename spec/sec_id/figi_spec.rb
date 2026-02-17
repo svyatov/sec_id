@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecId::FIGI do
+RSpec.describe SecID::FIGI do
   let(:figi) { described_class.new(figi_number) }
 
   # Edge cases - applicable to all identifiers
@@ -73,7 +73,7 @@ RSpec.describe SecId::FIGI do
 
     describe '#restore!' do
       it 'raises an error' do
-        expect { figi.restore! }.to raise_error(SecId::InvalidFormatError)
+        expect { figi.restore! }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -134,7 +134,7 @@ RSpec.describe SecId::FIGI do
     context 'when prefix is restricted (validate!)' do
       it 'raises InvalidStructureError' do
         expect { described_class.new('BSG000BLNNH6').validate! }
-          .to raise_error(SecId::InvalidStructureError, /restricted/)
+          .to raise_error(SecID::InvalidStructureError, /restricted/)
       end
     end
 
