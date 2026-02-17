@@ -58,10 +58,11 @@ gem install sec_id
 
 All identifier classes provide `valid?`, `errors`, `validate`, `validate!` methods at both class and instance levels.
 
-**All identifiers** support normalization:
+**All identifiers** support normalization and display formatting:
 - `.normalize(id)` - strips separators, upcases, validates, and returns the canonical string
 - `#normalized` / `#normalize` - returns the canonical string for a valid instance
 - `#normalize!` - mutates `full_id` to canonical form, returns `self`
+- `#to_pretty_s` / `.to_pretty_s(id)` - returns a human-readable formatted string, or `nil` for invalid input
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
@@ -192,6 +193,7 @@ isin.valid?                # => true
 isin.restore               # => 'US5949181045'
 isin.restore!              # => #<SecID::ISIN> (mutates instance)
 isin.calculate_check_digit # => 5
+isin.to_pretty_s           # => 'US 594918104 5'
 isin.to_cusip              # => #<SecID::CUSIP>
 isin.nsin_type             # => :cusip
 isin.to_nsin               # => #<SecID::CUSIP>
@@ -236,6 +238,7 @@ cusip.valid?                # => true
 cusip.restore               # => '594918104'
 cusip.restore!              # => #<SecID::CUSIP> (mutates instance)
 cusip.calculate_check_digit # => 4
+cusip.to_pretty_s           # => '594918 10 4'
 cusip.to_isin('US')         # => #<SecID::ISIN>
 cusip.cins?                 # => false
 ```
@@ -308,6 +311,7 @@ figi.valid?                # => true
 figi.restore               # => 'BBG000DMBXR2'
 figi.restore!              # => #<SecID::FIGI> (mutates instance)
 figi.calculate_check_digit # => 2
+figi.to_pretty_s           # => 'BBG 000DMBXR 2'
 ```
 
 ### LEI
@@ -332,6 +336,7 @@ lei.valid?                # => true
 lei.restore               # => '5493006MHB84DD0ZWV18'
 lei.restore!              # => #<SecID::LEI> (mutates instance)
 lei.calculate_check_digit # => 18
+lei.to_pretty_s           # => '5493 006M HB84 DD0Z WV18'
 ```
 
 ### IBAN
@@ -358,6 +363,7 @@ iban.restore               # => 'DE89370400440532013000'
 iban.restore!              # => #<SecID::IBAN> (mutates instance)
 iban.calculate_check_digit # => 89
 iban.known_country?        # => true
+iban.to_pretty_s           # => 'DE89 3704 0044 0532 0130 00'
 ```
 
 Full BBAN structural validation is supported for EU/EEA countries. Other countries have length-only validation.
@@ -412,6 +418,7 @@ occ.full_id       # => 'X 250620C00050000'
 occ.valid?        # => true
 occ.normalize!    # => #<SecID::OCC> (mutates full_id, returns self)
 occ.full_id       # => 'X     250620C00050000'
+occ.to_pretty_s   # => 'X 250620 C 00050000'
 ```
 
 ### WKN
@@ -454,6 +461,7 @@ valoren.identifier    # => '3886335'
 valoren.valid?        # => true
 valoren.normalized    # => '003886335'
 valoren.normalize!    # => #<SecID::Valoren> (mutates full_id, returns self)
+valoren.to_pretty_s   # => '3 886 335'
 valoren.to_isin       # => #<SecID::ISIN> (CH ISIN by default)
 valoren.to_isin('LI') # => #<SecID::ISIN> (LI ISIN)
 ```

@@ -23,6 +23,15 @@ module SecID
         cleaned = id.to_s.strip.gsub(self::SEPARATORS, '')
         new(cleaned.upcase).normalized
       end
+
+      # Returns a human-readable formatted string, or nil if invalid.
+      #
+      # @param id [String, #to_s] the identifier to format
+      # @return [String, nil]
+      def to_pretty_s(id)
+        cleaned = id.to_s.strip.gsub(self::SEPARATORS, '')
+        new(cleaned.upcase).to_pretty_s
+      end
     end
 
     # Returns the canonical normalized form of this identifier.
@@ -46,6 +55,15 @@ module SecID
     def normalize!
       @full_id = normalized
       self
+    end
+
+    # Returns a human-readable formatted string, or nil if invalid.
+    #
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      to_s
     end
 
     # @return [String]

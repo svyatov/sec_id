@@ -27,6 +27,11 @@ RSpec.describe SecID::CIK do
                   invalid_format_id: '0000000000'
 
   # Normalization
+  it_behaves_like 'a formattable identifier',
+                  valid_id: '1521365',
+                  dirty_id: '  1521365  ',
+                  invalid_id: '0000000000'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '0001521365',
                   canonical_id: '0001521365',

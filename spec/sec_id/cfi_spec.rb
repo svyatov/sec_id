@@ -17,6 +17,11 @@ RSpec.describe SecID::CFI do
                   dirty_id: 'esvufr',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'ESVUFR',
+                  dirty_id: 'esvufr',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'ESXXXX',

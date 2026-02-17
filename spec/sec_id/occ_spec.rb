@@ -24,6 +24,11 @@ RSpec.describe SecID::OCC do
                   invalid_chars_id: 'AAPL!!210917C00150000'
 
   # Normalization
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'EQX   260116C00005500',
+                  dirty_id: 'eqx   260116c00005500',
+                  invalid_id: 'ZVZZT'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'EQX   260116C00005500',
                   canonical_id: 'EQX   260116C00005500',
@@ -321,6 +326,16 @@ RSpec.describe SecID::OCC do
         occ = described_class.build(underlying: 'X', date: '250620', type: 'C', strike: strike)
         expect(occ.strike).to eq(strike)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats with space-separated components' do
+      expect(described_class.new('AAPL  210917C00150000').to_pretty_s).to eq('AAPL 210917 C 00150000')
+    end
+
+    it 'formats shorter underlying symbols' do
+      expect(described_class.new('EQX   260116C00005500').to_pretty_s).to eq('EQX 260116 C 00005500')
     end
   end
 end

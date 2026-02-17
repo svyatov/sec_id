@@ -50,6 +50,13 @@ module SecID
       @check_digit = figi_parts[:check_digit]&.to_i
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      "#{prefix}G #{random_part} #{check_digit}"
+    end
+
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the FIGI format is invalid
     def calculate_check_digit

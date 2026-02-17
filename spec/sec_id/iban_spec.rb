@@ -17,6 +17,11 @@ RSpec.describe SecID::IBAN do
                   dirty_id: 'GB29 NWBK 6016 1331 9268 19',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'GB29NWBK60161331926819',
+                  dirty_id: 'GB29 NWBK 6016 1331 9268 19',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'DE89370400440532013000',
@@ -531,6 +536,16 @@ RSpec.describe SecID::IBAN do
           expect(iban.bank_code).to be_nil
         end
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats with 4-char groups' do
+      expect(described_class.new('DE89370400440532013000').to_pretty_s).to eq('DE89 3704 0044 0532 0130 00')
+    end
+
+    it 'formats shorter IBANs' do
+      expect(described_class.new('GB29NWBK60161331926819').to_pretty_s).to eq('GB29 NWBK 6016 1331 9268 19')
     end
   end
 end
