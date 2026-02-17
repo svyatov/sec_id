@@ -20,7 +20,7 @@ module SecID
       # @return [String] the normalized identifier
       # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
       def normalize(id)
-        cleaned = id.to_s.strip.gsub(SEPARATORS, '')
+        cleaned = id.to_s.strip.gsub(self::SEPARATORS, '')
         new(cleaned.upcase).normalized
       end
     end

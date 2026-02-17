@@ -84,7 +84,7 @@ module SecID
       return self if valid?
 
       detail = errors.details.first
-      raise error_class_for(detail[:error]), detail[:message]
+      raise self.class.error_class_for(detail[:error]), detail[:message]
     end
 
     private
