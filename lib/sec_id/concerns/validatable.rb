@@ -71,10 +71,9 @@ module SecID
     #
     # @return [Errors]
     def errors
-      @errors ||= begin
-        err = error_codes.map { |code| build_error(code, validation_message(code)) }
-        Errors.new(err)
-      end
+      return @errors if defined?(@errors)
+
+      @errors = Errors.new(error_codes.map { |code| build_error(code, validation_message(code)) })
     end
 
     # Validates and returns self if valid, raises an exception otherwise.
@@ -85,7 +84,7 @@ module SecID
       return self if valid?
 
       detail = errors.details.first
-      raise self.class.error_class_for(detail[:error]), detail[:message]
+      raise error_class_for(detail[:error]), detail[:message]
     end
 
     private

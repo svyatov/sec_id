@@ -20,16 +20,8 @@ module SecID
       # @return [String] the normalized identifier
       # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
       def normalize(id)
-        cleaned = sanitize_for_normalization(id)
-        new(cleaned).normalized
-      end
-
-      private
-
-      # @param id [String, #to_s] the raw identifier input
-      # @return [String] stripped, upcased input with separators removed
-      def sanitize_for_normalization(id)
-        id.to_s.strip.upcase.gsub(self::SEPARATORS, '')
+        cleaned = id.to_s.strip.gsub(SEPARATORS, '')
+        new(cleaned.upcase).normalized
       end
     end
 

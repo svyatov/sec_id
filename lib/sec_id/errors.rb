@@ -27,11 +27,6 @@ module SecID
       freeze
     end
 
-    # @return [Boolean] true when there are no errors
-    def none?
-      @details.empty?
-    end
-
     # @return [Array<String>] human-readable error messages
     def messages
       @details.map { |e| e[:message] }
@@ -46,6 +41,7 @@ module SecID
     def empty?
       @details.empty?
     end
+    alias none? empty?
 
     # @return [Integer] number of errors
     def size

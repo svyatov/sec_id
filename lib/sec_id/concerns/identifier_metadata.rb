@@ -21,7 +21,7 @@ module SecID
       #
       # @return [String]
       def short_name
-        name.split('::').last
+        @short_name ||= name.split('::').last
       end
 
       # Returns the full human-readable standard name.
@@ -47,7 +47,7 @@ module SecID
 
       # @return [Boolean] true if this identifier type uses a check digit
       def has_check_digit?
-        ancestors.include?(SecID::Checkable)
+        @has_check_digit ||= ancestors.include?(SecID::Checkable)
       end
     end
   end
