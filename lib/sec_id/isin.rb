@@ -153,9 +153,9 @@ module SecID
 
       case nsin_type
       when :cusip   then to_cusip
-      when :sedol   then SEDOL.new(nsin[2..])
-      when :wkn     then WKN.new(nsin[3..])
-      when :valoren then Valoren.new(nsin)
+      when :sedol   then to_sedol
+      when :wkn     then to_wkn
+      when :valoren then to_valoren
       else nsin # :generic - return raw string
       end
     end

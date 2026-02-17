@@ -47,7 +47,9 @@ module SecID
 
       # @return [Boolean] true if this identifier type uses a check digit
       def has_check_digit?
-        @has_check_digit ||= ancestors.include?(SecID::Checkable)
+        return @has_check_digit if defined?(@has_check_digit)
+
+        @has_check_digit = ancestors.include?(SecID::Checkable)
       end
     end
   end

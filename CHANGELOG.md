@@ -24,7 +24,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - `#normalized` and `#normalize` instance methods on all identifier types returning the canonical string form
 - `#normalize!` instance method on all identifier types that mutates `full_id` to canonical form and returns `self`
 - `.normalize(id)` class method on all identifier types that strips separators, upcases, validates, and returns the canonical string
-- `SEPARATORS` constant on `Base` (`/[\s-]/`) with type-specific overrides for OCC and FISN (`/-/`)
+- `SEPARATORS` constant in `Normalizable` (`/[\s-]/`) included in `Base`, with type-specific overrides for OCC and FISN (`/-/`)
 
 ### Changed
 
@@ -167,9 +167,9 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **BREAKING:** API for accessing full number is unified across all classes:
 
     ```
-    SecID::ISIN#full_id  # previously SecID::ISIN#isin
-    SecID::CUSIP#full_id # previously SecID::CUSIP#cusip
-    SecID::SEDOL#full_id
+    SecId::ISIN#full_number  # previously SecId::ISIN#isin
+    SecId::CUSIP#full_number # previously SecId::CUSIP#cusip
+    SecId::SEDOL#full_number
     ```
 
 ### Fixed
