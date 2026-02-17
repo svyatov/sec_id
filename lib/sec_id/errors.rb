@@ -41,6 +41,9 @@ module SecID
     def empty?
       @details.empty?
     end
+
+    # @!method none?
+    #   @return [Boolean] true when there are no errors
     alias none? empty?
 
     # @return [Integer] number of errors

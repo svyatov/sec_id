@@ -33,6 +33,10 @@ module SecID
       validate!
       to_s
     end
+
+    # @!method normalize
+    #   @return [String]
+    #   @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
     alias normalize normalized
 
     # Normalizes this identifier in place, updating {#full_id}.
