@@ -60,9 +60,7 @@ module SecID
         raise(InvalidFormatError, "'#{country_code}' is not a CGS country code!")
       end
 
-      isin = ISIN.new(country_code + restore)
-      isin.restore!
-      isin
+      ISIN.new(country_code + restore).restore!
     end
 
     # @return [Boolean] true if first character is a letter (CINS identifier)

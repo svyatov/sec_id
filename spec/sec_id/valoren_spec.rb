@@ -174,7 +174,7 @@ RSpec.describe SecID::Valoren do
         result = valoren.to_isin
         expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('CH0038863350')
-        expect(valoren.full_id).to eq('003886335')
+        expect(valoren.full_id).to eq('3886335')
       end
     end
 

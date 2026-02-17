@@ -51,6 +51,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - OCC `#date` memoization for invalid dates — previously re-attempted parsing on every call instead of caching `nil`
 - LEI `restore` and `to_s` now correctly pad single-digit check digits to 2 characters
 - CUSIP and SEDOL `to_isin` now always embed the correct check digit
+- `Valoren#to_isin` no longer mutates the source instance
 
 ## [4.4.1] - 2026-02-05
 

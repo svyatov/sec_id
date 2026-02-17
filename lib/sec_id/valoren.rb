@@ -48,10 +48,7 @@ module SecID
         raise InvalidFormatError, "'#{country_code}' is not a valid Valoren country code!"
       end
 
-      normalize!
-      isin = ISIN.new(country_code + full_id)
-      isin.restore!
-      isin
+      ISIN.new(country_code + normalized).restore!
     end
 
     # @return [String] the normalized 9-digit Valoren

@@ -50,9 +50,7 @@ module SecID
         raise InvalidFormatError, "'#{country_code}' is not a valid SEDOL country code!"
       end
 
-      isin = ISIN.new("#{country_code}00#{restore}")
-      isin.restore!
-      isin
+      ISIN.new("#{country_code}00#{restore}").restore!
     end
 
     # @return [Integer] the calculated check digit (0-9)
