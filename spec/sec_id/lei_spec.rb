@@ -17,6 +17,11 @@ RSpec.describe SecID::LEI do
                   dirty_id: '5299 00t8 bm49 aurs do55',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: '529900T8BM49AURSDO55',
+                  dirty_id: '5299 00t8 bm49 aurs do55',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: '5493006MHB84DD0ZWV18',
@@ -181,6 +186,12 @@ RSpec.describe SecID::LEI do
         expect(described_class.check_digit('HWUPKR0MPOU8FGXBT3')).to eq(94)
         expect(described_class.check_digit('7ZW8QJWVPR4P1J1KQY')).to eq(45)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats with 4-char groups' do
+      expect(described_class.new('529900T8BM49AURSDO55').to_pretty_s).to eq('5299 00T8 BM49 AURS DO55')
     end
   end
 end

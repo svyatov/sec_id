@@ -16,6 +16,11 @@ RSpec.describe SecID::CEI do
                   dirty_id: 'a0-bcde-fgh1',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'A0BCDEFGH1',
+                  dirty_id: 'a0-bcde-fgh1',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'A0BCDEFGH1',

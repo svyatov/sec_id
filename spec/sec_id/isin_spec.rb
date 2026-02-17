@@ -17,6 +17,11 @@ RSpec.describe SecID::ISIN do
                   dirty_id: 'us-5949-1810-45',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'US5949181045',
+                  dirty_id: 'us-5949-1810-45',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'US5949181045',
@@ -469,6 +474,16 @@ RSpec.describe SecID::ISIN do
         expect(described_class.check_digit('US037833104')).to eq(7)
         expect(described_class.check_digit('US0378331004')).to eq(5)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats as country_code + nsin + check_digit' do
+      expect(described_class.new('US5949181045').to_pretty_s).to eq('US 594918104 5')
+    end
+
+    it 'formats another ISIN' do
+      expect(described_class.new('IE00B296YR77').to_pretty_s).to eq('IE 00B296YR7 7')
     end
   end
 end

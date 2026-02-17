@@ -17,6 +17,11 @@ RSpec.describe SecID::SEDOL do
                   dirty_id: 'b0y bkj7',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'B0YBKJ7',
+                  dirty_id: 'b0y bkj7',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'B19GKT4',

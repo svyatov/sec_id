@@ -17,6 +17,11 @@ RSpec.describe SecID::FIGI do
                   dirty_id: 'bbg-000-blnnh6',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'BBG000BLNNH6',
+                  dirty_id: 'bbg-000-blnnh6',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'BBG000H4FSM0',
@@ -157,6 +162,12 @@ RSpec.describe SecID::FIGI do
         expect(described_class.check_digit('BBG000BCK0D3')).to eq(3)
         expect(described_class.check_digit('BBG000BKRK3')).to eq(5)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats as prefix+G + random_part + check_digit' do
+      expect(described_class.new('BBG000BLNQ16').to_pretty_s).to eq('BBG 000BLNQ1 6')
     end
   end
 end

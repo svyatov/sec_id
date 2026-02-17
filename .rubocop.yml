@@ -41,6 +41,7 @@ Metrics/ClassLength:
   Exclude:
     - 'lib/sec_id/base.rb'
     - 'lib/sec_id/cfi.rb'
+    - 'lib/sec_id/iban.rb'
 
 Lint/MissingSuper:
   AllowedParentClasses:

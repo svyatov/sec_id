@@ -138,6 +138,13 @@ module SecID
       full_id
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      "#{underlying} #{date_str} #{type} #{strike_mills}"
+    end
+
     private
 
     # @return [Array<Symbol>]

@@ -40,6 +40,13 @@ module SecID
       @identifier = valoren_parts[:identifier]
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      identifier.reverse.scan(/.{1,3}/).join(' ').reverse
+    end
+
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'CH')
     # @return [ISIN] a new ISIN instance with calculated check digit
     # @raise [InvalidFormatError] if the country code is not CH or LI

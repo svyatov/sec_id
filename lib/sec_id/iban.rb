@@ -106,6 +106,11 @@ module SecID
       "#{country_code}#{check_digit.to_s.rjust(2, '0')}#{bban}"
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      to_s.scan(/.{1,4}/).join(' ') if valid?
+    end
+
     private
 
     # @return [Integer]

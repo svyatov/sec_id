@@ -17,6 +17,11 @@ RSpec.describe SecID::CUSIP do
                   dirty_id: '037-833-100',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: '037833100',
+                  dirty_id: '037-833-100',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: '037833100',
@@ -158,6 +163,12 @@ RSpec.describe SecID::CUSIP do
         expect(described_class.check_digit('59491810')).to eq(4)
         expect(described_class.check_digit('68389X10')).to eq(5)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats as cusip6 + issue + check_digit' do
+      expect(described_class.new('037833100').to_pretty_s).to eq('037833 10 0')
     end
   end
 end

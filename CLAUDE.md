@@ -72,9 +72,10 @@ Provides class-level metadata methods: `short_name`, `full_name`, `id_length`, `
 
 #### Normalizable (`normalizable.rb`)
 
-Provides normalization methods. Defines `SEPARATORS` constant (`/[\s-]/` by default).
-- Class methods: `normalize(id)`, `sanitize_for_normalization(id)` (private)
-- Instance methods: `normalized`, `normalize` (alias), `normalize!`, `to_s`, `to_str`
+Provides normalization and display formatting methods. Defines `SEPARATORS` constant (`/[\s-]/` by default).
+- Class methods: `normalize(id)`, `to_pretty_s(id)`, `sanitize_for_normalization(id)` (private)
+- Instance methods: `normalized`, `normalize` (alias), `normalize!`, `to_pretty_s`, `to_s`, `to_str`
+- `to_pretty_s` returns a human-readable formatted string or `nil` for invalid input; subclasses override for type-specific formatting (IBAN/LEI: 4-char groups, ISIN/CUSIP/FIGI: component-separated, OCC: space-separated components, Valoren: thousands grouping)
 
 #### Validatable (`validatable.rb`)
 

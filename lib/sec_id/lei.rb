@@ -50,6 +50,13 @@ module SecID
       @check_digit = lei_parts[:check_digit]&.to_i
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      to_s.scan(/.{1,4}/).join(' ')
+    end
+
     # @return [Integer] the calculated 2-digit check digit (1-98)
     # @raise [InvalidFormatError] if the LEI format is invalid
     def calculate_check_digit

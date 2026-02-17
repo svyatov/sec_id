@@ -17,6 +17,11 @@ RSpec.describe SecID::FISN do
                   dirty_id: 'apple inc/sh',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: 'APPLE INC/SH',
+                  dirty_id: 'apple inc/sh',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: 'APPLE INC/SH',

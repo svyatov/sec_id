@@ -45,6 +45,13 @@ module SecID
       @check_digit = cusip_parts[:check_digit]&.to_i
     end
 
+    # @return [String, nil]
+    def to_pretty_s
+      return nil unless valid?
+
+      "#{cusip6} #{issue} #{check_digit}"
+    end
+
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the CUSIP format is invalid
     def calculate_check_digit

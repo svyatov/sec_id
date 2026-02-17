@@ -24,6 +24,11 @@ RSpec.describe SecID::Valoren do
                   invalid_chars_id: 'ABCDE'
 
   # Normalization
+  it_behaves_like 'a formattable identifier',
+                  valid_id: '003886335',
+                  dirty_id: '  3886335  ',
+                  invalid_id: '0000'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '003886335',
                   canonical_id: '003886335',
@@ -186,6 +191,20 @@ RSpec.describe SecID::Valoren do
         valoren2 = isin.to_valoren
         expect(valoren.identifier).to eq(valoren2.identifier)
       end
+    end
+  end
+
+  describe '#to_pretty_s' do
+    it 'formats with thousands grouping' do
+      expect(described_class.new('3886335').to_pretty_s).to eq('3 886 335')
+    end
+
+    it 'formats without leading zeros' do
+      expect(described_class.new('003886335').to_pretty_s).to eq('3 886 335')
+    end
+
+    it 'formats 5-digit valoren' do
+      expect(described_class.new('12345').to_pretty_s).to eq('12 345')
     end
   end
 end

@@ -17,6 +17,11 @@ RSpec.describe SecID::WKN do
                   dirty_id: '51-40-00',
                   invalid_id: 'INVALID'
 
+  it_behaves_like 'a formattable identifier',
+                  valid_id: '514000',
+                  dirty_id: '51-40-00',
+                  invalid_id: 'INVALID'
+
   # Validation API
   it_behaves_like 'a validatable identifier',
                   valid_id: '514000',
