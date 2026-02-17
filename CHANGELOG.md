@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-02-17
+
 ### Added
 
 - `Validatable`, `Normalizable`, and `IdentifierMetadata` concerns extracted from `Base`, making each responsibility independently includable

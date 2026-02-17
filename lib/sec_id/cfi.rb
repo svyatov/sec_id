@@ -311,9 +311,7 @@ module SecID
       errors = []
       errors << :invalid_category unless valid_category?
       errors << :invalid_group unless valid_group?
-      return errors unless errors.empty?
-
-      super
+      errors
     end
 
     # @param code [Symbol]
