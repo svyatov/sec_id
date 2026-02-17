@@ -26,6 +26,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- **BREAKING:** Minimum Ruby version raised from 3.1 to 3.2 (Ruby 3.1 reached EOL on 2025-03-31)
 - **BREAKING:** `#restore!` now returns `self` instead of a string; use `#restore` for the string return value
 - **BREAKING:** `.restore!` now returns the restored instance instead of a string; use `.restore` for the string return value
 - **BREAKING:** `#normalize!` on CIK, OCC, and Valoren now returns `self` instead of a string; use `#normalized` to get the canonical string

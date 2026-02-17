@@ -19,7 +19,7 @@ jobs:
     name: Ruby ${{ matrix.ruby_version }}
     strategy:
       matrix:
-        ruby_version: [ruby-head, '4.0', '3.4', '3.3', '3.2', '3.1']
+        ruby_version: [ruby-head, '4.0', '3.4', '3.3', '3.2']
 
     env:
       COVERAGE: true

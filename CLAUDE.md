@@ -149,7 +149,7 @@ Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
 
 ## Code Style
 
-- Ruby 3.1+ required
+- Ruby 3.2+ required
 - Max line length: 120 characters
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)

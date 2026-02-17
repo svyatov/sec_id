@@ -30,7 +30,7 @@
 
 ## Supported Ruby Versions
 
-Ruby 3.1+ is required.
+Ruby 3.2+ is required.
 
 ## Installation
 

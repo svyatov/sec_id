@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 
-  spec.required_ruby_version = '>= 3.1.0'
+  spec.required_ruby_version = '>= 3.2.0'
 
   spec.require_paths = ['lib']
   spec.files = Dir['lib/**/*.rb'] + %w[CHANGELOG.md LICENSE.txt README.md sec_id.gemspec]

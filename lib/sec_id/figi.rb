@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'set'
-
 module SecID
   # Financial Instrument Global Identifier (FIGI) - a 12-character alphanumeric code
   # that uniquely identifies financial instruments.
