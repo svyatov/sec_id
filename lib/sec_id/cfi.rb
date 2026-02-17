@@ -305,7 +305,7 @@ module SecID
     end
 
     # @return [Array<Symbol>]
-    def format_errors
+    def detect_errors
       return super unless identifier
 
       errors = []

@@ -21,20 +21,22 @@ This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP
 
 ### Class Hierarchy
 
-All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), which provides:
-- Core API: `valid?`, `errors` (memoized, returns `ValidationResult`), `validate!` (returns self or raises)
-- Normalization API: `#normalized` / `#normalize` (canonical string), `#normalize!` (mutates `full_id`, returns self), `.normalize(id)` (class-level with separator stripping)
-- Class-level convenience methods: `valid?`, `validate` (returns `ValidationResult`), `validate!` (returns instance or raises)
-- `parse` helper method for extracting identifier components (always strips and upcases)
-- `SEPARATORS` constant (`/[\s-]/` by default) for class-level `.normalize` input sanitization
-- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
-- Private validation helpers: `valid_format?`, `validation_errors`, `format_errors`, `valid_length?`, `valid_characters?`, `validation_message`, `build_error`
+All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin coordinator that includes three concerns:
+- `IdentifierMetadata` — class-level metadata: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
+- `Normalizable` — normalization: `#normalized` / `#normalize`, `#normalize!`, `.normalize(id)`, `#to_s`, `#to_str`, `SEPARATORS`
+- `Validatable` — validation: `#valid?`, `#validate`, `#errors`, `#validate!`, `.valid?`, `.validate`, `.validate!`, `.error_class_for`, `ERROR_MAP`
+
+Base itself keeps only:
+- `attr_reader :full_id, :identifier`
+- `inherited` hook (auto-registration)
+- `initialize` (abstract, raises `NotImplementedError`)
+- `parse` (private, regex matching + `@full_id` assignment)
 
 Each identifier class defines these metadata constants:
 - `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
 - `ID_LENGTH` — fixed length or valid length range
 - `EXAMPLE` — representative valid identifier string
-- `VALID_CHARS_REGEX` — regex for valid character set (used by `format_errors` fallback)
+- `VALID_CHARS_REGEX` — regex for valid character set (used by `detect_errors` fallback)
 
 Classes with check digits include the `Checkable` concern, which adds:
 - `valid?` override that validates format and check digit
@@ -64,6 +66,23 @@ Lazily instantiated from `SecID.detect`; cache invalidated when new types regist
 
 ### Concerns (`lib/sec_id/concerns/`)
 
+#### IdentifierMetadata (`identifier_metadata.rb`)
+
+Provides class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`.
+
+#### Normalizable (`normalizable.rb`)
+
+Provides normalization methods. Defines `SEPARATORS` constant (`/[\s-]/` by default).
+- Class methods: `normalize(id)`, `sanitize_for_normalization(id)` (private)
+- Instance methods: `normalized`, `normalize` (alias), `normalize!`, `to_s`, `to_str`
+
+#### Validatable (`validatable.rb`)
+
+Provides validation methods. Defines `ERROR_MAP` constant (maps error code symbols to exception classes).
+- Class methods: `valid?(id)`, `validate(id)` (returns instance), `validate!(id)`, `error_class_for(code)`
+- Instance methods: `valid?`, `validate` (eagerly triggers errors, returns self), `errors` (memoized, returns `Errors`), `validate!`
+- Private methods: `valid_format?`, `error_codes`, `detect_errors`, `valid_length?`, `valid_characters?`, `check_digit_width`, `validation_message`, `build_error`
+
 #### Checkable (`checkable.rb`)
 
 Provides check-digit validation and calculation for identifiers with check digits. Include this in classes that have a check digit (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI).
@@ -80,8 +99,8 @@ Luhn algorithm variants (private):
 - `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
 
 Validation overrides (private):
-- `validation_errors` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
-- `check_digit_width` - Returns `1` (used by `Base#valid_length?` to allow optional check digit in length check; LEI and IBAN override → `2`)
+- `error_codes` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
+- `check_digit_width` - Returns `1` (used by `Validatable#valid_length?` to allow optional check digit in length check; LEI and IBAN override → `2`)
 
 `restore` and `to_s` use `check_digit_width` to right-justify the check digit string (e.g. `5` → `"05"` for width 2). IBAN overrides `restore`/`to_s` because its check digit is mid-string.
 
@@ -112,10 +131,10 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - OCC, FISN: override `SEPARATORS = /-/` (spaces are structural in these formats)
 
 **Type-specific validation overrides:**
-- FIGI: `format_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)
-- CFI: `format_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes
-- IBAN: `format_errors` returns `:invalid_bban` when BBAN format doesn't match country rules
-- OCC: `validation_errors` returns `:invalid_date` when date string can't be parsed
+- FIGI: `detect_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)
+- CFI: `detect_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes
+- IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules
+- OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
 
 ### Conversion Methods
 
@@ -128,13 +147,14 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - `WKN#to_isin(country_code = 'DE')` - Convert WKN to ISIN
 - `Valoren#to_isin(country_code = 'CH')` - Convert Valoren to ISIN (supports CH, LI)
 
-### ValidationResult (`lib/sec_id/validation_result.rb`)
+### Errors (`lib/sec_id/errors.rb`)
 
-Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
+Frozen, immutable value object returned by `#errors`. Contains:
 - `details` — array of `{ error: Symbol, message: String }` hashes (frozen)
 - `messages` — array of human-readable error message strings
-- `valid?` — true when no errors
+- `none?` — true when no errors
 - `any?` / `empty?` / `size` — collection-like query methods
+- `each` — yields each error detail hash
 - `to_a` — alias for `messages`
 
 ### Error Handling
@@ -143,7 +163,7 @@ Frozen, immutable value object returned by `#errors` and `.validate`. Contains:
 - `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
 - `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
 - `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
-- `Base::EXCEPTION_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
+- `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
 - **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
 

@@ -7,33 +7,33 @@ RSpec.describe SecID::Base do
     end
   end
 
-  describe '.exception_for_error' do
+  describe '.error_class_for' do
     it 'maps :invalid_check_digit to InvalidCheckDigitError' do
-      expect(described_class.exception_for_error(:invalid_check_digit)).to eq(SecID::InvalidCheckDigitError)
+      expect(described_class.error_class_for(:invalid_check_digit)).to eq(SecID::InvalidCheckDigitError)
     end
 
     it 'maps :invalid_prefix to InvalidStructureError' do
-      expect(described_class.exception_for_error(:invalid_prefix)).to eq(SecID::InvalidStructureError)
+      expect(described_class.error_class_for(:invalid_prefix)).to eq(SecID::InvalidStructureError)
     end
 
     it 'maps :invalid_category to InvalidStructureError' do
-      expect(described_class.exception_for_error(:invalid_category)).to eq(SecID::InvalidStructureError)
+      expect(described_class.error_class_for(:invalid_category)).to eq(SecID::InvalidStructureError)
     end
 
     it 'maps :invalid_group to InvalidStructureError' do
-      expect(described_class.exception_for_error(:invalid_group)).to eq(SecID::InvalidStructureError)
+      expect(described_class.error_class_for(:invalid_group)).to eq(SecID::InvalidStructureError)
     end
 
     it 'maps :invalid_bban to InvalidStructureError' do
-      expect(described_class.exception_for_error(:invalid_bban)).to eq(SecID::InvalidStructureError)
+      expect(described_class.error_class_for(:invalid_bban)).to eq(SecID::InvalidStructureError)
     end
 
     it 'maps :invalid_date to InvalidStructureError' do
-      expect(described_class.exception_for_error(:invalid_date)).to eq(SecID::InvalidStructureError)
+      expect(described_class.error_class_for(:invalid_date)).to eq(SecID::InvalidStructureError)
     end
 
     it 'defaults unknown codes to InvalidFormatError' do
-      expect(described_class.exception_for_error(:unknown_code)).to eq(SecID::InvalidFormatError)
+      expect(described_class.error_class_for(:unknown_code)).to eq(SecID::InvalidFormatError)
     end
   end
 

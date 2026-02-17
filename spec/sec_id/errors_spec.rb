@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe SecID::ValidationResult do
-  describe 'when valid (no errors)' do
+RSpec.describe SecID::Errors do
+  describe 'when no errors' do
     subject(:result) { described_class.new([]) }
 
-    it 'is valid' do
-      expect(result.valid?).to be(true)
+    it 'has no errors' do
+      expect(result.none?).to be(true)
     end
 
     it 'has empty details' do
@@ -39,9 +39,13 @@ RSpec.describe SecID::ValidationResult do
     it 'has frozen details array' do
       expect(result.details).to be_frozen
     end
+
+    it 'yields nothing from each' do
+      expect { |b| result.each(&b) }.not_to yield_control
+    end
   end
 
-  describe 'when invalid (has errors)' do
+  describe 'when has errors' do
     subject(:result) { described_class.new(errors) }
 
     let(:errors) do
@@ -51,8 +55,8 @@ RSpec.describe SecID::ValidationResult do
       ]
     end
 
-    it 'is not valid' do
-      expect(result.valid?).to be(false)
+    it 'is not none' do
+      expect(result.none?).to be(false)
     end
 
     it 'returns details' do
@@ -91,6 +95,10 @@ RSpec.describe SecID::ValidationResult do
     it 'has frozen details array' do
       expect(result.details).to be_frozen
     end
+
+    it 'yields each detail from each' do
+      expect { |b| result.each(&b) }.to yield_successive_args(*errors)
+    end
   end
 
   describe 'when single error' do
@@ -98,8 +106,8 @@ RSpec.describe SecID::ValidationResult do
 
     let(:errors) { [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }] }
 
-    it 'is not valid' do
-      expect(result.valid?).to be(false)
+    it 'is not none' do
+      expect(result.none?).to be(false)
     end
 
     it 'returns single detail' do

@@ -13,6 +13,13 @@ This guide covers all breaking changes when upgrading from SecID 4.x to 5.0.
 | Module rename | `SecId::` | `SecID::` |
 | Attribute rename | `.full_number` | `.full_id` |
 | OCC method removed | `.full_symbol` | `.full_id` |
+| ValidationResult rename | `SecID::ValidationResult` | `SecID::Errors` |
+| `ValidationResult#valid?` | `result.valid?` | `result.none?` |
+| `.validate` return type | `Klass.validate(id)` returns `ValidationResult` | `Klass.validate(id)` returns instance; use `.errors` for errors |
+| `EXCEPTION_MAP` rename | `Base::EXCEPTION_MAP` | `Validatable::ERROR_MAP` |
+| `.exception_for_error` rename | `.exception_for_error(code)` | `.error_class_for(code)` |
+| `format_errors` rename (private) | `def format_errors` | `def detect_errors` |
+| `validation_errors` rename (private) | `def validation_errors` | `def error_codes` |
 | Instance `restore!` return | `= obj.restore!` | `obj.restore!` (returns `self`) or `= obj.restore` (returns string) |
 | Class `restore!` return | `= Klass.restore!(id)` | `Klass.restore!(id)` (returns instance) or `= Klass.restore(id)` (returns string) |
 | Instance `normalize!` return | `= obj.normalize!` | `obj.normalize!` (returns `self`) or `= obj.normalized` (returns string) |
@@ -174,11 +181,72 @@ rescue SecID::InvalidFormatError => e
 end
 ```
 
-### 10. Explore new features (optional)
+### 10. Rename ValidationResult to Errors
+
+`ValidationResult` has been renamed to `Errors`. The `valid?` method is replaced by `none?` for clearer semantics.
+
+```ruby
+# Before
+result = SecID::ISIN.new('US5949181045').errors
+result.valid?  # => true
+
+# After
+result = SecID::ISIN.new('US5949181045').errors
+result.none?   # => true
+```
+
+Find all occurrences:
+
+```bash
+grep -rE 'ValidationResult|\.valid\?' app/ lib/ spec/
+```
+
+### 11. Update .validate usage (returns instance now)
+
+`.validate` now returns the identifier instance (with errors cached) instead of a `ValidationResult`/`Errors` object.
+
+```ruby
+# Before (v4)
+result = SecID::ISIN.validate('US5949181045')  # => #<SecID::ValidationResult>
+result.valid?
+
+# After (v5)
+instance = SecID::ISIN.validate('US5949181045')  # => #<SecID::ISIN>
+instance.errors.none?
+```
+
+### 12. Update subclass overrides (private API)
+
+If you subclass `SecID::Base` and override private validation methods:
+
+```ruby
+# Before
+def format_errors       # renamed
+def validation_errors   # renamed
+
+# After
+def detect_errors
+def error_codes
+```
+
+If you reference `EXCEPTION_MAP` or `exception_for_error`:
+
+```ruby
+# Before
+Base::EXCEPTION_MAP
+Klass.exception_for_error(:code)
+
+# After
+Validatable::ERROR_MAP
+Klass.error_class_for(:code)
+```
+
+### 13. Explore new features (optional)
 
 v5 adds several features beyond the breaking changes:
 
-- **Structured validation** — `#errors` returns a `ValidationResult` with `details`, `messages`, `any?`, `empty?`, `size`
+- **Structured validation** — `#errors` returns an `Errors` object with `details`, `messages`, `none?`, `any?`, `empty?`, `size`, `each`
+- **Eager validation** — `#validate` / `.validate` triggers validation and returns the instance
 - **Fail-fast validation** — `#validate!` raises descriptive exceptions
 - **Type detection** — `SecID.detect('US5949181045')` returns `[:isin]`
 - **Universal parsing** — `SecID.parse('US5949181045')` returns a typed instance

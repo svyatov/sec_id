@@ -24,10 +24,10 @@ RSpec.shared_examples 'a validatable identifier' do |params|
 
   describe '#errors' do
     context 'when identifier is valid' do
-      it 'returns a valid ValidationResult' do
+      it 'returns an Errors with no errors' do
         result = identifier_class.new(params[:valid_id]).errors
-        expect(result).to be_a(SecID::ValidationResult)
-        expect(result.valid?).to be(true)
+        expect(result).to be_a(SecID::Errors)
+        expect(result.none?).to be(true)
         expect(result.details).to be_empty
       end
 
@@ -38,9 +38,9 @@ RSpec.shared_examples 'a validatable identifier' do |params|
     end
 
     context 'when identifier has invalid length' do
-      it 'returns an invalid ValidationResult with :invalid_length' do
+      it 'returns Errors with :invalid_length' do
         result = identifier_class.new(params[:invalid_length_id]).errors
-        expect(result.valid?).to be(false)
+        expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to include(:invalid_length)
         expect(result.details.first[:message]).to match(/Expected .+ characters, got \d+/)
       end
@@ -52,40 +52,40 @@ RSpec.shared_examples 'a validatable identifier' do |params|
     end
 
     context 'when identifier has invalid characters' do
-      it 'returns an invalid ValidationResult with :invalid_characters' do
+      it 'returns Errors with :invalid_characters' do
         result = identifier_class.new(params[:invalid_chars_id]).errors
-        expect(result.valid?).to be(false)
+        expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to include(:invalid_characters)
         expect(result.details.first[:message]).to match(/Contains invalid characters for/)
       end
     end
 
     context 'when input is nil, empty, or whitespace' do
-      it 'returns invalid ValidationResult for nil' do
-        expect(identifier_class.new(nil).errors.valid?).to be(false)
+      it 'returns Errors for nil' do
+        expect(identifier_class.new(nil).errors.none?).to be(false)
       end
 
-      it 'returns invalid ValidationResult for empty string' do
-        expect(identifier_class.new('').errors.valid?).to be(false)
+      it 'returns Errors for empty string' do
+        expect(identifier_class.new('').errors.none?).to be(false)
       end
 
-      it 'returns invalid ValidationResult for whitespace' do
-        expect(identifier_class.new('   ').errors.valid?).to be(false)
+      it 'returns Errors for whitespace' do
+        expect(identifier_class.new('   ').errors.none?).to be(false)
       end
     end
   end
 
   describe '.validate' do
-    it 'delegates to instance method' do
+    it 'returns an instance of the identifier class' do
       result = identifier_class.validate(params[:valid_id])
-      expect(result).to be_a(SecID::ValidationResult)
-      expect(result.valid?).to be(true)
+      expect(result).to be_a(identifier_class)
+      expect(result.errors.none?).to be(true)
     end
 
-    it 'returns invalid result for invalid input' do
+    it 'returns an instance with errors for invalid input' do
       result = identifier_class.validate(params[:invalid_length_id])
-      expect(result).to be_a(SecID::ValidationResult)
-      expect(result.valid?).to be(false)
+      expect(result).to be_a(identifier_class)
+      expect(result.errors.none?).to be(false)
     end
   end
 end
@@ -101,16 +101,16 @@ RSpec.shared_examples 'detects invalid check digit' do |params|
     context 'when check digit is wrong' do
       it 'returns result with :invalid_check_digit and descriptive message' do
         result = identifier_class.new(params[:invalid_check_digit_id]).errors
-        expect(result.valid?).to be(false)
+        expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_check_digit])
         expect(result.details.first[:message]).to match(/invalid, expected/)
       end
     end
 
     context 'when check digit is correct' do
-      it 'returns valid result' do
+      it 'returns no errors' do
         result = identifier_class.new(params[:valid_id]).errors
-        expect(result.valid?).to be(true)
+        expect(result.none?).to be(true)
       end
     end
   end
@@ -183,7 +183,7 @@ RSpec.shared_examples 'detects invalid format' do |params|
     context 'when format is invalid but length and characters are valid' do
       it 'returns :invalid_format with descriptive message' do
         result = described_class.new(params[:invalid_format_id]).errors
-        expect(result.valid?).to be(false)
+        expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_format])
         expect(result.details.first[:message]).to match(/Does not match .+ format/)
       end

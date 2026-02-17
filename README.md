@@ -56,7 +56,7 @@ gem install sec_id
 
 ## Supported Standards and Usage
 
-All identifier classes provide `valid?`, `errors`, `validate!`, and `.validate` methods at both class and instance levels.
+All identifier classes provide `valid?`, `errors`, `validate`, `validate!` methods at both class and instance levels.
 
 **All identifiers** support normalization:
 - `.normalize(id)` - strips separators, upcases, validates, and returns the canonical string
@@ -123,7 +123,7 @@ All identifier classes provide a Rails-like `#errors` API for detailed error rep
 
 ```ruby
 isin = SecID::ISIN.new('US5949181040')
-isin.errors.valid?    # => false
+isin.errors.none?     # => false
 isin.errors.messages  # => ["Check digit '0' is invalid, expected '5'"]
 isin.errors.details   # => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
 isin.errors.any?      # => true
@@ -131,8 +131,9 @@ isin.errors.empty?    # => false
 isin.errors.size      # => 1
 isin.errors.to_a      # => same as messages
 
-# Class-level convenience method
-SecID::ISIN.validate('US5949181040')  # => #<SecID::ValidationResult>
+# Class-level convenience method (returns the instance with errors cached)
+SecID::ISIN.validate('US5949181040')         # => #<SecID::ISIN>
+SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 ```
 
 **Common error codes** (all identifier types):

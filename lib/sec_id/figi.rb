@@ -65,7 +65,7 @@ module SecID
     end
 
     # @return [Array<Symbol>]
-    def format_errors
+    def detect_errors
       return [:invalid_prefix] if identifier && RESTRICTED_PREFIXES.include?(prefix)
 
       super
