@@ -63,6 +63,19 @@ module SecID
       raise NotImplementedError
     end
 
+    # @param other [Object]
+    # @return [Boolean]
+    def ==(other)
+      other.class == self.class && comparison_id == other.comparison_id
+    end
+
+    alias eql? ==
+
+    # @return [Integer]
+    def hash
+      [self.class, comparison_id].hash
+    end
+
     # Returns a hash representation of this identifier for serialization.
     #
     # @return [Hash] hash with :type, :full_id, :normalized, :valid, and :components keys
@@ -74,6 +87,13 @@ module SecID
         valid: valid?,
         components: components
       }
+    end
+
+    protected
+
+    # @return [String]
+    def comparison_id
+      valid? ? normalized : full_id
     end
 
     private
