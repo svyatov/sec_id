@@ -40,6 +40,7 @@ Base itself keeps only:
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
 - `to_h` (returns `{ type:, full_id:, normalized:, valid:, components: }`)
+- `==`, `eql?`, `hash` — value equality based on `comparison_id` (type + normalized form); instances usable as Hash keys and in Sets
 - `components` (private, returns `{}` — subclasses override with type-specific attributes)
 - `parse` (private, regex matching + `@full_id` assignment)
 
