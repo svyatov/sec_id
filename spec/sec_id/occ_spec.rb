@@ -35,6 +35,13 @@ RSpec.describe SecID::OCC do
                   dirty_id: 'eqx   260116c00005500',
                   invalid_id: 'ZVZZT'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'AAPL  210917C00150000',
+                  invalid_id: 'ZVZZT',
+                  expected_type: :occ,
+                  expected_components: { underlying: 'AAPL', date_str: '210917', type: 'C', strike_mills: '00150000' }
+
   context 'when OCC symbol is in canonical form' do
     let(:occ_symbol) { 'EQX   260116C00005500' }
 

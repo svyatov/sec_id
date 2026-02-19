@@ -142,6 +142,13 @@ module SecID
       Valoren.new(nsin)
     end
 
+    private
+
+    # @return [Hash]
+    def components = { country_code:, nsin:, check_digit: }
+
+    public
+
     # Returns the type of NSIN embedded in this ISIN.
     #
     # @return [Symbol] :cusip, :sedol, :wkn, :valoren, or :generic

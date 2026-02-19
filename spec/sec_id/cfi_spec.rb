@@ -33,6 +33,15 @@ RSpec.describe SecID::CFI do
                   invalid_length_id: 'ES',
                   invalid_chars_id: 'ES1234'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'ESVUFR',
+                  invalid_id: 'INVALID',
+                  expected_type: :cfi,
+                  expected_components: {
+                    category_code: 'E', group_code: 'S', attr1: 'V', attr2: 'U', attr3: 'F', attr4: 'R'
+                  }
+
   describe 'valid CFI parsing' do
     context 'when CFI is mixed case' do
       let(:cfi_code) { 'EsXxXx' }

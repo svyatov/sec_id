@@ -40,6 +40,13 @@ RSpec.describe SecID::ISIN do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'IE00B296YR70'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'US5949181045',
+                  invalid_id: 'INVALID',
+                  expected_type: :isin,
+                  expected_components: { country_code: 'US', nsin: '594918104', check_digit: 5 }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'IE00B296YR77',

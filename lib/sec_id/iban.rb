@@ -113,6 +113,16 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components
+      hash = { country_code:, bban:, check_digit: }
+      hash[:bank_code] = bank_code if bank_code
+      hash[:branch_code] = branch_code if branch_code
+      hash[:account_number] = account_number if account_number
+      hash[:national_check] = national_check if national_check
+      hash
+    end
+
     # @return [Integer]
     def check_digit_width
       2

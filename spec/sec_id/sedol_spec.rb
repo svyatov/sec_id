@@ -40,6 +40,13 @@ RSpec.describe SecID::SEDOL do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'B19GKT0'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'B0YBKJ7',
+                  invalid_id: 'INVALID',
+                  expected_type: :sedol,
+                  expected_components: { check_digit: 7 }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'B19GKT4',

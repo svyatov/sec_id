@@ -54,5 +54,10 @@ module SecID
     def to_s
       identifier.to_s
     end
+
+    private
+
+    # @return [Hash]
+    def components = { issuer:, description: }
   end
 end

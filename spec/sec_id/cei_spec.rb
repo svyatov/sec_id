@@ -39,6 +39,13 @@ RSpec.describe SecID::CEI do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'A0BCDEFGH0'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'A0BCDEFGH1',
+                  invalid_id: 'INVALID',
+                  expected_type: :cei,
+                  expected_components: { prefix: 'A', numeric: '0', entity_id: 'BCDEFGH', check_digit: 1 }
+
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'A0BCDEFGH1',
                   valid_id_without_check: 'A0BCDEFGH',

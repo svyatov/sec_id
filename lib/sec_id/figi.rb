@@ -66,6 +66,9 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components = { prefix:, random_part:, check_digit: }
+
     # @return [Boolean]
     def valid_format?
       !identifier.nil? && !RESTRICTED_PREFIXES.include?(prefix)

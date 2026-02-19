@@ -35,6 +35,13 @@ RSpec.describe SecID::Valoren do
                   dirty_id: '  3886335  ',
                   invalid_id: '0000'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: '003886335',
+                  invalid_id: '0000',
+                  expected_type: :valoren,
+                  expected_components: {}
+
   context 'when Valoren is valid' do
     let(:valoren_number) { '003886335' }
 
