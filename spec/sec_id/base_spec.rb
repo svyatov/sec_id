@@ -63,6 +63,66 @@ RSpec.describe SecID::Base do
     end
   end
 
+  describe '#== / #eql? / #hash' do
+    it 'considers same type with same normalized value equal' do
+      expect(SecID::ISIN.new('us5949181045')).to eq(SecID::ISIN.new('US5949181045'))
+    end
+
+    it 'considers different values not equal' do
+      expect(SecID::ISIN.new('US5949181045')).not_to eq(SecID::ISIN.new('US0378331005'))
+    end
+
+    it 'considers different types not equal even with overlapping input' do
+      expect(SecID::ISIN.new('US5949181045')).not_to eq(SecID::CUSIP.new('US5949181045'))
+    end
+
+    it 'considers invalid identifiers with same input equal' do
+      a = SecID::ISIN.new('INVALID')
+      b = SecID::ISIN.new('INVALID')
+      expect(a).to eq(b)
+    end
+
+    it 'considers invalid identifiers with different input not equal' do
+      expect(SecID::ISIN.new('BAD1')).not_to eq(SecID::ISIN.new('BAD2'))
+    end
+
+    it 'has #eql? behave the same as #==' do
+      a = SecID::ISIN.new('us5949181045')
+      b = SecID::ISIN.new('US5949181045')
+      expect(a).to eql(b)
+    end
+
+    it 'produces equal #hash for equal instances' do
+      a = SecID::ISIN.new('us5949181045')
+      b = SecID::ISIN.new('US5949181045')
+      expect(a.hash).to eq(b.hash)
+    end
+
+    it 'produces different #hash for unequal instances' do
+      a = SecID::ISIN.new('US5949181045')
+      b = SecID::ISIN.new('US0378331005')
+      expect(a.hash).not_to eq(b.hash)
+    end
+
+    it 'works as Hash key' do
+      a = SecID::ISIN.new('us5949181045')
+      b = SecID::ISIN.new('US5949181045')
+      hash = { a => 'found' }
+      expect(hash[b]).to eq('found')
+    end
+
+    it 'works in Set' do
+      a = SecID::ISIN.new('us5949181045')
+      b = SecID::ISIN.new('US5949181045')
+      set = Set[a, b]
+      expect(set.size).to eq(1)
+    end
+
+    it 'handles CIK leading-zero padding' do
+      expect(SecID::CIK.new('1234')).to eq(SecID::CIK.new('0000001234'))
+    end
+  end
+
   describe '.inherited auto-registration' do
     it 'registers all 13 identifier types' do
       expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn]
