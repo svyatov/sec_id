@@ -40,6 +40,13 @@ RSpec.describe SecID::CUSIP do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: '68389X100'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: '037833100',
+                  invalid_id: 'INVALID',
+                  expected_type: :cusip,
+                  expected_components: { cusip6: '037833', issue: '10', check_digit: 0 }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: '68389X105',

@@ -30,6 +30,8 @@ Base itself keeps only:
 - `attr_reader :full_id, :identifier`
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
+- `to_h` (returns `{ type:, full_id:, normalized:, valid:, components: }`)
+- `components` (private, returns `{}` — subclasses override with type-specific attributes)
 - `parse` (private, regex matching + `@full_id` assignment)
 
 Each identifier class defines these metadata constants:
@@ -49,6 +51,7 @@ Classes with check digits include the `Checkable` concern, which adds:
 Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecID[:isin]` — look up class by symbol key (raises `ArgumentError` if unknown)
 - `SecID.identifiers` — all registered classes in load order
+- `SecID.valid?(str, types: nil)` — quick boolean validation against all or specific types
 - `SecID.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
 - `SecID.parse(str, types: nil)` — returns a typed instance for the most specific match (or `nil`)
 - `SecID.parse!(str, types: nil)` — like `parse` but raises `InvalidFormatError` on failure
@@ -73,7 +76,7 @@ Provides class-level metadata methods: `short_name`, `full_name`, `id_length`, `
 #### Normalizable (`normalizable.rb`)
 
 Provides normalization and display formatting methods. Defines `SEPARATORS` constant (`/[\s-]/` by default).
-- Class methods: `normalize(id)`, `to_pretty_s(id)`, `sanitize_for_normalization(id)` (private)
+- Class methods: `normalize(id)`, `to_pretty_s(id)`
 - Instance methods: `normalized`, `normalize` (alias), `normalize!`, `to_pretty_s`, `to_s`, `to_str`
 - `to_pretty_s` returns a human-readable formatted string or `nil` for invalid input; subclasses override for type-specific formatting (IBAN/LEI: 4-char groups, ISIN/CUSIP/FIGI: component-separated, OCC: space-separated components, Valoren: thousands grouping)
 
@@ -115,6 +118,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - `ID_REGEX` constant with named capture groups for parsing
 - `initialize` that calls `parse` and extracts components
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
+- Private `components` method returning a hash of parsed attributes (for `#to_h` serialization); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
 
 **Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI):
 - Include `Checkable` concern
@@ -140,11 +144,11 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 ### Conversion Methods
 
 - `ISIN#to_cusip` - Convert ISIN to CUSIP (for CGS country codes only)
-- `ISIN#to_sedol` - Convert ISIN to SEDOL (for GB, IE, GG, IM, JE country codes)
+- `ISIN#to_sedol` - Convert ISIN to SEDOL (for GB, IE, GG, IM, JE, FK country codes)
 - `ISIN#to_wkn` - Convert ISIN to WKN (for DE country code)
 - `ISIN#to_valoren` - Convert ISIN to Valoren (for CH/LI country codes)
 - `CUSIP#to_isin(country_code)` - Convert CUSIP to ISIN
-- `SEDOL#to_isin(country_code = 'GB')` - Convert SEDOL to ISIN (supports GB, IE, GG, IM, JE)
+- `SEDOL#to_isin(country_code = 'GB')` - Convert SEDOL to ISIN (supports GB, IE, GG, IM, JE, FK)
 - `WKN#to_isin(country_code = 'DE')` - Convert WKN to ISIN
 - `Valoren#to_isin(country_code = 'CH')` - Convert Valoren to ISIN (supports CH, LI)
 

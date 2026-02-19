@@ -66,6 +66,9 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components = { lou_id:, reserved:, entity_id:, check_digit: }
+
     # @return [Integer]
     def check_digit_width
       2

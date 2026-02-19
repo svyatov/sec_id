@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `#to_h` method on all identifier types for consistent hash serialization — returns `{ type:, full_id:, normalized:, valid:, components: }` with type-specific component hashes (e.g. ISIN: `country_code`, `nsin`, `check_digit`)
 - `#to_pretty_s` and `.to_pretty_s` display formatting methods on all identifier types, returning a human-readable string or `nil` for invalid input — with type-specific formats for IBAN (4-char groups), LEI (4-char groups), ISIN (CC + NSIN + CD), CUSIP (cusip6 + issue + CD), FIGI (prefix+G + random + CD), OCC (space-separated components), and Valoren (thousands grouping)
 
 ## [5.0.0] - 2026-02-17

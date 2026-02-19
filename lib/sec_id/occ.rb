@@ -147,6 +147,9 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components = { underlying:, date_str:, type:, strike_mills: }
+
     # @return [Array<Symbol>]
     def error_codes
       return detect_errors unless valid_format?

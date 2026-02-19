@@ -63,7 +63,25 @@ module SecID
       raise NotImplementedError
     end
 
+    # Returns a hash representation of this identifier for serialization.
+    #
+    # @return [Hash] hash with :type, :full_id, :normalized, :valid, and :components keys
+    def to_h
+      {
+        type: self.class.short_name.downcase.to_sym,
+        full_id: full_id,
+        normalized: valid? ? normalized : nil,
+        valid: valid?,
+        components: components
+      }
+    end
+
     private
+
+    # @return [Hash]
+    def components
+      {}
+    end
 
     # @param sec_id_number [String, #to_s] the identifier to parse
     # @return [MatchData, Hash] the regex match data or empty hash if no match

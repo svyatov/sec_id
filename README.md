@@ -64,6 +64,19 @@ All identifier classes provide `valid?`, `errors`, `validate`, `validate!` metho
 - `#normalize!` - mutates `full_id` to canonical form, returns `self`
 - `#to_pretty_s` / `.to_pretty_s(id)` - returns a human-readable formatted string, or `nil` for invalid input
 
+**All identifiers** support hash serialization:
+- `#to_h` - returns a hash with `:type`, `:full_id`, `:normalized`, `:valid`, and `:components` keys
+
+```ruby
+SecID::ISIN.new('US5949181045').to_h
+# => { type: :isin, full_id: 'US5949181045', normalized: 'US5949181045',
+#      valid: true, components: { country_code: 'US', nsin: '594918104', check_digit: 5 } }
+
+SecID::ISIN.new('INVALID').to_h
+# => { type: :isin, full_id: 'INVALID', normalized: nil,
+#      valid: false, components: { country_code: nil, nsin: nil, check_digit: nil } }
+```
+
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
 - `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance

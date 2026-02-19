@@ -33,6 +33,13 @@ RSpec.describe SecID::WKN do
                   invalid_length_id: '51',
                   invalid_chars_id: '514-00'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: '514000',
+                  invalid_id: 'INVALID',
+                  expected_type: :wkn,
+                  expected_components: {}
+
   context 'when WKN is valid' do
     let(:wkn_number) { '514000' }
 

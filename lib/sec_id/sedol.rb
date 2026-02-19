@@ -62,6 +62,9 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components = { check_digit: }
+
     # NOTE: Not idiomatic Ruby, but optimized for performance.
     #
     # @return [Integer] the weighted sum

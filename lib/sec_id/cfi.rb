@@ -299,6 +299,9 @@ module SecID
 
     private
 
+    # @return [Hash]
+    def components = { category_code:, group_code:, attr1:, attr2:, attr3:, attr4: }
+
     # @return [Boolean]
     def valid_format?
       super && valid_category? && valid_group?

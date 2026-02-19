@@ -40,6 +40,13 @@ RSpec.describe SecID::FIGI do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'BBG000H4FSM5'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'BBG000BLNNH6',
+                  invalid_id: 'INVALID',
+                  expected_type: :figi,
+                  expected_components: { prefix: 'BB', random_part: '000BLNNH', check_digit: 6 }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'BBG000H4FSM0',

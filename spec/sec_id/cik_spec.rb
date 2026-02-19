@@ -26,6 +26,13 @@ RSpec.describe SecID::CIK do
   it_behaves_like 'detects invalid format',
                   invalid_format_id: '0000000000'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: '0001521365',
+                  invalid_id: '0000000000',
+                  expected_type: :cik,
+                  expected_components: {}
+
   # Normalization
   it_behaves_like 'a formattable identifier',
                   valid_id: '1521365',

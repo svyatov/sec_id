@@ -40,6 +40,16 @@ RSpec.describe SecID::IBAN do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: 'DE99370400440532013000'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'DE89370400440532013000',
+                  invalid_id: 'INVALID',
+                  expected_type: :iban,
+                  expected_components: {
+                    country_code: 'DE', bban: '370400440532013000', check_digit: 89,
+                    bank_code: '37040044', account_number: '0532013000'
+                  }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: 'DE89370400440532013000',

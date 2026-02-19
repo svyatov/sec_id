@@ -40,6 +40,13 @@ RSpec.describe SecID::LEI do
   it_behaves_like 'validate! detects invalid check digit',
                   invalid_check_digit_id: '5493006MHB84DD0ZWV99'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: '529900T8BM49AURSDO55',
+                  invalid_id: 'INVALID',
+                  expected_type: :lei,
+                  expected_components: { lou_id: '5299', reserved: '00', entity_id: 'T8BM49AURSDO', check_digit: 55 }
+
   # Core check-digit identifier behavior
   it_behaves_like 'a check-digit identifier',
                   valid_id: '5493006MHB84DD0ZWV18',

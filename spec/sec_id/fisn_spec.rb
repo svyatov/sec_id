@@ -36,6 +36,13 @@ RSpec.describe SecID::FISN do
   it_behaves_like 'detects invalid format',
                   invalid_format_id: 'APPLE INC SH'
 
+  # Serialization
+  it_behaves_like 'a hashable identifier',
+                  valid_id: 'APPLE INC/SH',
+                  invalid_id: 'INVALID',
+                  expected_type: :fisn,
+                  expected_components: { issuer: 'APPLE INC', description: 'SH' }
+
   describe 'valid FISN parsing' do
     context 'when FISN is simple (APPLE INC/SH)' do
       let(:fisn_code) { 'APPLE INC/SH' }
