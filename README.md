@@ -22,6 +22,7 @@
   - [Valoren](#valoren) - Swiss Security Number
   - [CFI](#cfi) - Classification of Financial Instruments
   - [FISN](#fisn) - Financial Instrument Short Name
+- [Lookup Service Integration](#lookup-service-integration)
 - [Development](#development)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -526,6 +527,19 @@ fisn.to_s          # => 'APPLE INC/SH'
 ```
 
 FISN format: `Issuer Name/Abbreviated Instrument Description` with issuer (1-15 chars) and description (1-19 chars) separated by a forward slash. Character set: uppercase A-Z, digits 0-9, and space.
+
+## Lookup Service Integration
+
+SecID validates identifiers but does not include HTTP clients. The [`docs/guides/`](docs/guides/) directory provides integration patterns for external lookup services using only stdlib (`net/http`, `json`):
+
+| Guide | Service | Identifier |
+|-------|---------|------------|
+| [OpenFIGI](docs/guides/openfigi.md) | [OpenFIGI API](https://www.openfigi.com/api) | FIGI |
+| [SEC EDGAR](docs/guides/sec-edgar.md) | [SEC EDGAR](https://www.sec.gov/edgar/sec-api-documentation) | CIK |
+| [GLEIF](docs/guides/gleif.md) | [GLEIF API](https://www.gleif.org/en/lei-data/gleif-api) | LEI |
+| [Eurex](docs/guides/eurex.md) | [Eurex Reference Data](https://www.eurex.com/ex-en/data/free-reference-data-api) | ISIN |
+
+Each guide includes a complete adapter class and a [runnable example](examples/).
 
 ## Development
 
