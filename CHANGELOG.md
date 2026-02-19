@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-02-19
+
 ### Added
 
 - `#==`, `#eql?`, and `#hash` methods on all identifier types — two instances of the same type with the same normalized form are equal and usable as Hash keys / in Sets

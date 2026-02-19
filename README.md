@@ -38,7 +38,7 @@ Ruby 3.2+ is required.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 5.0'
+gem 'sec_id', '~> 5.1'
 ```
 
 And then execute:
@@ -76,6 +76,20 @@ SecID::ISIN.new('US5949181045').to_h
 SecID::ISIN.new('INVALID').to_h
 # => { type: :isin, full_id: 'INVALID', normalized: nil,
 #      valid: false, components: { country_code: nil, nsin: nil, check_digit: nil } }
+```
+
+**All identifiers** support value equality — two instances of the same type with the same normalized form are equal:
+
+```ruby
+a = SecID::ISIN.new('US5949181045')
+b = SecID::ISIN.new('us 5949 1810 45')
+
+a == b  # => true
+a.eql?(b) # => true
+
+# Works as Hash keys and in Sets
+{ a => 'MSFT' }[b]          # => 'MSFT'
+Set.new([a, b]).size         # => 1
 ```
 
 **Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
