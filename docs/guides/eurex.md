@@ -42,8 +42,8 @@ class EurexAdapter
   #
   # @param isin_str [String] an ISIN for a Eurex-listed derivative
   # @return [Hash] product data
+  # @param isin_str [String] a validated ISIN for a Eurex-listed derivative
   def lookup(isin_str)
-    isin = SecID::ISIN.validate!(isin_str)
     query = {
       query: <<~GRAPHQL
         query {
@@ -106,12 +106,18 @@ end
 
 ## Usage with sec_id
 
-`validate!` ensures only valid ISINs reach the API:
+Validate with SecID, then pass the identifier to the adapter:
 
 ```ruby
 adapter = EurexAdapter.new
 
-result = adapter.lookup('DE0009652644') # Euro-Bund Futures
+# validate! raises SecID::Error on invalid input, returns the instance on success
+isin = SecID::ISIN.validate!('DE0009652644')
+isin.to_pretty_s  # => "DE 000965264 4"
+isin.country_code # => "DE"
+isin.nsin_type    # => :wkn
+
+result = adapter.lookup(isin.to_s)
 result[:products].each do |prod|
   puts "#{prod[:product_id]}: #{prod[:name]} (#{prod[:product_type]})"
 end

@@ -31,17 +31,15 @@ class EurexAdapter
 
   # Look up a derivative product by ISIN.
   #
-  # @param isin_str [String] an ISIN for a Eurex-listed derivative
+  # @param isin_str [String] a validated ISIN for a Eurex-listed derivative
   # @return [Hash] product data
-  # @raise [SecID::Error] if the ISIN is invalid
   # @raise [RuntimeError] on API errors
   def lookup(isin_str)
-    isin = SecID::ISIN.validate!(isin_str)
-    query = build_query(isin.to_s)
+    query = build_query(isin_str)
     response = post(GRAPHQL_ENDPOINT, query)
     data = JSON.parse(response.body)
 
-    parse_products(data, isin.to_s)
+    parse_products(data, isin_str)
   end
 
   private
@@ -101,15 +99,18 @@ end
 # --- Demo ---
 
 if __FILE__ == $PROGRAM_NAME
-  adapter = EurexAdapter.new
-
-  # Euro-Bund Futures ISIN (a well-known Eurex derivative)
-  isin_str = 'DE0009652644'
-  puts "Looking up ISIN: #{isin_str} (Euro-Bund Futures)"
+  # Validate with SecID before calling the API
+  isin = SecID::ISIN.validate!('DE0009652644')
+  puts "ISIN:         #{isin}"
+  puts "Formatted:    #{isin.to_pretty_s}"
+  puts "Country:      #{isin.country_code}"
+  puts "NSIN type:    #{isin.nsin_type}"
+  puts "Check digit:  #{isin.check_digit}"
   puts
 
   begin
-    result = adapter.lookup(isin_str)
+    adapter = EurexAdapter.new
+    result = adapter.lookup(isin.to_s)
     puts "Data date: #{result[:date]}"
     if result[:products].empty?
       puts "No products found for #{isin_str}"

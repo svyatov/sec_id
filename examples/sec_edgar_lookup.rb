@@ -30,15 +30,13 @@ class SecEdgarAdapter
     @last_request_at = nil
   end
 
-  # Look up a company by CIK number.
+  # Look up a company by CIK number (must be zero-padded to 10 digits).
   #
-  # @param cik_str [String, Integer] a CIK (e.g. "0001521365" or "1521365")
+  # @param padded_cik [String] a 10-digit CIK (e.g. "0001521365")
   # @return [Hash] company data including name, tickers, and recent filings
-  # @raise [SecID::Error] if the CIK is invalid
   # @raise [RuntimeError] on API errors
-  def lookup(cik_str)
-    cik = SecID::CIK.validate!(cik_str.to_s)
-    padded = cik.normalized
+  def lookup(padded_cik)
+    padded = padded_cik
     rate_limit!
 
     response = get("/submissions/CIK#{padded}.json")
@@ -97,15 +95,16 @@ end
 # --- Demo ---
 
 if __FILE__ == $PROGRAM_NAME
-  adapter = SecEdgarAdapter.new(user_agent: 'SecIdExample admin@example.com')
-
-  # Use the CIK example from sec_id
-  cik_str = SecID::CIK::EXAMPLE # "0001521365"
-  puts "Looking up CIK: #{cik_str}"
+  # Validate and normalize with SecID before calling the API
+  cik = SecID::CIK.validate!(SecID::CIK::EXAMPLE)
+  padded = cik.normalized # zero-pads to 10 digits, exactly what EDGAR expects
+  puts "CIK:        #{cik}"
+  puts "Normalized: #{padded}"
   puts
 
   begin
-    result = adapter.lookup(cik_str)
+    adapter = SecEdgarAdapter.new(user_agent: 'SecIdExample admin@example.com')
+    result = adapter.lookup(padded)
     puts "Company:  #{result[:name]}"
     puts "Tickers:  #{result[:tickers].join(', ')}" unless result[:tickers].empty?
     puts "Exchange: #{result[:exchanges].join(', ')}" unless result[:exchanges].empty?

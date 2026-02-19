@@ -41,9 +41,9 @@ class SecEdgarAdapter
   #
   # @param cik_str [String, Integer]
   # @return [Hash] company data including name, tickers, and recent filings
-  def lookup(cik_str)
-    cik = SecID::CIK.validate!(cik_str.to_s)
-    padded = cik.normalized # zero-padded to 10 digits
+  # @param padded_cik [String] a 10-digit CIK from SecID::CIK#normalized
+  def lookup(padded_cik)
+    padded = padded_cik
     rate_limit!
 
     response = get("/submissions/CIK#{padded}.json")
@@ -101,17 +101,18 @@ end
 
 ## Usage with sec_id
 
-`SecID::CIK#normalized` zero-pads the CIK to 10 digits, which is exactly what the EDGAR API expects:
+Validate and normalize with SecID before calling the API. `SecID::CIK#normalized` zero-pads to 10 digits, exactly what EDGAR expects:
 
 ```ruby
 adapter = SecEdgarAdapter.new(user_agent: 'MyApp admin@example.com')
 
-# Works with or without leading zeros
-result = adapter.lookup('1521365')
-result = adapter.lookup('0001521365')
+# validate! accepts any CIK format — with or without leading zeros
+cik = SecID::CIK.validate!('1521365')
+cik.normalized  # => "0001521365"
 
-puts result[:name]          # Company name
-puts result[:tickers]       # Trading tickers
+result = adapter.lookup(cik.normalized)
+puts result[:name]           # Company name
+puts result[:tickers]        # Trading tickers
 puts result[:recent_filings] # Last 5 filings
 ```
 

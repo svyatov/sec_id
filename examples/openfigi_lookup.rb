@@ -24,27 +24,23 @@ class OpenFigiAdapter
 
   # Look up a single FIGI identifier.
   #
-  # @param figi_str [String] a FIGI string (e.g. "BBG000BLNNH6")
+  # @param figi_str [String] a validated FIGI string (e.g. "BBG000BLNNH6")
   # @return [Hash] parsed instrument data
-  # @raise [SecID::Error] if the FIGI is invalid
   # @raise [RuntimeError] on API errors
   def lookup(figi_str)
-    figi = SecID::FIGI.validate!(figi_str)
-
-    body = [{ idType: 'ID_BB_GLOBAL', idValue: figi.to_s }]
+    body = [{ idType: 'ID_BB_GLOBAL', idValue: figi_str }]
     response = post(MAPPING_ENDPOINT, body)
     result = JSON.parse(response.body)
 
-    parse_single_result(result, figi.to_s)
+    parse_single_result(result, figi_str)
   end
 
   # Look up multiple FIGIs in a single batch request (max 100).
   #
-  # @param figi_strings [Array<String>] FIGI strings
+  # @param figi_strings [Array<String>] validated FIGI strings
   # @return [Array<Hash>] parsed results per FIGI
   def batch_lookup(figi_strings)
-    validated = figi_strings.map { |str| SecID::FIGI.validate!(str) }
-    body = validated.map { |f| { idType: 'ID_BB_GLOBAL', idValue: f.to_s } }
+    body = figi_strings.map { |f| { idType: 'ID_BB_GLOBAL', idValue: f } }
     response = post(MAPPING_ENDPOINT, body)
     JSON.parse(response.body)
   end
@@ -93,15 +89,16 @@ end
 # --- Demo ---
 
 if __FILE__ == $PROGRAM_NAME
-  adapter = OpenFigiAdapter.new
-
-  # Use the FIGI example from sec_id
-  figi_str = SecID::FIGI::EXAMPLE # "BBG000BLNNH6"
-  puts "Looking up FIGI: #{figi_str}"
+  # Validate with SecID before calling the API
+  figi = SecID::FIGI.validate!(SecID::FIGI::EXAMPLE)
+  puts "FIGI:        #{figi}"
+  puts "Formatted:   #{figi.to_pretty_s}"
+  puts "Check digit: #{figi.check_digit}"
   puts
 
   begin
-    result = adapter.lookup(figi_str)
+    adapter = OpenFigiAdapter.new
+    result = adapter.lookup(figi.to_s)
     puts "Found #{result[:instruments].size} instrument(s):"
     result[:instruments].each do |inst|
       puts "  Name:     #{inst[:name]}"

@@ -32,11 +32,10 @@ class OpenFigiAdapter
 
   # Look up a single FIGI.
   #
-  # @param figi_str [String]
+  # @param figi_str [String] a validated FIGI string
   # @return [Hash] instrument data
   def lookup(figi_str)
-    figi = SecID::FIGI.validate!(figi_str)
-    body = [{ idType: 'ID_BB_GLOBAL', idValue: figi.to_s }]
+    body = [{ idType: 'ID_BB_GLOBAL', idValue: figi_str }]
     response = post(MAPPING_ENDPOINT, body)
     result = JSON.parse(response.body)
 
@@ -63,8 +62,7 @@ class OpenFigiAdapter
   # @param figi_strings [Array<String>]
   # @return [Array<Hash>]
   def batch_lookup(figi_strings)
-    validated = figi_strings.map { |str| SecID::FIGI.validate!(str) }
-    body = validated.map { |f| { idType: 'ID_BB_GLOBAL', idValue: f.to_s } }
+    body = figi_strings.map { |f| { idType: 'ID_BB_GLOBAL', idValue: f } }
     response = post(MAPPING_ENDPOINT, body)
     JSON.parse(response.body)
   end
@@ -94,12 +92,17 @@ end
 
 ## Usage with sec_id
 
-`validate!` ensures only valid FIGIs reach the API:
+Validate with SecID, then pass the identifier to the adapter:
 
 ```ruby
 adapter = OpenFigiAdapter.new(api_key: ENV['OPENFIGI_API_KEY'])
 
-result = adapter.lookup('BBG000BLNNH6')
+# validate! raises SecID::Error on invalid input, returns the instance on success
+figi = SecID::FIGI.validate!('BBG000BLNNH6')
+figi.to_pretty_s  # => "BBG 000BLNNH 6"
+figi.check_digit  # => 6
+
+result = adapter.lookup(figi.to_s)
 result[:instruments].each do |inst|
   puts "#{inst[:ticker]} on #{inst[:exchange]}: #{inst[:name]}"
 end

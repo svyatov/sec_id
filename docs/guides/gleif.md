@@ -31,8 +31,8 @@ class GleifAdapter
   #
   # @param lei_str [String]
   # @return [Hash] entity data
+  # @param lei_str [String] a validated LEI
   def lookup(lei_str)
-    lei = SecID::LEI.validate!(lei_str)
     rate_limit!
     response = get("/lei-records?filter[lei]=#{lei}")
     data = JSON.parse(response.body)
@@ -98,12 +98,18 @@ end
 
 ## Usage with sec_id
 
-`validate!` ensures only valid LEIs reach the API:
+Validate with SecID, then pass the identifier to the adapter:
 
 ```ruby
 adapter = GleifAdapter.new
 
-result = adapter.lookup('7LTWFZYICNSX8D621K86')
+# validate! raises SecID::Error on invalid input, returns the instance on success
+lei = SecID::LEI.validate!('7LTWFZYICNSX8D621K86')
+lei.to_pretty_s  # => "7LTW FZYI CNSX 8D62 1K86"
+lei.lou_id       # => "7LTW"
+lei.check_digit  # => 86
+
+result = adapter.lookup(lei.to_s)
 puts "#{result[:name]} (#{result[:jurisdiction]})"
 puts "Status: #{result[:status]}"
 ```

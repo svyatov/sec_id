@@ -25,17 +25,15 @@ class GleifAdapter
 
   # Look up a legal entity by LEI.
   #
-  # @param lei_str [String] a LEI (e.g. "7LTWFZYICNSX8D621K86")
+  # @param lei_str [String] a validated LEI (e.g. "7LTWFZYICNSX8D621K86")
   # @return [Hash] entity data including name, jurisdiction, status
-  # @raise [SecID::Error] if the LEI is invalid
   # @raise [RuntimeError] on API errors
   def lookup(lei_str)
-    lei = SecID::LEI.validate!(lei_str)
     rate_limit!
-    response = get("/lei-records?filter[lei]=#{lei}")
+    response = get("/lei-records?filter[lei]=#{lei_str}")
     data = JSON.parse(response.body)
 
-    parse_lei_record(data, lei.to_s)
+    parse_lei_record(data, lei_str)
   end
 
   private
@@ -103,15 +101,17 @@ end
 # --- Demo ---
 
 if __FILE__ == $PROGRAM_NAME
-  adapter = GleifAdapter.new
-
-  # Use the LEI example from sec_id
-  lei_str = SecID::LEI::EXAMPLE # "7LTWFZYICNSX8D621K86"
-  puts "Looking up LEI: #{lei_str}"
+  # Validate with SecID before calling the API
+  lei = SecID::LEI.validate!(SecID::LEI::EXAMPLE)
+  puts "LEI:         #{lei}"
+  puts "Formatted:   #{lei.to_pretty_s}"
+  puts "LOU ID:      #{lei.lou_id}"
+  puts "Check digit: #{lei.check_digit}"
   puts
 
   begin
-    result = adapter.lookup(lei_str)
+    adapter = GleifAdapter.new
+    result = adapter.lookup(lei.to_s)
     puts "Entity:       #{result[:name]}"
     puts "Jurisdiction: #{result[:jurisdiction]}"
     puts "Legal Form:   #{result[:legal_form]}"
