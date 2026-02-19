@@ -551,12 +551,9 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Make your changes and run tests (`bundle exec rake`)
-4. Commit using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format (`git commit -m 'feat: add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create a new Pull Request
+Bug reports and pull requests are welcome on [GitHub](https://github.com/svyatov/sec_id). See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and PR guidelines.
+
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Changelog
 
