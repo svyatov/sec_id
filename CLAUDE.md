@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build and Test Commands
 
+- **Run example scripts**: `bundle exec ruby examples/openfigi_lookup.rb`
 - **Run all tests**: `bundle exec rake spec` or `bundle exec rspec`
 - **Run single test file**: `bundle exec rspec spec/sec_id/isin_spec.rb`
 - **Run specific test**: `bundle exec rspec spec/sec_id/isin_spec.rb:42`
@@ -18,6 +19,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture
 
 This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN).
+
+### Directory Layout
+
+- `lib/` — gem source (shipped in the gem)
+- `spec/` — RSpec tests
+- `examples/` — runnable integration examples (not shipped in gem, linted by rubocop)
+- `docs/guides/` — lookup service integration guides (not shipped in gem)
+- `sec_id.gemspec` `spec.files` includes only `lib/**/*.rb` and select markdown files — `docs/` and `examples/` are intentionally excluded
 
 ### Class Hierarchy
 
@@ -178,6 +187,7 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - Max line length: 120 characters
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)
+- Scripts with `#!/usr/bin/env ruby` shebangs must have execute permission (`chmod +x`)
 
 ### Method Ordering (Stepdown Rule)
 
