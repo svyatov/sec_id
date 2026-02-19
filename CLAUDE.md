@@ -310,6 +310,19 @@ def calculate_check_digit(value)
 end
 ```
 
+## Community Standards
+
+The repository includes GitHub community standards files:
+
+- **`CODE_OF_CONDUCT.md`** — Contributor Covenant v2.1; enforcement contact: `leonid@svyatov.com`
+- **`CONTRIBUTING.md`** — development setup, code style, commit conventions, and PR process
+- **`SECURITY.md`** — vulnerability reporting via GitHub Security Advisories; v5.x supported
+- **`.github/ISSUE_TEMPLATE/bug_report.md`** — bug report template (version, reproduction steps, expected vs actual)
+- **`.github/ISSUE_TEMPLATE/feature_request.md`** — feature request template (problem, solution, alternatives)
+- **`.github/pull_request_template.md`** — PR checklist (tests, RuboCop, changelog, docs, commit format)
+
+When creating issues or PRs, follow the templates. Commit messages must use Conventional Commits (see Commit Message Convention section).
+
 ## Pre-Commit Checklist
 
 Before committing changes, always verify these files are updated to accurately reflect the changes:
