@@ -52,6 +52,7 @@ module SecID
     # @api private
     def self.inherited(subclass)
       super
+      # Skip anonymous classes and classes outside the SecID namespace (e.g. in tests)
       SecID.__send__(:register_identifier, subclass) if subclass.name&.start_with?('SecID::')
     end
 
