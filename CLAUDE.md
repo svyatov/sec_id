@@ -344,8 +344,5 @@ This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.
 2. Update `CHANGELOG.md`: change `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` and add new empty `[Unreleased]` section
 3. Update `README.md` installation version if needed (e.g., `~> 4.3` to `~> 4.4`)
 4. Commit changes: `git commit -am "chore: bump version to X.Y.Z"`
-5. Release: `bundle exec rake release` - this will:
-   - Build the gem
-   - Create and push the git tag
-   - Push the gem to RubyGems.org (requires OTP if MFA enabled)
+5. Release: `bundle exec rake release` — builds the gem, creates and pushes the git tag, pushes to RubyGems.org
 6. Create GitHub release at https://github.com/svyatov/sec_id/releases with notes from CHANGELOG
