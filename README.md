@@ -1,6 +1,6 @@
 # SecID [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
 
-> Validate securities identification numbers with ease!
+> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, and convert.
 
 ## Table of Contents
 

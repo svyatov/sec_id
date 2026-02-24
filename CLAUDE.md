@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby gem for validating securities identification numbers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN).
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN) — validate, normalize, parse, detect, convert, and calculate check digits.
 
 ### Directory Layout
 
@@ -332,6 +332,7 @@ Before committing changes, always verify these files are updated to accurately r
 - **README.md** - Update usage examples, Table of Contents, and supported standards list
 - **CHANGELOG.md** - Add entry under `[Unreleased]` section describing the change (use only standard Keep a Changelog categories — see Changelog Format section above)
 - **sec_id.gemspec** - Update `description` if adding/removing supported standards
+- **Marketing copy** - When adding major features or capabilities, ensure all descriptions stay accurate and unified: `sec_id.gemspec` (summary + description), `README.md` (tagline), GitHub repo description (via `gh repo edit --description`), and `CLAUDE.md` (architecture intro)
 
 ## Releasing a New Version
 
