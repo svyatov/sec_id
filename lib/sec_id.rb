@@ -179,7 +179,6 @@ module SecID
 end
 
 require 'sec_id/errors'
-require 'sec_id/concerns/identifier_metadata'
 require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/validatable'
 require 'sec_id/concerns/checkable'

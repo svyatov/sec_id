@@ -55,12 +55,6 @@ module SecID
       'LI' => :valoren
     }.freeze
 
-    # Country codes that use SEDOL as their national identifier.
-    SEDOL_COUNTRY_CODES = Set.new(%w[GB IE IM JE GG FK]).freeze
-
-    # Country codes that use Valoren as their national identifier.
-    VALOREN_COUNTRY_CODES = Set.new(%w[CH LI]).freeze
-
     # @return [String, nil] the ISO 3166-1 alpha-2 country code
     attr_reader :country_code
 
@@ -105,7 +99,7 @@ module SecID
 
     # @return [Boolean] true if the country code uses SEDOL
     def sedol?
-      SEDOL_COUNTRY_CODES.include?(country_code)
+      NSIN_COUNTRY_TYPES[country_code] == :sedol
     end
 
     # @return [Boolean] true if the country code uses WKN
@@ -115,7 +109,7 @@ module SecID
 
     # @return [Boolean] true if the country code uses Valoren
     def valoren?
-      VALOREN_COUNTRY_CODES.include?(country_code)
+      NSIN_COUNTRY_TYPES[country_code] == :valoren
     end
 
     # @return [SEDOL] a new SEDOL instance
@@ -142,13 +136,6 @@ module SecID
       Valoren.new(nsin)
     end
 
-    private
-
-    # @return [Hash]
-    def components = { country_code:, nsin:, check_digit: }
-
-    public
-
     # Returns the type of NSIN embedded in this ISIN.
     #
     # @return [Symbol] :cusip, :sedol, :wkn, :valoren, or :generic
@@ -173,5 +160,10 @@ module SecID
       else nsin # :generic - return raw string
       end
     end
+
+    private
+
+    # @return [Hash]
+    def components = { country_code:, nsin:, check_digit: }
   end
 end
