@@ -241,7 +241,7 @@ RSpec.describe SecID::Detector do
         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         1000.times { detector.call('US5949181045') }
         elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
-        expect(elapsed).to be < 1.0
+        expect(elapsed).to be < 0.1
       end
     end
   end

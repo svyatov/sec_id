@@ -250,7 +250,7 @@ RSpec.describe SecID::Scanner do
       elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
 
       expect(matches.size).to be >= 10
-      expect(elapsed).to be < 1.0
+      expect(elapsed).to be < 0.1
     end
   end
 end
