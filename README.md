@@ -40,7 +40,7 @@ Ruby 3.2+ is required.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 5.1'
+gem 'sec_id', '~> 5.2'
 ```
 
 And then execute:

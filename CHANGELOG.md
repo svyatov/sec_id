@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-02-24
+
 ### Added
 
 - `SecID.scan` and `SecID.extract` methods for finding identifiers in freeform text — returns `Scanner::Match` objects (`Data.define(:type, :raw, :range, :identifier)`) with the validated identifier instance; supports `types:` filtering, hyphenated identifiers, and compound patterns (OCC with spaces, FISN with slashes)
@@ -18,6 +20,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - `SecID::IBAN.supported_countries` class method returning sorted array of all supported country codes
 - `SecID::CFI.categories` class method returning the categories hash
 - `SecID::CFI.groups_for(category_code)` class method returning groups hash for a given category
+
 
 ## [5.1.0] - 2026-02-19
 
