@@ -101,6 +101,18 @@ RSpec.describe SecID::Errors do
     end
   end
 
+  describe '#as_json' do
+    it 'returns the same array as details' do
+      errors = described_class.new([{ error: :invalid_length, message: 'bad' }])
+      expect(errors.as_json).to eq(errors.details)
+    end
+
+    it 'returns empty array for no errors' do
+      errors = described_class.new([])
+      expect(errors.as_json).to eq([])
+    end
+  end
+
   describe 'when single error' do
     subject(:result) { described_class.new(errors) }
 

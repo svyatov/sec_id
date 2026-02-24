@@ -166,6 +166,21 @@ module SecID
       }
     }.freeze
 
+    # Returns the category codes hash.
+    #
+    # @return [Hash{String => Symbol}]
+    def self.categories
+      CATEGORIES
+    end
+
+    # Returns the groups hash for a given category code.
+    #
+    # @param category_code [String] single-letter category code
+    # @return [Hash{String => Symbol}, nil]
+    def self.groups_for(category_code)
+      GROUPS[category_code.to_s.upcase]
+    end
+
     # @return [String, nil] the category code (position 1)
     attr_reader :category_code
 

@@ -8,6 +8,17 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `SecID.scan` and `SecID.extract` methods for finding identifiers in freeform text — returns `Scanner::Match` objects (`Data.define(:type, :raw, :range, :identifier)`) with the validated identifier instance; supports `types:` filtering, hyphenated identifiers, and compound patterns (OCC with spaces, FISN with slashes)
+- `SecID.explain` method for debugging identifier detection — returns per-type validation results showing exactly why each type matched or rejected the input
+- `on_ambiguous:` option for `SecID.parse` and `SecID.parse!` — `:first` (default, existing behavior), `:raise` (raises `AmbiguousMatchError`), `:all` (returns array of all matching instances)
+- `SecID::AmbiguousMatchError` exception class for ambiguous identifier detection
+- `#as_json` method on all identifier types (delegates to `#to_h`) and on `Errors` (delegates to `#details`) for JSON serialization compatibility
+- `SecID::IBAN.supported_countries` class method returning sorted array of all supported country codes
+- `SecID::CFI.categories` class method returning the categories hash
+- `SecID::CFI.groups_for(category_code)` class method returning groups hash for a given category
+
 ## [5.1.0] - 2026-02-19
 
 ### Added

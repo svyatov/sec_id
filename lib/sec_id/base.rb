@@ -90,6 +90,13 @@ module SecID
       }
     end
 
+    # Returns a JSON-compatible hash representation.
+    #
+    # @return [Hash]
+    def as_json(*)
+      to_h
+    end
+
     protected
 
     # @return [String]

@@ -123,6 +123,19 @@ RSpec.describe SecID::Base do
     end
   end
 
+  describe '#as_json' do
+    it 'returns the same hash as to_h' do
+      isin = SecID::ISIN.new('US5949181045')
+      expect(isin.as_json).to eq(isin.to_h)
+    end
+
+    it 'works with JSON.generate' do
+      require 'json'
+      isin = SecID::ISIN.new('US5949181045')
+      expect { JSON.generate(isin.as_json) }.not_to raise_error
+    end
+  end
+
   describe '.inherited auto-registration' do
     it 'registers all 13 identifier types' do
       expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn]
