@@ -46,18 +46,16 @@ module SecID
       @check_digit = cei_parts[:check_digit]&.to_i
     end
 
-    private
-
-    # @return [Hash]
-    def components = { prefix:, numeric:, entity_id:, check_digit: }
-
-    public
-
     # @return [Integer] the calculated check digit (0-9)
     # @raise [InvalidFormatError] if the CEI format is invalid
     def calculate_check_digit
       validate_format_for_calculation!
       mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
+
+    private
+
+    # @return [Hash]
+    def components = { prefix:, numeric:, entity_id:, check_digit: }
   end
 end

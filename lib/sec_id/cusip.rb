@@ -70,16 +70,14 @@ module SecID
       ISIN.new(country_code + restore).restore!
     end
 
-    private
-
-    # @return [Hash]
-    def components = { cusip6:, issue:, check_digit: }
-
-    public
-
     # @return [Boolean] true if first character is a letter (CINS identifier)
     def cins?
       cusip6[0] < '0' || cusip6[0] > '9'
     end
+
+    private
+
+    # @return [Hash]
+    def components = { cusip6:, issue:, check_digit: }
   end
 end

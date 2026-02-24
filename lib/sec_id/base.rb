@@ -39,7 +39,6 @@ module SecID
   #     end
   #   end
   class Base
-    include IdentifierMetadata
     include Normalizable
     include Validatable
 
@@ -48,6 +47,27 @@ module SecID
 
     # @return [String, nil] the main identifier portion (without check digit)
     attr_reader :identifier
+
+    class << self
+      # @return [String] the unqualified class name (e.g. "ISIN", "CUSIP")
+      def short_name = @short_name ||= name.split('::').last
+
+      # @return [String] the full human-readable standard name
+      def full_name = self::FULL_NAME
+
+      # @return [Integer, Range] the fixed length or valid length range
+      def id_length = self::ID_LENGTH
+
+      # @return [String] a representative valid identifier string
+      def example = self::EXAMPLE
+
+      # @return [Boolean] true if this identifier type uses a check digit
+      def has_check_digit?
+        return @has_check_digit if defined?(@has_check_digit)
+
+        @has_check_digit = ancestors.include?(SecID::Checkable)
+      end
+    end
 
     # @api private
     def self.inherited(subclass)

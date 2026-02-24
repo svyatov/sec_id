@@ -30,12 +30,12 @@ This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI
 
 ### Class Hierarchy
 
-All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin coordinator that includes three concerns:
-- `IdentifierMetadata` — class-level metadata: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
+All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin coordinator that includes two concerns:
 - `Normalizable` — normalization: `#normalized` / `#normalize`, `#normalize!`, `.normalize(id)`, `#to_s`, `#to_str`, `SEPARATORS`
 - `Validatable` — validation: `#valid?`, `#validate`, `#errors`, `#validate!`, `.valid?`, `.validate`, `.validate!`, `.error_class_for`, `ERROR_MAP`
 
-Base itself keeps only:
+Base itself keeps:
+- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
 - `attr_reader :full_id, :identifier`
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
@@ -88,10 +88,6 @@ Lazily instantiated from `SecID.detect`; cache invalidated when new types regist
 Lazily instantiated from `SecID.scan`/`SecID.extract`; cache invalidated when new types register.
 
 ### Concerns (`lib/sec_id/concerns/`)
-
-#### IdentifierMetadata (`identifier_metadata.rb`)
-
-Provides class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`.
 
 #### Normalizable (`normalizable.rb`)
 
