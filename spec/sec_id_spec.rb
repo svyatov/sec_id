@@ -239,9 +239,9 @@ RSpec.describe SecID do
     end
 
     context 'with on_ambiguous: :all' do
-      it 'returns array even if empty (does not raise)' do
-        result = described_class.parse!('INVALID', on_ambiguous: :all)
-        expect(result).to eq([])
+      it 'raises InvalidFormatError for no match' do
+        expect { described_class.parse!('INVALID', on_ambiguous: :all) }
+          .to raise_error(SecID::InvalidFormatError)
       end
 
       it 'returns array of matches' do

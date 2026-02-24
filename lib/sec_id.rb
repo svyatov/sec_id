@@ -60,6 +60,7 @@ module SecID
     # @param text [String, nil] the text to scan
     # @param types [Array<Symbol>, nil] restrict to specific types
     # @return [Array<Match>]
+    # @raise [ArgumentError] if any key in types is unknown
     def extract(text, types: nil)
       scan(text, types: types).to_a
     end
@@ -68,6 +69,7 @@ module SecID
     # @param types [Array<Symbol>, nil] restrict to specific types
     # @return [Enumerator<Match>] if no block given
     # @yieldparam match [Match]
+    # @raise [ArgumentError] if any key in types is unknown
     def scan(text, types: nil, &)
       classes = types&.map { |key| self[key] }
       scanner.call(text, classes: classes, &)
@@ -108,7 +110,12 @@ module SecID
     # @raise [AmbiguousMatchError] when on_ambiguous: :raise and multiple types match
     def parse!(str, types: nil, on_ambiguous: :first)
       result = parse(str, types: types, on_ambiguous: on_ambiguous)
-      return result if on_ambiguous == :all
+
+      if on_ambiguous == :all
+        raise(InvalidFormatError, parse_error_message(str, types)) if result.empty?
+
+        return result
+      end
 
       result || raise(InvalidFormatError, parse_error_message(str, types))
     end

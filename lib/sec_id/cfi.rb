@@ -164,7 +164,7 @@ module SecID
         'C' => :combined_instruments,
         'M' => :miscellaneous
       }
-    }.freeze
+    }.each_value(&:freeze).freeze
 
     # Returns the category codes hash.
     #

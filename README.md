@@ -179,6 +179,12 @@ match.raw                    # => "US-5949-1810-45"
 match.identifier.normalized  # => "US5949181045"
 ```
 
+> **Known limitations:** Format-only types (CIK, Valoren, WKN, CFI) can false-positive on
+> common numbers and short words in prose — use the `types:` filter to restrict scanning when
+> this is a concern. Identifiers prefixed with special characters (e.g. `#US5949181045`) may be
+> consumed as a single token by CUSIP's `*@#` character class and fail validation, preventing
+> the embedded identifier from being found.
+
 ### Debugging Detection
 
 Understand why a string matches or doesn't match specific identifier types:
