@@ -63,5 +63,12 @@ module SecID
     def to_a
       messages
     end
+
+    # Returns a JSON-compatible array of error detail hashes.
+    #
+    # @return [Array<Hash>]
+    def as_json(*)
+      details
+    end
   end
 end

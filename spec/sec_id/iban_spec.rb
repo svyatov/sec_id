@@ -549,6 +549,30 @@ RSpec.describe SecID::IBAN do
     end
   end
 
+  describe '.supported_countries' do
+    it 'returns a sorted array of country codes' do
+      result = described_class.supported_countries
+      expect(result).to eq(result.sort)
+    end
+
+    it 'includes known countries' do
+      result = described_class.supported_countries
+      %w[DE GB CH TR].each do |cc|
+        expect(result).to include(cc)
+      end
+    end
+
+    it 'returns a frozen array' do
+      expect(described_class.supported_countries).to be_frozen
+    end
+
+    it 'has size matching COUNTRY_RULES + LENGTH_ONLY_COUNTRIES' do
+      expected = (SecID::IBANCountryRules::COUNTRY_RULES.keys +
+                  SecID::IBANCountryRules::LENGTH_ONLY_COUNTRIES.keys).uniq.size
+      expect(described_class.supported_countries.size).to eq(expected)
+    end
+  end
+
   describe '#to_pretty_s' do
     it 'formats with 4-char groups' do
       expect(described_class.new('DE89370400440532013000').to_pretty_s).to eq('DE89 3704 0044 0532 0130 00')

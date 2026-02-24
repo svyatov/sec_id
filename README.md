@@ -8,6 +8,8 @@
 - [Installation](#installation)
 - [Supported Standards and Usage](#supported-standards-and-usage)
   - [Metadata Registry](#metadata-registry) - enumerate, filter, look up, and detect identifier types
+  - [Text Scanning](#text-scanning) - find identifiers in freeform text
+  - [Debugging Detection](#debugging-detection) - understand why strings match or don't
   - [Structured Validation](#structured-validation) - detailed error codes and messages
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
@@ -67,6 +69,7 @@ All identifier classes provide `valid?`, `errors`, `validate`, `validate!` metho
 
 **All identifiers** support hash serialization:
 - `#to_h` - returns a hash with `:type`, `:full_id`, `:normalized`, `:valid`, and `:components` keys
+- `#as_json` - same as `#to_h`, for JSON serialization compatibility (Rails, `JSON.generate`, etc.)
 
 ```ruby
 SecID::ISIN.new('US5949181045').to_h
@@ -144,6 +147,56 @@ SecID.parse('594918104', types: [:cusip])         # => #<SecID::CUSIP>
 # Bang version raises on failure
 SecID.parse!('US5949181045')                      # => #<SecID::ISIN>
 SecID.parse!('unknown')                           # raises SecID::InvalidFormatError
+
+# Handle ambiguous matches
+SecID.parse('514000', on_ambiguous: :first)        # => #<SecID::WKN> (default)
+SecID.parse('514000', on_ambiguous: :raise)        # raises SecID::AmbiguousMatchError
+SecID.parse('514000', on_ambiguous: :all)          # => [#<SecID::WKN>, #<SecID::Valoren>, #<SecID::CIK>]
+SecID.parse('US5949181045', on_ambiguous: :raise)  # => #<SecID::ISIN> (unambiguous, no error)
+```
+
+### Text Scanning
+
+Find identifiers embedded in freeform text:
+
+```ruby
+# Extract all identifiers from text
+matches = SecID.extract('Portfolio: US5949181045, 594918104, B0YBKJ7')
+matches.map(&:type)   # => [:isin, :cusip, :sedol]
+matches.first.raw     # => "US5949181045"
+matches.first.range   # => 11...23
+matches.first.identifier.country_code  # => "US"
+
+# Lazy scanning with Enumerator
+SecID.scan('Buy US5949181045 now').each { |m| puts m.type }
+
+# Filter by types
+SecID.extract('514000', types: [:valoren])  # => only Valoren matches
+
+# Handles hyphenated identifiers
+match = SecID.extract('ID: US-5949-1810-45').first
+match.raw                    # => "US-5949-1810-45"
+match.identifier.normalized  # => "US5949181045"
+```
+
+> **Known limitations:** Format-only types (CIK, Valoren, WKN, CFI) can false-positive on
+> common numbers and short words in prose — use the `types:` filter to restrict scanning when
+> this is a concern. Identifiers prefixed with special characters (e.g. `#US5949181045`) may be
+> consumed as a single token by CUSIP's `*@#` character class and fail validation, preventing
+> the embedded identifier from being found.
+
+### Debugging Detection
+
+Understand why a string matches or doesn't match specific identifier types:
+
+```ruby
+result = SecID.explain('US5949181040')
+isin = result[:candidates].find { |c| c[:type] == :isin }
+isin[:valid]                      # => false
+isin[:errors].first[:error]       # => :invalid_check_digit
+
+# Filter to specific types
+SecID.explain('US5949181045', types: %i[isin cusip])
 ```
 
 ### Structured Validation
@@ -396,6 +449,11 @@ iban.to_pretty_s           # => 'DE89 3704 0044 0532 0130 00'
 
 Full BBAN structural validation is supported for EU/EEA countries. Other countries have length-only validation.
 
+```ruby
+# List all supported countries
+SecID::IBAN.supported_countries  # => ["AD", "AE", "AT", "BE", "BG", "CH", ...]
+```
+
 ### CIK
 
 > [Central Index Key](https://en.wikipedia.org/wiki/Central_Index_Key) - a 10-digit number used by the SEC to identify corporations and individuals who have filed disclosures.
@@ -521,6 +579,12 @@ cfi.registered?    # => true
 ```
 
 CFI validates the category code (position 1) against 14 valid values and the group code (position 2) against valid values for that category. Attribute positions 3-6 accept any letter A-Z, with X meaning "not applicable".
+
+```ruby
+# Introspect valid codes
+SecID::CFI.categories            # => { "E" => :equity, "C" => :collective_investment_vehicles, ... }
+SecID::CFI.groups_for('E')       # => { "S" => :common_shares, "P" => :preferred_shares, ... }
+```
 
 ### FISN
 

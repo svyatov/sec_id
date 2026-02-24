@@ -40,6 +40,7 @@ Base itself keeps only:
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
 - `to_h` (returns `{ type:, full_id:, normalized:, valid:, components: }`)
+- `as_json(*)` — delegates to `to_h` for JSON serialization compatibility
 - `==`, `eql?`, `hash` — value equality based on `comparison_id` (type + normalized form); instances usable as Hash keys and in Sets
 - `components` (private, returns `{}` — subclasses override with type-specific attributes)
 - `parse` (private, regex matching + `@full_id` assignment)
@@ -63,8 +64,11 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecID.identifiers` — all registered classes in load order
 - `SecID.valid?(str, types: nil)` — quick boolean validation against all or specific types
 - `SecID.detect(str)` — returns all matching type symbols sorted by specificity (e.g. `[:isin]`)
-- `SecID.parse(str, types: nil)` — returns a typed instance for the most specific match (or `nil`)
-- `SecID.parse!(str, types: nil)` — like `parse` but raises `InvalidFormatError` on failure
+- `SecID.parse(str, types: nil, on_ambiguous: :first)` — returns a typed instance for the most specific match (or `nil`); `on_ambiguous:` accepts `:first` (default), `:raise` (raises `AmbiguousMatchError`), `:all` (returns array of all matching instances)
+- `SecID.parse!(str, types: nil, on_ambiguous: :first)` — like `parse` but raises `InvalidFormatError` on failure
+- `SecID.extract(text, types: nil)` — finds identifiers in freeform text, returns `Array<Match>`
+- `SecID.scan(text, types: nil)` — lazy version of `extract`, returns `Enumerator<Match>`
+- `SecID.explain(str, types: nil)` — returns per-type validation results for debugging detection
 
 ### Detector (`lib/sec_id/detector.rb`)
 
@@ -76,6 +80,12 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 Specificity sort: check-digit types first, then smaller length range, then load order.
 
 Lazily instantiated from `SecID.detect`; cache invalidated when new types register.
+
+### Scanner (`lib/sec_id/scanner.rb`)
+
+`@api private` class that finds identifiers in freeform text. Uses a composite regex with three named groups (FISN, OCC, simple tokens) and cursor-based overlap prevention. Candidates are length-filtered, charset-filtered, and validated, then the most specific match is returned as a `Match` data object (`Data.define(:type, :raw, :range, :identifier)`).
+
+Lazily instantiated from `SecID.scan`/`SecID.extract`; cache invalidated when new types register.
 
 ### Concerns (`lib/sec_id/concerns/`)
 
@@ -147,8 +157,8 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 **Type-specific validation overrides:**
 - FIGI: `detect_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)
-- CFI: `detect_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes
-- IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules
+- CFI: `detect_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes; class methods `.categories` (returns `CATEGORIES` hash), `.groups_for(code)` (returns groups hash for a category)
+- IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules; `.supported_countries` returns sorted array of all supported country codes
 - OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
 
 ### Conversion Methods
@@ -171,6 +181,7 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - `any?` / `empty?` / `size` — collection-like query methods
 - `each` — yields each error detail hash
 - `to_a` — alias for `messages`
+- `as_json(*)` — delegates to `details` for JSON serialization compatibility
 
 ### Error Handling
 
@@ -178,6 +189,7 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
 - `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
 - `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
+- `SecID::AmbiguousMatchError` - Raised by `parse`/`parse!` when `on_ambiguous: :raise` and multiple types match
 - `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
 - **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.

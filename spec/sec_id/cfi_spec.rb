@@ -305,6 +305,32 @@ RSpec.describe SecID::CFI do
     end
   end
 
+  describe '.categories' do
+    it 'returns the CATEGORIES hash' do
+      expect(described_class.categories).to eq(SecID::CFI::CATEGORIES)
+    end
+
+    it 'includes all 14 category codes' do
+      expect(described_class.categories.size).to eq(14)
+    end
+  end
+
+  describe '.groups_for' do
+    it 'returns equity groups for E' do
+      result = described_class.groups_for('E')
+      expect(result).to be_a(Hash)
+      expect(result['S']).to eq(:common_shares)
+    end
+
+    it 'returns nil for unknown category' do
+      expect(described_class.groups_for('Z')).to be_nil
+    end
+
+    it 'is case-insensitive' do
+      expect(described_class.groups_for('e')).to eq(described_class.groups_for('E'))
+    end
+  end
+
   describe '#to_s' do
     let(:cfi_code) { 'ESVUFR' }
 

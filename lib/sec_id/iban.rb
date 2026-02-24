@@ -33,6 +33,13 @@ module SecID
       (?<rest>[A-Z0-9]{13,32})
     \z/x
 
+    # Returns sorted array of all supported country codes.
+    #
+    # @return [Array<String>]
+    def self.supported_countries
+      @supported_countries ||= (COUNTRY_RULES.keys + LENGTH_ONLY_COUNTRIES.keys).sort.freeze
+    end
+
     # @return [String, nil] the ISO 3166-1 alpha-2 country code
     attr_reader :country_code
 
