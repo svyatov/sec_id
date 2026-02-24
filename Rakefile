@@ -11,7 +11,7 @@ RuboCop::RakeTask.new
 Rake::Task['release:rubygem_push'].enhance(['fetch_otp'])
 
 task :fetch_otp do
-  ENV['GEM_HOST_OTP_CODE'] = `op item get "RubyGems" --otp`.strip
+  ENV['GEM_HOST_OTP_CODE'] = `op item get "RubyGems" --account my --otp`.strip
 end
 
 task default: %i[rubocop spec]
