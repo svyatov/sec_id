@@ -139,7 +139,7 @@ RSpec.describe SecID::FIGI do
       it 'returns :invalid_prefix error with descriptive message' do
         result = described_class.new('BSG000BLNNH6').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_prefix])
-        expect(result.details.first[:message]).to match(/restricted/)
+        expect(result.details.first[:message]).to include('restricted')
       end
     end
 
