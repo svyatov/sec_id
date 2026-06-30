@@ -10,6 +10,8 @@ gemspec
 # Specify your gem's development dependencies below
 gem 'rake', '>= 13'
 
+gem 'benchmark-ips', '~> 2.0', require: false
+
 gem 'rspec', '~> 3.9'
 gem 'rspec_junit_formatter'
 
