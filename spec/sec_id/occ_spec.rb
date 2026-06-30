@@ -108,7 +108,7 @@ RSpec.describe SecID::OCC do
       it 'returns :invalid_date error' do
         result = described_class.new('SPX   141199P01950000').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_date])
-        expect(result.details.first[:message]).to match(/cannot be parsed/)
+        expect(result.details.first[:message]).to include('cannot be parsed')
       end
     end
 

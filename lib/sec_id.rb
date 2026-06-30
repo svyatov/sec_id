@@ -52,7 +52,7 @@ module SecID
     # @return [Boolean]
     # @raise [ArgumentError] if any key in types is unknown
     def valid?(str, types: nil)
-      return detect(str).any? if types.nil?
+      return detector.matches?(str) if types.nil?
 
       types.any? { |key| self[key].valid?(str) }
     end
@@ -132,8 +132,7 @@ module SecID
     end
 
     def parse_any(str)
-      key = detect(str).first
-      key && self[key].new(str)
+      detector.first_match(str)
     end
 
     def parse_from(str, types)

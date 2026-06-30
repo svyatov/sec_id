@@ -36,6 +36,31 @@ module SecID
       validate_and_sort(input, candidates)
     end
 
+    # Returns whether any registered type matches, short-circuiting on the first
+    # valid candidate without sorting or mapping to symbols.
+    #
+    # @param str [String, nil] the identifier string to test
+    # @return [Boolean]
+    def matches?(str)
+      input = str.to_s.strip
+      return false if input.empty?
+
+      filter_candidates(input.upcase).any? { |klass| klass.valid?(input) }
+    end
+
+    # Returns the most-specific matching instance, built once and reused, or nil.
+    #
+    # @param str [String, nil] the identifier string to parse
+    # @return [SecID::Base, nil]
+    def first_match(str)
+      input = str.to_s.strip
+      return if input.empty?
+
+      candidates = filter_candidates(input.upcase)
+      matches = candidates.filter_map { |klass| (i = klass.new(input)).valid? ? i : nil }
+      matches.min_by { |instance| @priority_for[instance.class] }
+    end
+
     private
 
     # Runs stages 1-3 to narrow candidate classes.

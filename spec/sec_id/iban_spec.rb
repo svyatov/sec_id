@@ -382,7 +382,7 @@ RSpec.describe SecID::IBAN do
         # Letters in BBAN for DE (should be all digits)
         result = described_class.new('DE89ABCD00440532013000').errors
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_bban])
-        expect(result.details.first[:message]).to match(/BBAN/)
+        expect(result.details.first[:message]).to include('BBAN')
       end
     end
 

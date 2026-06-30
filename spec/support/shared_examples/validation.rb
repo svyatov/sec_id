@@ -56,7 +56,7 @@ RSpec.shared_examples 'a validatable identifier' do |params|
         result = identifier_class.new(params[:invalid_chars_id]).errors
         expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to include(:invalid_characters)
-        expect(result.details.first[:message]).to match(/Contains invalid characters for/)
+        expect(result.details.first[:message]).to include('Contains invalid characters for')
       end
     end
 
@@ -103,7 +103,7 @@ RSpec.shared_examples 'detects invalid check digit' do |params|
         result = identifier_class.new(params[:invalid_check_digit_id]).errors
         expect(result.none?).to be(false)
         expect(result.details.map { |d| d[:error] }).to eq([:invalid_check_digit])
-        expect(result.details.first[:message]).to match(/invalid, expected/)
+        expect(result.details.first[:message]).to include('invalid, expected')
       end
     end
 

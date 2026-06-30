@@ -10,11 +10,13 @@ gemspec
 # Specify your gem's development dependencies below
 gem 'rake', '>= 13'
 
+gem 'benchmark-ips', '~> 2.0', require: false
+
 gem 'rspec', '~> 3.9'
 gem 'rspec_junit_formatter'
 
-gem 'rubocop', '~> 1.72'
-gem 'rubocop-rspec', '~> 3.5'
+gem 'rubocop', '~> 1.88.0'
+gem 'rubocop-rspec', '~> 3.10.0'
 
 gem 'simplecov', '~> 0.22', require: false
 gem 'simplecov_json_formatter', require: false

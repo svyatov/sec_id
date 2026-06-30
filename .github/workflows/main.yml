@@ -14,6 +14,19 @@ permissions:
   contents: read
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: RuboCop
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '4.0'
+        bundler-cache: true
+
+    - run: bundle exec rake rubocop
+
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby_version }}
@@ -33,7 +46,7 @@ jobs:
         bundler-cache: true
       continue-on-error: ${{ matrix.ruby_version == 'ruby-head' }}
 
-    - run: bundle exec rake
+    - run: bundle exec rake spec
       continue-on-error: ${{ matrix.ruby_version == 'ruby-head' }}
 
     - name: Upload coverage reports to Codecov

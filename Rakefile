@@ -14,4 +14,9 @@ task :fetch_otp do
   ENV['GEM_HOST_OTP_CODE'] = `op item get "RubyGems" --account my --otp`.strip
 end
 
+desc 'Run validation/detection throughput and allocation benchmarks'
+task :bench do
+  ruby '-Ilib benchmark/run.rb'
+end
+
 task default: %i[rubocop spec]

@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Auto-fix ALL lint issues (potentially unsafe)**: `bundle exec rubocop -A`
 - **Run both lint and tests**: `bundle exec rake` (default task)
 - **Run tests with coverage**: `COVERAGE=1 bundle exec rspec`
+- **Run benchmarks**: `bundle exec rake bench` (validation/detection throughput + allocations; machine-dependent, for catching regressions)
 - **Install dependencies**: `bin/setup`
 - **Interactive console**: `bin/console`
 
@@ -78,6 +79,8 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 3. **Charset pre-filter** — survivors filtered by `VALID_CHARS_REGEX` before calling `valid?`
 
 Specificity sort: check-digit types first, then smaller length range, then load order.
+
+Fast paths bypass the full sort: `#matches?` (used by `SecID.valid?`) short-circuits on the first valid candidate; `#first_match` (used by `SecID.parse`) builds the winning instance once and selects it via `min_by`, avoiding a second instantiation.
 
 Lazily instantiated from `SecID.detect`; cache invalidated when new types register.
 
