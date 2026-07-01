@@ -213,3 +213,7 @@ require 'sec_id/cei'
 require 'sec_id/cfi'
 require 'sec_id/fisn'
 require 'sec_id/bic'
+
+# Auto-activate the ActiveModel validator inside Rails; a no-op everywhere else (keeps the
+# default require zero-dependency). See SecID::Railtie and lib/sec_id/active_model.rb.
+require 'sec_id/railtie' if defined?(Rails::Railtie)

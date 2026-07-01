@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+# Pins Rails to 8.0.x for the CI rails-version matrix (KTD6/U5). Run with:
+#   BUNDLE_GEMFILE=gemfiles/rails_8.0.gemfile bundle exec rake spec
+eval_gemfile File.expand_path('../Gemfile', __dir__)
+
+gem 'activemodel', '~> 8.0.0'
+gem 'railties', '~> 8.0.0'

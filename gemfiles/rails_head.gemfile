@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+# Tracks Rails main (advisory / continue-on-error in CI). Run with:
+#   BUNDLE_GEMFILE=gemfiles/rails_head.gemfile bundle exec rake spec
+eval_gemfile File.expand_path('../Gemfile', __dir__)
+
+git 'https://github.com/rails/rails', branch: 'main' do
+  gem 'activemodel'
+  gem 'railties'
+end

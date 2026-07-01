@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, and calculate check digits.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, and calculate check digits. Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
 
 ### Directory Layout
 
@@ -93,6 +93,14 @@ Lazily instantiated from `SecID.detect`; cache invalidated when new types regist
 `@api private` class that finds identifiers in freeform text. Uses a composite regex with three named groups (FISN, OCC, simple tokens) and cursor-based overlap prevention. Candidates are length-filtered, charset-filtered, and validated, then the most specific match is returned as a `Match` data object (`Data.define(:type, :raw, :range, :identifier)`).
 
 Lazily instantiated from `SecID.scan`/`SecID.extract`; cache invalidated when new types register.
+
+### ActiveModel / Rails Validator (`lib/sec_id/active_model.rb`, `lib/sec_id/railtie.rb`)
+
+Optional, opt-in adapter — **never on the default `require 'sec_id'` path**, so the gem keeps zero runtime dependencies (ActiveModel/railties are dev/test deps only).
+
+- `lib/sec_id/active_model.rb` defines a top-level `::SecIdValidator < ActiveModel::EachValidator` (top-level constant so ActiveModel's `sec_id` → `SecIdValidator` lookup resolves it; distinct from the `SecID` module). It requires `active_model`, re-raising a clear `LoadError` if absent. `check_validity!` resolves `type:`/`types:` via `SecID[]` (fail-fast `ArgumentError` at class-load on unknown type, both keys together, or an empty `types:`). `validate_each` is strict by default (`SecID.valid?`); `normalize: true` switches to the separator-lenient `SecID[t].normalize` path and writes the canonical string back on success (agnostic/allowlist ambiguity resolves to the first matching type in registration/allowlist order — KTD5); `details: true` (single `type:` only) surfaces sec_id's specific failure reason. The error is added under the i18n key `:sec_id` with a built-in type-aware English default (`DEFAULT_MESSAGE`, `%{type_name}` interpolation) supplied as ActiveModel's `message:` fallback — no locale files shipped, so the only i18n override point is the attribute-scoped key `activemodel.errors.models.<model>.attributes.<attr>.sec_id` (the generic `errors.messages.sec_id` is not consulted); `message:` is the general override.
+- `lib/sec_id/railtie.rb` defines `SecID::Railtie < Rails::Railtie` with an `initializer` that requires `sec_id/active_model` after the framework boots. It is loaded only by the guarded last line of `lib/sec_id.rb` (`require 'sec_id/railtie' if defined?(Rails::Railtie)`), which is inert outside Rails.
+- CI verifies the adapter across a Rails-version matrix (7.2, 8.0, 8.1, head) on Ruby 4.0 via `gemfiles/rails_*.gemfile` (each `eval_gemfile`s the root `Gemfile` and pins `activemodel`/`railties`; the root `Gemfile` only declares them unpinned when not run through a `gemfiles/` variant). `rails_head` is `continue-on-error`.
 
 ### Concerns (`lib/sec_id/concerns/`)
 

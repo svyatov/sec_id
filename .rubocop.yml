@@ -57,3 +57,4 @@ RSpec/SpecFilePathFormat:
   CustomTransform:
     Checkable: concerns/checkable
     Validatable: concerns/validatable
+    SecIdValidator: active_model

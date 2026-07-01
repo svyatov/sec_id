@@ -14,8 +14,9 @@ Gem::Specification.new do |spec|
                        'and generate.'
   spec.description   = 'Validate, normalize, parse, convert, and generate securities identifiers. Auto-detect ' \
                        'identifier type from any string. Calculate and restore check digits. Generate format-valid ' \
-                       'identifiers as test fixtures. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, ' \
-                       'WKN, Valoren, CFI, FISN, and BIC.'
+                       'identifiers as test fixtures. Includes an opt-in ActiveModel/Rails validator that adds no ' \
+                       'runtime dependency. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, ' \
+                       'Valoren, CFI, FISN, and BIC.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 
