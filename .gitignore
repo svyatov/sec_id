@@ -9,6 +9,7 @@
 /tmp/
 /docs/
 /.compound-engineering/
+CONCEPTS.md
 
 # rspec failure tracking
 .rspec_status
