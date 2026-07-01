@@ -10,6 +10,14 @@ gemspec
 # Specify your gem's development dependencies below
 gem 'rake', '>= 13'
 
+# ActiveModel/Rails validator (sec_id/active_model) — dev/test only; never a runtime dependency.
+# The gemfiles/*.gemfile variants eval this file and pin activemodel/railties per Rails version, so
+# declare them here (unpinned, tracking the latest) only for the default root Gemfile run.
+unless ENV['BUNDLE_GEMFILE'].to_s.include?('gemfiles/')
+  gem 'activemodel'
+  gem 'railties'
+end
+
 gem 'benchmark-ips', '~> 2.0', require: false
 
 gem 'rspec', '~> 3.9'

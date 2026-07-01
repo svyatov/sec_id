@@ -26,6 +26,7 @@
   - [CFI](#cfi) - Classification of Financial Instruments
   - [FISN](#fisn) - Financial Instrument Short Name
   - [BIC](#bic) - Business Identifier Code / SWIFT code
+- [ActiveModel / Rails Validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
 - [Lookup Service Integration](#lookup-service-integration)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -658,6 +659,61 @@ SecID::BIC.countries                # => ['AD', 'AE', 'AF', ...] (sorted, includ
 ```
 
 BIC validation confirms structure and a real country code only. It does **not** verify that the institution, location, or branch corresponds to a registered SWIFT participant — that requires the licensed SWIFT registry.
+
+## ActiveModel / Rails Validator
+
+SecID ships an opt-in [ActiveModel](https://api.rubyonrails.org/classes/ActiveModel/Validations.html) validator, registered as `sec_id`, for declarative validation of any supported identifier type. It adds **no runtime dependency** — `require 'sec_id'` loads none of it, and ActiveModel is a development/test dependency only.
+
+**In Rails it just works.** A Railtie loads the validator automatically after the framework boots, so `gem 'sec_id'` in your `Gemfile` is enough — no `require:` option and no initializer:
+
+```ruby
+class Security < ApplicationRecord
+  validates :isin, sec_id: { type: :isin }
+end
+```
+
+Outside Rails (e.g. Hanami, Sinatra + ActiveModel), require the adapter explicitly:
+
+```ruby
+require 'sec_id/active_model'
+```
+
+### Validation modes
+
+```ruby
+# Single type — the value must be a valid ISIN
+validates :isin, sec_id: { type: :isin }
+
+# Allowlist — valid as at least one of the listed types
+validates :ref, sec_id: { types: %i[isin cusip] }
+
+# Type-agnostic — valid as any supported type
+validates :ref, sec_id: true
+```
+
+An unknown `type:`/`types:` symbol raises `ArgumentError` when the model class loads (fail-fast on misconfiguration), not at validation time.
+
+### Strict by default; `normalize:` for lenient input
+
+Validation is strict by default, so separatored input like `"US-0378331005"` is invalid. Pass `normalize: true` to accept spaces/hyphens **and** rewrite the attribute to its canonical form on success (a failing value is left untouched):
+
+```ruby
+validates :isin, sec_id: { type: :isin, normalize: true }
+# "us-0378331005" validates, and the attribute afterward reads "US0378331005"
+```
+
+With `normalize: true` in allowlist or agnostic mode, a value valid as more than one type is written in the canonical form of the **first** matching type (allowlist order, or registration order when agnostic). Prefer a single `type:` when the input is ambiguous across types that normalize differently (e.g. a bare numeric string valid as both CIK and Valoren).
+
+### Error messages and `details:`
+
+On failure the validator adds one error under the `:sec_id` key with a type-aware default ("is not a valid ISIN" for a single type, "is not a valid securities identifier" for an allowlist/agnostic). Override the message in either of two ways: pass the standard `message:` option (the simplest, per-validation override), or define the attribute-scoped i18n key `activemodel.errors.models.<model>.attributes.<attribute>.sec_id` in your locale files. (The generic `activemodel.errors.messages.sec_id` key is not consulted, because the built-in default is supplied as ActiveModel's `message:` fallback.) Pass `details: true` (with a single `type:` — it is ignored for an allowlist/agnostic) to surface sec_id's specific reason instead of the generic text:
+
+```ruby
+validates :isin, sec_id: { type: :isin, details: true }
+# a bad check digit reports e.g. "Check digit '4' is invalid, expected '5'"
+```
+
+Standard `EachValidator` options — `allow_nil`, `allow_blank`, `if`, `unless`, `on` — work as usual. Tested against Rails 7.2, 8.0, and 8.1.
 
 ## Lookup Service Integration
 
