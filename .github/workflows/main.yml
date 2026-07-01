@@ -59,14 +59,14 @@ jobs:
 
   rails:
     runs-on: ubuntu-latest
-    name: Rails ${{ matrix.gemfile }}
+    name: Rails ${{ matrix.rails_version }}
     strategy:
       fail-fast: false
       matrix:
-        gemfile: [rails_7.2, rails_8.0, rails_8.1, rails_head]
+        rails_version: ['7.2', '8.0', '8.1', head]
 
     env:
-      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: gemfiles/rails_${{ matrix.rails_version }}.gemfile
 
     steps:
     - uses: actions/checkout@v4
@@ -75,7 +75,7 @@ jobs:
       with:
         ruby-version: '4.0'
         bundler-cache: true
-      continue-on-error: ${{ matrix.gemfile == 'rails_head' }}
+      continue-on-error: ${{ matrix.rails_version == 'head' }}
 
     - run: bundle exec rake spec
-      continue-on-error: ${{ matrix.gemfile == 'rails_head' }}
+      continue-on-error: ${{ matrix.rails_version == 'head' }}
