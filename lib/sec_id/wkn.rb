@@ -24,6 +24,9 @@ module SecID
       (?<identifier>[0-9A-HJ-NP-Z]{6})
     \z/x
 
+    # Characters valid in a WKN (alphanumeric excluding I and O).
+    GENERATE_CHARSET = ALPHANUMERIC.grep(VALID_CHARS_REGEX).freeze
+
     # @param wkn [String] the WKN string to parse
     def initialize(wkn)
       wkn_parts = parse(wkn)
@@ -40,5 +43,14 @@ module SecID
 
       ISIN.new("#{country_code}000#{identifier}").restore!
     end
+
+    # Generates a random WKN: 6 characters excluding I and O.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 6-character WKN
+    def self.generate_body(random)
+      random_string(GENERATE_CHARSET, 6, random: random)
+    end
+    private_class_method :generate_body
   end
 end

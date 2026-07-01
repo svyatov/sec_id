@@ -11,6 +11,8 @@ RSpec.describe SecID::CEI do
                   id_length: 10,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'A0BCDEFGH1',
                   dirty_id: 'a0-bcde-fgh1',

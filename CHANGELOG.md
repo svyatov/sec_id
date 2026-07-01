@@ -8,6 +8,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `.generate` on all 13 identifier types plus a central `SecID.generate(:type)` dispatcher for producing syntactically valid identifiers (with correct check digits where applicable) as test fixtures — accepts an optional `random:` keyword (a Ruby `Random`) for reproducible output. Generated values are valid in format only and are not real, registered securities
+
 ### Changed
 
 - `SecID.valid?` and `SecID.parse` are faster and allocate less — `SecID.valid?` short-circuits on the first matching type instead of running a full detect-and-sort, and `SecID.parse` reuses the instance built during detection instead of instantiating the matched type a second time

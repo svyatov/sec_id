@@ -12,6 +12,8 @@ RSpec.describe SecID::CFI do
                   id_length: 6,
                   has_check_digit: false
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'ESVUFR',
                   dirty_id: 'esvufr',
@@ -363,6 +365,12 @@ RSpec.describe SecID::CFI do
       it { expect(cfi.partly_paid?).to be(false) }
       it { expect(cfi.bearer?).to be(false) }
       it { expect(cfi.registered?).to be(false) }
+    end
+  end
+
+  describe '.generate' do
+    it 'generates a group valid for its category' do
+      expect(described_class.generate.group).not_to be_nil
     end
   end
 end

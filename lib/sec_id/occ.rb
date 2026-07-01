@@ -46,6 +46,22 @@ module SecID
     # @return [String, nil] the strike price in mills (thousandths of a dollar, represented as an 8-digit string)
     attr_reader :strike_mills
 
+    # Generates a random OCC option symbol.
+    #
+    # @note Generated symbols are valid in format only — they are not real, listed options.
+    #
+    # @param random [Random] source of randomness
+    # @return [OCC] a generated, valid OCC instance
+    def self.generate(random: Random.new)
+      build(
+        underlying: random_string(ALPHA, random.rand(1..5), random: random),
+        # Year 2000-2068 so the 2-digit-year symbol round-trips: strptime maps %y 69-99 to 19xx.
+        date: Date.new(2000 + random.rand(0..68), random.rand(1..12), random.rand(1..28)),
+        type: %w[C P].sample(random: random),
+        strike: random_string(DIGITS, 8, random: random)
+      )
+    end
+
     class << self
       # Builds an OCC symbol from components.
       #

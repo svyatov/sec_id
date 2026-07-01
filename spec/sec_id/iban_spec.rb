@@ -12,6 +12,8 @@ RSpec.describe SecID::IBAN do
                   id_length: 15..34,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'GB29NWBK60161331926819',
                   dirty_id: 'GB29 NWBK 6016 1331 9268 19',
@@ -580,6 +582,20 @@ RSpec.describe SecID::IBAN do
 
     it 'formats shorter IBANs' do
       expect(described_class.new('GB29NWBK60161331926819').to_pretty_s).to eq('GB29 NWBK 6016 1331 9268 19')
+    end
+  end
+
+  describe '.generate' do
+    it 'generates a supported country code' do
+      expect(described_class.supported_countries).to include(described_class.generate.country_code)
+    end
+
+    it 'generates an all-numeric BBAN' do
+      expect(described_class.generate.bban).to match(/\A\d+\z/)
+    end
+
+    it 'has at least one numeric-BBAN country rule to draw from' do
+      expect(described_class::NUMERIC_COUNTRY_RULES).not_to be_empty
     end
   end
 end

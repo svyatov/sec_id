@@ -10,10 +10,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Leonid Svyatov']
   spec.email         = ['leonid@svyatov.ru']
 
-  spec.summary       = 'A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, and convert.'
-  spec.description   = 'Validate, normalize, parse, and convert securities identifiers. Auto-detect identifier ' \
-                       'type from any string. Calculate and restore check digits. Supports ISIN, CUSIP, CEI, ' \
-                       'SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, and FISN.'
+  spec.summary       = 'A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, ' \
+                       'and generate.'
+  spec.description   = 'Validate, normalize, parse, convert, and generate securities identifiers. Auto-detect ' \
+                       'identifier type from any string. Calculate and restore check digits. Generate format-valid ' \
+                       'identifiers as test fixtures. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, ' \
+                       'WKN, Valoren, CFI, and FISN.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 

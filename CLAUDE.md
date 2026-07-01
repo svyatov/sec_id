@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN) — validate, normalize, parse, detect, convert, and calculate check digits.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN) — validate, normalize, parse, detect, convert, generate, and calculate check digits.
 
 ### Directory Layout
 
@@ -31,9 +31,10 @@ This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI
 
 ### Class Hierarchy
 
-All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin coordinator that includes two concerns:
+All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin coordinator that includes three concerns:
 - `Normalizable` — normalization: `#normalized` / `#normalize`, `#normalize!`, `.normalize(id)`, `#to_s`, `#to_str`, `SEPARATORS`
 - `Validatable` — validation: `#valid?`, `#validate`, `#errors`, `#validate!`, `.valid?`, `.validate`, `.validate!`, `.error_class_for`, `ERROR_MAP`
+- `Generatable` — generation: `.generate(random:)`, `random_string(charset, length, random:)` helper, `ALPHA`/`DIGITS`/`ALPHANUMERIC` charset constants
 
 Base itself keeps:
 - Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
@@ -70,6 +71,7 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecID.extract(text, types: nil)` — finds identifiers in freeform text, returns `Array<Match>`
 - `SecID.scan(text, types: nil)` — lazy version of `extract`, returns `Enumerator<Match>`
 - `SecID.explain(str, types: nil)` — returns per-type validation results for debugging detection
+- `SecID.generate(key, random: Random.new)` — returns a generated, format-valid instance for a type symbol (raises `ArgumentError` on unknown type); generated values are valid in format only, not real securities
 
 ### Detector (`lib/sec_id/detector.rb`)
 
@@ -130,6 +132,23 @@ Validation overrides (private):
 Helper methods (private):
 - `mod10`, `div10mod10`, `mod97` - Check digit calculation helpers
 - `validate_format_for_calculation!` - Raises error if format invalid
+
+#### Generatable (`generatable.rb`)
+
+Provides generation of new, format-valid identifiers for use as test fixtures. Included in `Base`, so every type inherits a `.generate` entry point. **Generated values are valid in format only — they are not real, registered securities** (random country codes, FIGI prefixes, OCC dates, CFI attributes).
+
+Constants (charset building blocks): `ALPHA`, `DIGITS`, `ALPHANUMERIC`.
+
+Class methods (added via `included`/`extend(ClassMethods)`):
+- `generate(random: Random.new)` - Builds `new(generate_body(random))`, then calls `restore!` when `has_check_digit?` is true, else returns the instance
+- `random_string(charset, length, random:)` (private) - Draws `length` characters from `charset` using `Array#sample(random:)`
+
+Per-type hooks:
+- Each type defines a private class-level `generate_body(random)` returning a valid body (identifier without check digit); check-digit types' bodies are restored by the default `generate`
+- Check-digit-less types (CFI, FISN) compose the complete identifier in `generate_body`; no `restore!` is called
+- IBAN composes a full-length body with placeholder `"00"` check digits in `generate_body`; the default `generate` then calls `restore!` to replace them with the real two-digit check value
+- OCC overrides `generate` entirely (via `OCC.build`)
+- FIGI resamples its prefix until it is not in `RESTRICTED_PREFIXES`; IBAN generates only numeric-BBAN countries (`NUMERIC_COUNTRY_RULES`); CIK/Valoren use a random integer (not a digit char-fill) to avoid leading-zero bodies
 
 ### Identifier Classes
 

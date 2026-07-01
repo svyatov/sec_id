@@ -39,6 +39,8 @@ RSpec.describe SecID::CIK do
                   dirty_id: '  1521365  ',
                   invalid_id: '0000000000'
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '0001521365',
                   canonical_id: '0001521365',
@@ -138,6 +140,14 @@ RSpec.describe SecID::CIK do
         expect(described_class.normalize('001072424')).to eq('0001072424')
         expect(described_class.normalize('0001072424')).to eq('0001072424')
       end
+    end
+  end
+
+  describe '.generate' do
+    it 'generates a value within the valid length range that pads when normalized' do
+      cik = described_class.generate
+      expect(described_class::ID_LENGTH).to cover(cik.full_id.length)
+      expect(cik.normalized.length).to eq(10)
     end
   end
 end

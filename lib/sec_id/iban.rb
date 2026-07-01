@@ -33,6 +33,10 @@ module SecID
       (?<rest>[A-Z0-9]{13,32})
     \z/x
 
+    # Country rules whose BBAN format accepts an all-digit value, used for generation.
+    # Restricts generation to numeric BBANs so output validates without interpreting the format regex.
+    NUMERIC_COUNTRY_RULES = COUNTRY_RULES.select { |_cc, rule| rule[:format].match?('0' * rule[:length]) }.to_a.freeze
+
     # Returns sorted array of all supported country codes.
     #
     # @return [Array<String>]
@@ -85,6 +89,17 @@ module SecID
       validate_format_for_calculation!
       mod97(numeric_string_for_check)
     end
+
+    # Generates a random IBAN body for a numeric-BBAN country with placeholder check digits.
+    # The default {Generatable::ClassMethods#generate} restores the real check digits via `restore!`.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a country code + "00" + numeric BBAN
+    def self.generate_body(random)
+      country_code, rule = NUMERIC_COUNTRY_RULES.sample(random: random)
+      "#{country_code}00#{random_string(DIGITS, rule[:length], random: random)}"
+    end
+    private_class_method :generate_body
 
     # @return [Boolean]
     def valid_bban_format?

@@ -54,5 +54,14 @@ module SecID
     def to_s
       full_id
     end
+
+    # Generates a random CIK: an integer rendered without leading zeros.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 1-10 digit CIK
+    def self.generate_body(random)
+      random.rand(1..9_999_999_999).to_s
+    end
+    private_class_method :generate_body
   end
 end

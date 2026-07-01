@@ -29,6 +29,8 @@ RSpec.describe SecID::OCC do
                   dirty_id: 'eqx   260116c00005500',
                   invalid_id: 'ZVZZT'
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'EQX   260116C00005500',
                   canonical_id: 'EQX   260116C00005500',
@@ -343,6 +345,24 @@ RSpec.describe SecID::OCC do
 
     it 'formats shorter underlying symbols' do
       expect(described_class.new('EQX   260116C00005500').to_pretty_s).to eq('EQX 260116 C 00005500')
+    end
+  end
+
+  describe '.generate' do
+    it 'generates a parseable expiry date' do
+      expect(described_class.generate.date).to be_a(Date)
+    end
+
+    it 'generates a call or put with a 1-5 character underlying' do
+      occ = described_class.generate
+      expect(occ.type).to eq('C').or eq('P')
+      expect(occ.underlying.length).to be_between(1, 5)
+    end
+
+    it 'generates dates that round-trip within the parser century (2000-2068)' do
+      (1..250).each do |seed|
+        expect(described_class.generate(random: Random.new(seed)).date.year).to be_between(2000, 2068)
+      end
     end
   end
 end

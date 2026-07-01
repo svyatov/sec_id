@@ -35,6 +35,9 @@ module SecID
     # Country-code prefixes that are restricted from use in FIGI.
     RESTRICTED_PREFIXES = Set.new %w[BS BM GG GB GH KY VG]
 
+    # Characters valid in a FIGI (alphanumeric excluding vowels).
+    GENERATE_CHARSET = ALPHANUMERIC.grep(VALID_CHARS_REGEX).freeze
+
     # @return [String, nil] the 2-character prefix
     attr_reader :prefix
 
@@ -63,6 +66,17 @@ module SecID
       validate_format_for_calculation!
       mod10(luhn_sum_indexed(reversed_digits_single(identifier)))
     end
+
+    # Generates a random FIGI body: non-reserved 2-char prefix + 'G' + 8-char random part.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] an 11-character FIGI body without check digit
+    def self.generate_body(random)
+      prefix = random_string(GENERATE_CHARSET, 2, random: random)
+      prefix = random_string(GENERATE_CHARSET, 2, random: random) while RESTRICTED_PREFIXES.include?(prefix)
+      "#{prefix}G#{random_string(GENERATE_CHARSET, 8, random: random)}"
+    end
+    private_class_method :generate_body
 
     private
 

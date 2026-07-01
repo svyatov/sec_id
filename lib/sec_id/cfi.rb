@@ -312,6 +312,17 @@ module SecID
       identifier.to_s
     end
 
+    # Generates a random CFI: a category, a valid group for it, and 4 attribute letters.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 6-character CFI code
+    def self.generate_body(random)
+      category = CATEGORIES.keys.sample(random: random)
+      group = GROUPS[category].keys.sample(random: random)
+      "#{category}#{group}#{random_string(ALPHA, 4, random: random)}"
+    end
+    private_class_method :generate_body
+
     private
 
     # @return [Hash]

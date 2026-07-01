@@ -12,6 +12,8 @@ RSpec.describe SecID::LEI do
                   id_length: 20,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '529900T8BM49AURSDO55',
                   dirty_id: '5299 00t8 bm49 aurs do55',

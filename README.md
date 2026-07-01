@@ -1,6 +1,6 @@
 # SecID [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
 
-> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, and convert.
+> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, and generate.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@
   - [Text Scanning](#text-scanning) - find identifiers in freeform text
   - [Debugging Detection](#debugging-detection) - understand why strings match or don't
   - [Structured Validation](#structured-validation) - detailed error codes and messages
+  - [Generating Test Fixtures](#generating-test-fixtures) - produce valid identifiers for tests
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [CEI](#cei) - CUSIP Entity Identifier
@@ -252,6 +253,26 @@ SecID::FIGI.new('BSG000BLNNH6').validate!
 # Class-level convenience method (returns the instance)
 isin = SecID::ISIN.validate!('US5949181045')  # => #<SecID::ISIN>
 ```
+
+### Generating Test Fixtures
+
+Generate syntactically valid identifiers — with correct check digits where applicable — for use as test fixtures. Available per class and via the central dispatcher:
+
+```ruby
+SecID::ISIN.generate          # => #<SecID::ISIN ...>
+SecID::ISIN.generate.valid?   # => true
+
+# Central dispatcher by type symbol (mirrors SecID[])
+SecID.generate(:cusip)        # => #<SecID::CUSIP ...>
+SecID.generate(:nope)         # => raises ArgumentError: Unknown identifier type: :nope
+
+# Pass a seeded Random for reproducible output
+SecID::LEI.generate(random: Random.new(42)) == SecID::LEI.generate(random: Random.new(42))  # => true
+```
+
+> **Generated identifiers are valid in format only — they are not real, registered securities.**
+> Country codes, FIGI prefixes, OCC expiry dates, and CFI attributes are random and do not map to
+> real-world instruments. Use them as test fixtures, not as references to actual securities.
 
 ### ISIN
 
