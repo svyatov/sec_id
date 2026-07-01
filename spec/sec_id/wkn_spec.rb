@@ -12,6 +12,8 @@ RSpec.describe SecID::WKN do
                   id_length: 6,
                   has_check_digit: false
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '514000',
                   dirty_id: '51-40-00',

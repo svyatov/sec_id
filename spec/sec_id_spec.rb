@@ -373,4 +373,38 @@ RSpec.describe SecID do
       end
     end
   end
+
+  describe '.generate' do
+    it 'returns a valid instance for a known type' do
+      result = described_class.generate(:isin)
+      expect(result).to be_a(SecID::ISIN)
+      expect(result).to be_valid
+    end
+
+    it 'raises ArgumentError for an unknown type' do
+      expect { described_class.generate(:nope) }.to raise_error(ArgumentError, /Unknown identifier type/)
+    end
+
+    it 'produces identical output for the same seed' do
+      first = described_class.generate(:isin, random: Random.new(42)).to_s
+      second = described_class.generate(:isin, random: Random.new(42)).to_s
+      expect(first).to eq(second)
+    end
+
+    it 'produces different output for a different seed' do
+      expect(described_class.generate(:isin, random: Random.new(42)).to_s)
+        .not_to eq(described_class.generate(:isin, random: Random.new(7)).to_s)
+    end
+
+    it 'is supported by every registered identifier type' do
+      described_class.identifiers.each do |klass|
+        expect(klass.generate).to be_valid
+      end
+    end
+
+    it 'raises NotImplementedError for a type that does not implement generate_body' do
+      klass = Class.new(SecID::Base)
+      expect { klass.generate }.to raise_error(NotImplementedError)
+    end
+  end
 end

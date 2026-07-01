@@ -53,6 +53,16 @@ module SecID
       mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
 
+    # Generates a random CEI body: 1 letter + 1 digit + 7 alphanumeric characters.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 9-character CEI body without check digit
+    def self.generate_body(random)
+      "#{random_string(ALPHA, 1, random: random)}#{random_string(DIGITS, 1, random: random)}" \
+        "#{random_string(ALPHANUMERIC, 7, random: random)}"
+    end
+    private_class_method :generate_body
+
     private
 
     # @return [Hash]

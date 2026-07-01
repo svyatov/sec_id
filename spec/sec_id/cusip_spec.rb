@@ -12,6 +12,8 @@ RSpec.describe SecID::CUSIP do
                   id_length: 9,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '037833100',
                   dirty_id: '037-833-100',

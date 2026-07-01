@@ -29,6 +29,8 @@ RSpec.describe SecID::Valoren do
                   dirty_id: '  3886335  ',
                   invalid_id: '0000'
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: '003886335',
                   canonical_id: '003886335',
@@ -212,6 +214,14 @@ RSpec.describe SecID::Valoren do
 
     it 'formats 5-digit valoren' do
       expect(described_class.new('12345').to_pretty_s).to eq('12 345')
+    end
+  end
+
+  describe '.generate' do
+    it 'generates a value within the valid length range that pads when normalized' do
+      valoren = described_class.generate
+      expect(described_class::ID_LENGTH).to cover(valoren.full_id.length)
+      expect(valoren.normalized.length).to eq(9)
     end
   end
 end

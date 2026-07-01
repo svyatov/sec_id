@@ -120,6 +120,20 @@ module SecID
       result || raise(InvalidFormatError, parse_error_message(str, types))
     end
 
+    # Generates a new, format-valid identifier instance of the given type.
+    #
+    # @note Generated identifiers are valid in format only — they are not real,
+    #   registered securities.
+    #
+    # @param key [Symbol] identifier type (e.g. :isin, :cusip)
+    # @param random [Random] seedable source for reproducible output
+    # @return [SecID::Base] a generated, format-valid instance of the type mapped to `key`
+    #   (e.g. {SecID::ISIN} for `:isin`)
+    # @raise [ArgumentError] if key is unknown
+    def generate(key, random: Random.new)
+      self[key].generate(random: random)
+    end
+
     private
 
     # @return [void]
@@ -181,6 +195,7 @@ require 'sec_id/errors'
 require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/validatable'
 require 'sec_id/concerns/checkable'
+require 'sec_id/concerns/generatable'
 require 'sec_id/base'
 require 'sec_id/detector'
 require 'sec_id/scanner'

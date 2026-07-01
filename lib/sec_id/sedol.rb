@@ -32,6 +32,9 @@ module SecID
     # Weights applied to each character position in the check digit calculation.
     CHARACTER_WEIGHTS = [1, 3, 1, 7, 3, 9].freeze
 
+    # Characters valid in a SEDOL body (alphanumeric excluding vowels).
+    GENERATE_CHARSET = ALPHANUMERIC.grep(VALID_CHARS_REGEX).freeze
+
     # @param sedol [String] the SEDOL string to parse
     def initialize(sedol)
       sedol_parts = parse sedol
@@ -59,6 +62,15 @@ module SecID
       validate_format_for_calculation!
       mod10(weighted_sum)
     end
+
+    # Generates a random SEDOL body: 6 characters excluding vowels.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 6-character SEDOL body without check digit
+    def self.generate_body(random)
+      random_string(GENERATE_CHARSET, 6, random: random)
+    end
+    private_class_method :generate_body
 
     private
 

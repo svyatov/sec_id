@@ -59,6 +59,15 @@ module SecID
       mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
 
+    # Generates a random CUSIP body: 8 alphanumeric characters.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] an 8-character CUSIP body without check digit
+    def self.generate_body(random)
+      random_string(ALPHANUMERIC, 8, random: random)
+    end
+    private_class_method :generate_body
+
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (must be CGS country)
     # @return [ISIN] a new ISIN instance
     # @raise [InvalidFormatError] if the country code is not a CGS country

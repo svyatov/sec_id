@@ -12,6 +12,8 @@ RSpec.describe SecID::FISN do
                   id_length: 3..35,
                   has_check_digit: false
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'APPLE INC/SH',
                   dirty_id: 'apple inc/sh',
@@ -276,6 +278,14 @@ RSpec.describe SecID::FISN do
 
     it 'returns the normalized (uppercased) full id' do
       expect(fisn.full_id).to eq('APPLE INC/SH')
+    end
+  end
+
+  describe '.generate' do
+    it 'generates issuer and description within their length limits' do
+      fisn = described_class.generate
+      expect(fisn.issuer.length).to be_between(1, 15)
+      expect(fisn.description.length).to be_between(1, 19)
     end
   end
 end

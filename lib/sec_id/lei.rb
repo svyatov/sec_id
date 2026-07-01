@@ -64,6 +64,15 @@ module SecID
       mod97("#{numeric_identifier}00")
     end
 
+    # Generates a random LEI body: 18 alphanumeric characters.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] an 18-character LEI body without check digits
+    def self.generate_body(random)
+      random_string(ALPHANUMERIC, 18, random: random)
+    end
+    private_class_method :generate_body
+
     private
 
     # @return [Hash]

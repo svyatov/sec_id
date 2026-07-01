@@ -77,5 +77,14 @@ module SecID
     def to_s
       full_id
     end
+
+    # Generates a random Valoren: an integer rendered without leading zeros.
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a 5-9 digit Valoren
+    def self.generate_body(random)
+      random.rand(10_000..999_999_999).to_s
+    end
+    private_class_method :generate_body
   end
 end

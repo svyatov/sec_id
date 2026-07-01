@@ -12,6 +12,8 @@ RSpec.describe SecID::FIGI do
                   id_length: 12,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'BBG000BLNNH6',
                   dirty_id: 'bbg-000-blnnh6',
@@ -175,6 +177,29 @@ RSpec.describe SecID::FIGI do
   describe '#to_pretty_s' do
     it 'formats as prefix+G + random_part + check_digit' do
       expect(described_class.new('BBG000BLNQ16').to_pretty_s).to eq('BBG 000BLNQ1 6')
+    end
+  end
+
+  describe '.generate' do
+    it 'uses a non-reserved prefix and a vowel-free random part' do
+      figi = described_class.generate
+      expect(described_class::RESTRICTED_PREFIXES).not_to include(figi.prefix)
+      expect(figi.random_part).to match(/\A[B-DF-HJ-NP-TV-Z0-9]{8}\z/)
+    end
+
+    it 'resamples when the first draw is a restricted prefix' do
+      # Seed 3's first two-character draw is the restricted prefix 'BS', forcing the
+      # rejection-sampling loop to retry until it lands on a permitted prefix.
+      figi = described_class.generate(random: Random.new(3))
+      expect(figi.prefix).not_to eq('BS')
+      expect(described_class::RESTRICTED_PREFIXES).not_to include(figi.prefix)
+    end
+
+    it 'never returns a restricted prefix across many seeds' do
+      (0..300).each do |seed|
+        prefix = described_class.generate(random: Random.new(seed)).prefix
+        expect(described_class::RESTRICTED_PREFIXES).not_to include(prefix)
+      end
     end
   end
 end

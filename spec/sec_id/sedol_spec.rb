@@ -12,6 +12,8 @@ RSpec.describe SecID::SEDOL do
                   id_length: 7,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'B0YBKJ7',
                   dirty_id: 'b0y bkj7',

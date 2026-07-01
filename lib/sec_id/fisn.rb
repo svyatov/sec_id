@@ -36,6 +36,9 @@ module SecID
         (?<description>[A-Z0-9 ]{1,19}))
     \z}x
 
+    # Characters valid in a FISN segment (alphanumeric and space).
+    FISN_CHARSET = (ALPHANUMERIC + [' ']).freeze
+
     # @return [String, nil] the issuer name portion (before the slash)
     attr_reader :issuer
 
@@ -54,6 +57,29 @@ module SecID
     def to_s
       identifier.to_s
     end
+
+    # Generates a random FISN: issuer (1-15 chars) + '/' + description (1-19 chars).
+    #
+    # @param random [Random] source of randomness
+    # @return [String] a generated FISN, at most 35 characters
+    def self.generate_body(random)
+      "#{generate_part(random.rand(1..15), random)}/#{generate_part(random.rand(1..19), random)}"
+    end
+    private_class_method :generate_body
+
+    # Generates a FISN segment whose first and last characters are not spaces,
+    # so Base#parse's strip leaves both segments intact.
+    #
+    # @param length [Integer] the segment length
+    # @param random [Random] source of randomness
+    # @return [String] a segment of the given length
+    def self.generate_part(length, random)
+      chars = Array.new(length) { FISN_CHARSET.sample(random: random) }
+      chars[0] = ALPHANUMERIC.sample(random: random)
+      chars[-1] = ALPHANUMERIC.sample(random: random)
+      chars.join
+    end
+    private_class_method :generate_part
 
     private
 

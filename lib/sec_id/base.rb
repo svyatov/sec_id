@@ -41,6 +41,7 @@ module SecID
   class Base
     include Normalizable
     include Validatable
+    include Generatable
 
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_id

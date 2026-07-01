@@ -12,6 +12,8 @@ RSpec.describe SecID::ISIN do
                   id_length: 12,
                   has_check_digit: true
 
+  it_behaves_like 'a generatable identifier'
+
   it_behaves_like 'a normalizable identifier',
                   valid_id: 'US5949181045',
                   dirty_id: 'us-5949-1810-45',
