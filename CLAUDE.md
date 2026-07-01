@@ -27,6 +27,8 @@ This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI
 - `spec/` — RSpec tests
 - `examples/` — runnable integration examples (not shipped in gem, linted by rubocop)
 - `docs/guides/` — lookup service integration guides (not shipped in gem)
+- `docs/solutions/` — documented solutions to past problems (bugs, best practices, design patterns), organized by category with YAML frontmatter (`module`, `tags`, `problem_type`); relevant when implementing or debugging in documented areas (not shipped in gem)
+- `CONCEPTS.md` — shared domain vocabulary (identifier anatomy, named processes); relevant when orienting to the codebase or discussing domain concepts
 - `sec_id.gemspec` `spec.files` includes only `lib/**/*.rb` and select markdown files — `docs/` and `examples/` are intentionally excluded
 
 ### Class Hierarchy
