@@ -31,6 +31,8 @@ RSpec.shared_examples 'an identifier with metadata' do |params|
       case id_length
       when Range
         expect(id_length).to cover(length)
+      when Array
+        expect(id_length).to include(length)
       else
         expect(length).to eq(id_length)
       end

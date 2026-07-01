@@ -57,6 +57,23 @@ RSpec.describe SecID::Scanner do
         types = matches.map(&:type)
         expect(types).to include(:wkn)
       end
+
+      it 'finds BIC in text' do
+        matches = SecID.extract('Wire to DEUTDEFF500 today')
+        expect(matches.map(&:type)).to include(:bic)
+      end
+
+      it 'finds an embedded BIC8 in text' do
+        matches = SecID.extract('Pay via DEUTDEFF before noon')
+        expect(matches.map(&:type)).to include(:bic)
+      end
+
+      it 'does not match an 8-letter word whose middle is not a country code' do
+        # KTD4: a BIC8 false-positive needs a recognized country at positions 5-6;
+        # 'SOFTWARE' has 'WA' there (not recognized), so country validation filters it out.
+        matches = SecID.extract('Our SOFTWARE ships today')
+        expect(matches.map(&:type)).not_to include(:bic)
+      end
     end
 
     describe 'compound patterns' do

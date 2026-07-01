@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN) — validate, normalize, parse, detect, convert, generate, and calculate check digits.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, and calculate check digits.
 
 ### Directory Layout
 
@@ -51,7 +51,7 @@ Base itself keeps:
 
 Each identifier class defines these metadata constants:
 - `FULL_NAME` — human-readable standard name (e.g. `"International Securities Identification Number"`)
-- `ID_LENGTH` — fixed length or valid length range
+- `ID_LENGTH` — fixed length (`Integer`), valid length range (`Range`), or discrete valid lengths (`Array`, e.g. BIC's `[8, 11]`). `detector.rb` and `scanner.rb` read the shape via the shared `Base.length_values` (enumerable lengths) / `Base.length_specificity` (specificity weight) helpers; `validatable.rb#valid_length?` branches on the three shapes directly for its bounds check
 - `EXAMPLE` — representative valid identifier string
 - `VALID_CHARS_REGEX` — regex for valid character set (used by `detect_errors` fallback)
 
@@ -147,7 +147,7 @@ Class methods (added via `included`/`extend(ClassMethods)`):
 
 Per-type hooks:
 - Each type defines a private class-level `generate_body(random)` returning a valid body (identifier without check digit); check-digit types' bodies are restored by the default `generate`
-- Check-digit-less types (CFI, FISN) compose the complete identifier in `generate_body`; no `restore!` is called
+- Check-digit-less types (CFI, FISN, BIC) compose the complete identifier in `generate_body`; no `restore!` is called
 - IBAN composes a full-length body with placeholder `"00"` check digits in `generate_body`; the default `generate` then calls `restore!` to replace them with the real two-digit check value
 - OCC overrides `generate` entirely (via `OCC.build`)
 - FIGI resamples its prefix until it is not in `RESTRICTED_PREFIXES`; IBAN generates only numeric-BBAN countries (`NUMERIC_COUNTRY_RULES`); CIK/Valoren use a random integer (not a digit char-fill) to avoid leading-zero bodies
@@ -165,7 +165,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - Implement `calculate_check_digit` with standard-specific algorithm
 - LEI and IBAN override `check_digit_width` → `2` (two-character check digit)
 
-**Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN):
+**Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN, BIC):
 - Do not include `Checkable`
 - Validation based solely on format
 
@@ -180,6 +180,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - CFI: `detect_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes; class methods `.categories` (returns `CATEGORIES` hash), `.groups_for(code)` (returns groups hash for a category)
 - IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules; `.supported_countries` returns sorted array of all supported country codes
 - OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
+- BIC: `detect_errors` returns `:invalid_country` when positions 5-6 are not in the recognized set (`lib/sec_id/bic/country_codes.rb`); `.countries` returns the sorted frozen set of recognized ISO 3166 / SWIFT country codes
 
 ### Conversion Methods
 
@@ -208,7 +209,7 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - `SecID::Error` - Base error class
 - `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
 - `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
-- `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`)
+- `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`, `:invalid_country`)
 - `SecID::AmbiguousMatchError` - Raised by `parse`/`parse!` when `on_ambiguous: :raise` and multiple types match
 - `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance

@@ -12,7 +12,8 @@ module SecID
       invalid_category: InvalidStructureError,
       invalid_group: InvalidStructureError,
       invalid_bban: InvalidStructureError,
-      invalid_date: InvalidStructureError
+      invalid_date: InvalidStructureError,
+      invalid_country: InvalidStructureError
     }.freeze
 
     # @api private
@@ -115,13 +116,20 @@ module SecID
       [:invalid_format]
     end
 
+    # Checks length against ID_LENGTH's three shapes: Range (bounds), Array
+    # (discrete valid lengths), or Integer (allows an optional check digit).
+    #
     # @return [Boolean]
     def valid_length?
       return false if full_id.empty?
 
       id_length = self.class::ID_LENGTH
-      expected = id_length.is_a?(Range) ? id_length : ((id_length - check_digit_width)..id_length)
-      expected.cover?(full_id.length)
+      len = full_id.length
+      case id_length
+      when Range then id_length.cover?(len)
+      when Array then id_length.include?(len)
+      else            ((id_length - check_digit_width)..id_length).cover?(len)
+      end
     end
 
     # @return [Boolean]
@@ -140,6 +148,7 @@ module SecID
       case code
       when :invalid_length
         expected = self.class::ID_LENGTH
+        expected = expected.join(' or ') if expected.is_a?(Array)
         "Expected #{expected} characters, got #{full_id.length}"
       when :invalid_characters
         "Contains invalid characters for #{self.class.short_name}"

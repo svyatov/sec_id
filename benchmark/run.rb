@@ -14,8 +14,10 @@ VALID_ISIN  = 'US5949181045'
 BAD_CD_ISIN = 'US5949181040' # valid format, wrong check digit
 CUSIP       = '594918104'
 SEDOL       = '2046251'
-TEXT = 'Holdings: US5949181045, DE000BAY0017 and 2046251 plus noise word1 word2 ' \
-       'and another 037833100 in the same paragraph for the scanner to chew on.'
+# Deliberate, deterministic match set: 2 ISIN, 1 SEDOL, 1 CUSIP, 1 BIC. Avoid
+# stray 8-letter words, which can validate as a BIC8 (e.g. "Holdings" -> HOLD/IN/GS).
+TEXT = 'Portfolio: US5949181045, DE000BAY0017 and 2046251 plus BIC DEUTDEFF500 with ' \
+       'noise word1 word2 and 037833100 in the same paragraph for the scanner to chew on.'
 
 CASES = {
   'ISIN.valid? (known type)' => -> { SecID::ISIN.valid?(VALID_ISIN) },

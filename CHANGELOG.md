@@ -10,7 +10,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
-- `.generate` on all 13 identifier types plus a central `SecID.generate(:type)` dispatcher for producing syntactically valid identifiers (with correct check digits where applicable) as test fixtures — accepts an optional `random:` keyword (a Ruby `Random`) for reproducible output. Generated values are valid in format only and are not real, registered securities
+- BIC / SWIFT code (ISO 9362) support via `SecID::BIC` — validate, normalize, parse, detect, extract, and generate 8- or 11-character Business Identifier Codes. Exposes `bank_code`, `country_code`, `location_code`, and `branch_code` (`nil` for a BIC8) components. Validates the embedded country code against a frozen ISO 3166-1 / SWIFT-recognized set (`SecID::BIC.countries`), raising `InvalidStructureError` (`:invalid_country`) for unrecognized codes. Validation confirms structure and a real country code only — it does not verify registration in the licensed SWIFT registry
+- `.generate` on all 14 identifier types plus a central `SecID.generate(:type)` dispatcher for producing syntactically valid identifiers (with correct check digits where applicable) as test fixtures — accepts an optional `random:` keyword (a Ruby `Random`) for reproducible output. Generated values are valid in format only and are not real, registered securities
 
 ### Changed
 

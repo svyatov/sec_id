@@ -56,3 +56,4 @@ RSpec/ExampleLength:
 RSpec/SpecFilePathFormat:
   CustomTransform:
     Checkable: concerns/checkable
+    Validatable: concerns/validatable
