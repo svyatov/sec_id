@@ -137,8 +137,8 @@ RSpec.describe SecID::Base do
   end
 
   describe '.inherited auto-registration' do
-    it 'registers all 13 identifier types' do
-      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn]
+    it 'registers all 14 identifier types' do
+      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic]
       registered = SecID.identifiers.map { |k| k.short_name.downcase.to_sym }
       expect(registered).to eq(expected)
     end

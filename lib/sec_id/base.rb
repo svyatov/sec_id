@@ -56,8 +56,19 @@ module SecID
       # @return [String] the full human-readable standard name
       def full_name = self::FULL_NAME
 
-      # @return [Integer, Range] the fixed length or valid length range
+      # @return [Integer, Range, Array<Integer>] the fixed length, valid length range, or discrete valid lengths
       def id_length = self::ID_LENGTH
+
+      # Valid length values, for length-table indexing. Integer wraps to a
+      # one-element Array; Range and Array both yield their own elements.
+      #
+      # @return [Array<Integer>, Range]
+      def length_values = (v = self::ID_LENGTH).is_a?(Integer) ? [v] : v
+
+      # Specificity weight from ID_LENGTH: fewer valid lengths ranks more specific.
+      #
+      # @return [Integer]
+      def length_specificity = (v = self::ID_LENGTH).is_a?(Integer) ? 1 : v.size
 
       # @return [String] a representative valid identifier string
       def example = self::EXAMPLE

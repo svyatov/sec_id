@@ -59,9 +59,7 @@ module SecID
       @simple_classes = @classes - @fisn_classes - @occ_classes
       @candidates_by_length = Hash.new { |h, k| h[k] = [] }
       @classes.each do |klass|
-        id_length = klass::ID_LENGTH
-        lengths = id_length.is_a?(Range) ? id_length : [id_length]
-        lengths.each { |len| @candidates_by_length[len] << klass }
+        klass.length_values.each { |len| @candidates_by_length[len] << klass }
       end
       @candidates_by_length.each_value(&:freeze)
     end
@@ -78,9 +76,7 @@ module SecID
       @priority_for = {}
       @classes.each_with_index do |klass, index|
         check_digit_rank = klass.has_check_digit? ? 0 : 1
-        id_length = klass::ID_LENGTH
-        range_size = id_length.is_a?(Range) ? id_length.size : 1
-        @priority_for[klass] = [check_digit_rank, range_size, index].freeze
+        @priority_for[klass] = [check_digit_rank, klass.length_specificity, index].freeze
       end
       @priority_for.freeze
     end

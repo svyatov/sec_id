@@ -211,6 +211,36 @@ RSpec.describe SecID::Detector do
       end
     end
 
+    context 'with discrete-length (Array) ID_LENGTH' do
+      let(:stub) do
+        klass = Class.new(SecID::Base)
+        allow(klass).to receive(:name).and_return('SecID::STUBLEN')
+        klass.const_set(:ID_LENGTH, [8, 11])
+        klass.const_set(:VALID_CHARS_REGEX, /\A[A-Z0-9]+\z/)
+        klass
+      end
+      let(:length_table) { described_class.new([stub]).instance_variable_get(:@candidates_by_length) }
+
+      it 'registers the class at its listed lengths' do
+        expect(length_table[8]).to include(stub)
+        expect(length_table[11]).to include(stub)
+      end
+
+      it 'excludes lengths outside and between the listed values' do
+        expect(length_table[7]).not_to include(stub)
+        expect(length_table[9]).not_to include(stub)
+        expect(length_table[10]).not_to include(stub)
+        expect(length_table[12]).not_to include(stub)
+      end
+
+      it 'sets specificity to the count of discrete lengths' do
+        # Base.length_specificity: a discrete [8, 11] contributes size 2.
+        # Scanner's build_priority_table calls the same helper.
+        priority = described_class.new([stub]).instance_variable_get(:@priority_for)
+        expect(priority[stub][1]).to eq(2)
+      end
+    end
+
     context 'with cache invalidation' do
       # rubocop:disable RSpec/ExampleLength
       it 'recreates detector when a new identifier type is registered' do

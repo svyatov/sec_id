@@ -25,6 +25,7 @@
   - [Valoren](#valoren) - Swiss Security Number
   - [CFI](#cfi) - Classification of Financial Instruments
   - [FISN](#fisn) - Financial Instrument Short Name
+  - [BIC](#bic) - Business Identifier Code / SWIFT code
 - [Lookup Service Integration](#lookup-service-integration)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -180,8 +181,9 @@ match.raw                    # => "US-5949-1810-45"
 match.identifier.normalized  # => "US5949181045"
 ```
 
-> **Known limitations:** Format-only types (CIK, Valoren, WKN, CFI) can false-positive on
-> common numbers and short words in prose — use the `types:` filter to restrict scanning when
+> **Known limitations:** Format-only types (CIK, Valoren, WKN, CFI, BIC) can false-positive on
+> common numbers and short words in prose (a BIC8 is 8 letters with a valid country code in the
+> middle) — use the `types:` filter to restrict scanning when
 > this is a concern. Identifiers prefixed with special characters (e.g. `#US5949181045`) may be
 > consumed as a single token by CUSIP's `*@#` character class and fail validation, preventing
 > the embedded identifier from being found.
@@ -231,6 +233,7 @@ SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 - `:invalid_group` - unknown CFI group code for category (CFI)
 - `:invalid_bban` - BBAN format invalid for country (IBAN)
 - `:invalid_date` - unparseable expiration date (OCC)
+- `:invalid_country` - unrecognized ISO 3166 / SWIFT country code (BIC)
 
 #### Fail-fast validation with `validate!`
 
@@ -626,6 +629,35 @@ fisn.to_s          # => 'APPLE INC/SH'
 ```
 
 FISN format: `Issuer Name/Abbreviated Instrument Description` with issuer (1-15 chars) and description (1-19 chars) separated by a forward slash. Character set: uppercase A-Z, digits 0-9, and space.
+
+### BIC
+
+> [Business Identifier Code](https://en.wikipedia.org/wiki/ISO_9362) - an 8- or 11-character code identifying financial and non-financial institutions per ISO 9362 (also known as a SWIFT code).
+
+```ruby
+# class level
+SecID::BIC.valid?('DEUTDEFF')       # => true  (BIC8)
+SecID::BIC.valid?('DEUTDEFF500')    # => true  (BIC11)
+
+# instance level
+bic = SecID::BIC.new('DEUTDEFF500')
+bic.full_id        # => 'DEUTDEFF500'
+bic.identifier     # => 'DEUTDEFF500'
+bic.bank_code      # => 'DEUT'
+bic.country_code   # => 'DE'
+bic.location_code  # => 'FF'
+bic.branch_code    # => '500' (nil for a BIC8)
+bic.valid?         # => true
+```
+
+BIC accepts exactly 8 or 11 characters: a 4-letter institution code, 2-letter country code, 2-alphanumeric location code, and (for BIC11) a 3-alphanumeric branch code. The country code (positions 5-6) is validated against a frozen ISO 3166-1 / SWIFT-recognized set; a well-formed BIC with an unrecognized country is an `:invalid_country` structural error.
+
+```ruby
+SecID::BIC.valid?('DEUTZZFF')       # => false ('ZZ' is not a recognized country)
+SecID::BIC.countries                # => ['AD', 'AE', 'AF', ...] (sorted, includes 'XK')
+```
+
+BIC validation confirms structure and a real country code only. It does **not** verify that the institution, location, or branch corresponds to a registered SWIFT participant — that requires the licensed SWIFT registry.
 
 ## Lookup Service Integration
 

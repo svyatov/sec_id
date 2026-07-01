@@ -8,15 +8,15 @@ RSpec.describe SecID do
   end
 
   describe '.identifiers' do
-    it 'returns all 13 identifier classes' do
-      expect(described_class.identifiers.size).to eq(13)
+    it 'returns all 14 identifier classes' do
+      expect(described_class.identifiers.size).to eq(14)
     end
 
     it 'includes all expected classes' do
       expected = [
         SecID::ISIN, SecID::CUSIP, SecID::SEDOL, SecID::FIGI, SecID::LEI,
         SecID::IBAN, SecID::CIK, SecID::OCC, SecID::WKN, SecID::Valoren,
-        SecID::CEI, SecID::CFI, SecID::FISN,
+        SecID::CEI, SecID::CFI, SecID::FISN, SecID::BIC,
       ]
       expect(described_class.identifiers).to match_array(expected)
     end
@@ -24,7 +24,7 @@ RSpec.describe SecID do
     it 'returns a copy that does not affect the internal list' do
       list = described_class.identifiers
       list.clear
-      expect(described_class.identifiers.size).to eq(13)
+      expect(described_class.identifiers.size).to eq(14)
     end
   end
 
@@ -405,6 +405,37 @@ RSpec.describe SecID do
     it 'raises NotImplementedError for a type that does not implement generate_body' do
       klass = Class.new(SecID::Base)
       expect { klass.generate }.to raise_error(NotImplementedError)
+    end
+  end
+
+  describe 'BIC integration' do # covers AE5, R5, R6
+    it 'detects a BIC8 and BIC11' do
+      expect(described_class.detect('DEUTDEFF')).to include(:bic)
+      expect(described_class.detect('DEUTDEFF500')).to include(:bic)
+    end
+
+    it 'validates a BIC' do
+      expect(described_class.valid?('DEUTDEFF')).to be(true)
+    end
+
+    it 'parses a BIC into a SecID::BIC instance' do
+      expect(described_class.parse('DEUTDEFF500')).to be_a(SecID::BIC)
+    end
+
+    it 'extracts a BIC embedded in freeform text' do
+      matches = described_class.extract('Wire to DEUTDEFF500 today')
+      expect(matches.map(&:type)).to include(:bic)
+    end
+
+    it 'restricts scanning to BIC with types:' do
+      matches = described_class.scan('DEUTDEFF500', types: [:bic]).to_a
+      expect(matches.map(&:type)).to eq([:bic])
+    end
+
+    it 'generates a valid BIC via the central entry point' do
+      result = described_class.generate(:bic)
+      expect(result).to be_a(SecID::BIC)
+      expect(result).to be_valid
     end
   end
 end
