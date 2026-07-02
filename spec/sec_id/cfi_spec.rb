@@ -296,66 +296,25 @@ RSpec.describe SecID::CFI do
     end
   end
 
-  describe 'equity predicate methods' do
-    context 'when equity with voting rights (ESVUFR)' do
-      let(:cfi_code) { 'ESVUFR' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(true) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restricted_voting?).to be(false) }
-      it { expect(cfi.enhanced_voting?).to be(false) }
-      it { expect(cfi.no_restrictions?).to be(true) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(true) }
-      it { expect(cfi.nil_paid?).to be(false) }
-      it { expect(cfi.partly_paid?).to be(false) }
-      it { expect(cfi.registered?).to be(true) }
-      it { expect(cfi.bearer?).to be(false) }
+  describe '#decode' do
+    it 'returns a Classification for a valid CFI' do
+      expect(described_class.new('ESVUFR').decode).to be_a(SecID::CFI::Classification)
     end
 
-    context 'when equity with non-voting, restrictions, nil-paid, bearer (ESNTOB)' do
-      let(:cfi_code) { 'ESNTOB' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(true) }
-      it { expect(cfi.restrictions?).to be(true) }
-      it { expect(cfi.no_restrictions?).to be(false) }
-      it { expect(cfi.nil_paid?).to be(true) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(true) }
-      it { expect(cfi.registered?).to be(false) }
+    it 'returns nil for an invalid CFI (AE5)' do
+      expect(described_class.new('QQXXXX').decode).to be_nil
     end
 
-    context 'when equity with restricted voting (ESRXXX)' do
-      let(:cfi_code) { 'ESRXXX' }
-
-      it { expect(cfi.restricted_voting?).to be(true) }
+    it 'returns nil for an unparsed/garbage instance without raising' do
+      expect(described_class.new('INVALID').decode).to be_nil
     end
 
-    context 'when equity with enhanced voting (ESEXXX)' do
-      let(:cfi_code) { 'ESEXXX' }
-
-      it { expect(cfi.enhanced_voting?).to be(true) }
-    end
-
-    context 'when equity with partly paid (ESXXPX)' do
-      let(:cfi_code) { 'ESXXPX' }
-
-      it { expect(cfi.partly_paid?).to be(true) }
-    end
-
-    context 'when non-equity (DBXXXX)' do
-      let(:cfi_code) { 'DBXXXX' }
-
-      it { expect(cfi.equity?).to be(false) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(false) }
-      it { expect(cfi.registered?).to be(false) }
+    it 'no longer responds to the removed equity predicates' do
+      cfi = described_class.new('ESVUFR')
+      %i[equity? voting? non_voting? restricted_voting? enhanced_voting? restrictions?
+         no_restrictions? fully_paid? nil_paid? partly_paid? bearer? registered?].each do |predicate|
+        expect(cfi).not_to respond_to(predicate)
+      end
     end
   end
 
@@ -484,25 +443,6 @@ RSpec.describe SecID::CFI do
 
     it 'returns the normalized (uppercased) full id' do
       expect(cfi.full_id).to eq('ESVUFR')
-    end
-  end
-
-  describe 'X attribute handling in predicates' do
-    context 'when all attributes are X (not applicable)' do
-      let(:cfi_code) { 'ESXXXX' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restricted_voting?).to be(false) }
-      it { expect(cfi.enhanced_voting?).to be(false) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.no_restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.nil_paid?).to be(false) }
-      it { expect(cfi.partly_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(false) }
-      it { expect(cfi.registered?).to be(false) }
     end
   end
 

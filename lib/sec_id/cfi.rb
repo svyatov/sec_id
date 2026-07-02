@@ -4,24 +4,25 @@ require_relative 'cfi/tables'
 
 module SecID
   # Classification of Financial Instruments (CFI) - a 6-character alphabetic code
-  # that classifies financial instruments per ISO 10962.
+  # that classifies financial instruments per ISO 10962:2021.
   #
   # Format: 6 uppercase letters A-Z
   # - Position 1: Category code (14 valid values)
   # - Position 2: Group code (varies by category)
-  # - Positions 3-6: Attribute codes (A-Z, with X meaning "not applicable")
+  # - Positions 3-6: Attribute codes, strictly validated per group (X = "not applicable")
   #
   # @see https://en.wikipedia.org/wiki/ISO_10962
   #
   # @example Validate a CFI code
-  #   SecID::CFI.valid?('ESXXXX')  #=> true
   #   SecID::CFI.valid?('ESVUFR')  #=> true
+  #   SecID::CFI.valid?('ESZZZZ')  #=> false (Z is not a permissible equity attribute)
   #
-  # @example Access CFI components
+  # @example Access CFI components and decode the classification
   #   cfi = SecID::CFI.new('ESVUFR')
-  #   cfi.category        #=> :equity
-  #   cfi.group           #=> :common_shares
-  #   cfi.voting?         #=> true
+  #   cfi.category           #=> :equity
+  #   cfi.group              #=> :common_shares
+  #   cfi.decode.voting?     #=> true
+  #   cfi.decode.to_s        #=> "Equities / Common/Ordinary shares: Voting, ..."
   class CFI < Base
     FULL_NAME = 'Classification of Financial Instruments'
     ID_LENGTH = 6
@@ -108,86 +109,13 @@ module SecID
       GROUPS.dig(category_code, group_code)
     end
 
-    # @return [Boolean] true if category is equity
-    def equity?
-      category_code == 'E'
-    end
-
-    # Voting rights (position 3 = V). Only meaningful for equity.
+    # Decodes this CFI into its full ISO 10962:2021 classification.
     #
-    # @return [Boolean]
-    def voting?
-      equity? && attr1 == 'V'
-    end
+    # @return [Classification, nil] the classification, or nil if this CFI is invalid
+    def decode
+      return nil unless valid?
 
-    # Non-voting (position 3 = N). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def non_voting?
-      equity? && attr1 == 'N'
-    end
-
-    # Restricted voting (position 3 = R). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def restricted_voting?
-      equity? && attr1 == 'R'
-    end
-
-    # Enhanced voting (position 3 = E). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def enhanced_voting?
-      equity? && attr1 == 'E'
-    end
-
-    # Ownership restrictions exist (position 4 = T). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def restrictions?
-      equity? && attr2 == 'T'
-    end
-
-    # No ownership restrictions (position 4 = U). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def no_restrictions?
-      equity? && attr2 == 'U'
-    end
-
-    # Fully paid shares (position 5 = F). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def fully_paid?
-      equity? && attr3 == 'F'
-    end
-
-    # Nil paid shares (position 5 = O). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def nil_paid?
-      equity? && attr3 == 'O'
-    end
-
-    # Partly paid shares (position 5 = P). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def partly_paid?
-      equity? && attr3 == 'P'
-    end
-
-    # Bearer form (position 6 = B). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def bearer?
-      equity? && attr4 == 'B'
-    end
-
-    # Registered form (position 6 = R). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def registered?
-      equity? && attr4 == 'R'
+      Classification.new(category_code, group_code, attribute_letters)
     end
 
     # @return [String]
@@ -352,3 +280,5 @@ module SecID
     end
   end
 end
+
+require_relative 'cfi/classification'
