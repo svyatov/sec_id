@@ -142,12 +142,14 @@ RSpec.describe SecID::CFI do
       'OCXXXX' => { category: :listed_options, group: :call_options },
       'FFXXXX' => { category: :futures, group: :financial_futures },
       'SRXXXX' => { category: :swaps, group: :rates },
-      'HCXXXX' => { category: :non_listed_options, group: :call_options },
+      'HCXXXX' => { category: :non_listed_options, group: :credit },
       'IFXXXX' => { category: :spot, group: :foreign_exchange },
       'JFXXXX' => { category: :forwards, group: :foreign_exchange },
       'KRXXXX' => { category: :strategies, group: :rates },
-      'LSXXXX' => { category: :financing, group: :loan_lease },
-      'TIXXXX' => { category: :referential_instruments, group: :currencies },
+      'LLXXXX' => { category: :financing, group: :loan_lease },
+      'LSXXXX' => { category: :financing, group: :securities_lending },
+      'TCXXXX' => { category: :referential_instruments, group: :currencies },
+      'TIXXXX' => { category: :referential_instruments, group: :indices },
       'MCXXXX' => { category: :miscellaneous, group: :combined_instruments }
     }.each do |code, expected|
       it "returns #{expected[:category]}/#{expected[:group]} for #{code}" do
@@ -155,6 +157,39 @@ RSpec.describe SecID::CFI do
         expect(cfi.category).to eq(expected[:category])
         expect(cfi.group).to eq(expected[:group])
       end
+    end
+  end
+
+  describe 'ISO 10962:2021 corrected group tables' do
+    it 'classifies H (non-listed options) by underlying, not call/put' do
+      expect(described_class.groups_for('H')).to eq(
+        'R' => :rates, 'T' => :commodities, 'E' => :equity,
+        'C' => :credit, 'F' => :foreign_exchange, 'M' => :miscellaneous
+      )
+    end
+
+    it 'corrects the L, T, D, and M group symbols' do
+      expect(described_class.groups_for('L')).to include('L' => :loan_lease, 'S' => :securities_lending)
+      expect(described_class.groups_for('T')).to include('C' => :currencies, 'T' => :commodities, 'I' => :indices)
+      expect(described_class.groups_for('D')).to include('E' => :structured_products_without_protection,
+                                                         'N' => :municipal_bonds)
+      expect(described_class.groups_for('M')).to include('M' => :other_assets)
+    end
+
+    it 'drops the invented municipal_notes group' do
+      expect(described_class.groups_for('D').values).not_to include(:municipal_notes)
+    end
+
+    it 'rejects the phantom FM/IM/JM/LM groups with :invalid_group' do
+      %w[FMXXXX IMXXXX JMXXXX LMXXXX].each do |code|
+        result = described_class.new(code).errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_group]), "expected #{code} invalid group"
+      end
+    end
+
+    it 'keeps the 14-letter category set unchanged' do
+      expect(described_class.categories.size).to eq(14)
+      expect(described_class.categories['E']).to eq(:equity)
     end
   end
 

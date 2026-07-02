@@ -17,6 +17,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 ### Changed
 
 - `SecID.valid?` and `SecID.parse` are faster and allocate less — `SecID.valid?` short-circuits on the first matching type instead of running a full detect-and-sort, and `SecID.parse` reuses the instance built during detection instead of instantiating the matched type a second time
+- **BREAKING:** `SecID::CFI` group tables corrected to ISO 10962:2021 — six categories carried wrong group letters. Non-listed options (`H`) are now classified by underlying (`HR` Rates, `HT` Commodities, `HE` Equity, `HC` Credit, `HF` FX, `HM` Others) instead of the copied listed-option call/put shape; `D` gains `DE` (structured products without capital protection) and corrects `DG`/`DA`/`DN` (dropping the invented `municipal_notes`); `L` becomes `LL`/`LR`/`LS`, `T` becomes `TC`/`TT`/`TR`/`TI`/…, and the phantom `FM`/`IM`/`JM`/`LM` groups are removed. Group symbols renamed accordingly (e.g. `LS` → `:securities_lending`, `TI` → `:indices`, `MM` → `:other_assets`). Real `H`-category codes that were rejected now validate; codes relying on the old wrong letters no longer do
 
 ## [5.2.0] - 2026-02-24
 

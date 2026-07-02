@@ -39,134 +39,15 @@ module SecID
         (?<attr4>[A-Z]))
     \z/x
 
-    # Category codes per ISO 10962.
-    CATEGORIES = {
-      'E' => :equity,
-      'C' => :collective_investment_vehicles,
-      'D' => :debt_instruments,
-      'R' => :entitlements,
-      'O' => :listed_options,
-      'F' => :futures,
-      'S' => :swaps,
-      'H' => :non_listed_options,
-      'I' => :spot,
-      'J' => :forwards,
-      'K' => :strategies,
-      'L' => :financing,
-      'T' => :referential_instruments,
-      'M' => :miscellaneous
-    }.freeze
+    # Category codes per ISO 10962:2021, derived from {SecID::CFITables}
+    # (letter => symbol).
+    CATEGORIES = CFITables::CATEGORIES.transform_values(&:first).freeze
 
-    # Group codes per category per ISO 10962.
-    GROUPS = {
-      'E' => { # Equity
-        'S' => :common_shares,
-        'P' => :preferred_shares,
-        'C' => :convertible_common_shares,
-        'F' => :convertible_preferred_shares,
-        'L' => :limited_partnership_units,
-        'D' => :depositary_receipts,
-        'Y' => :structured_instruments,
-        'M' => :miscellaneous
-      },
-      'C' => { # Collective Investment Vehicles
-        'I' => :standard_investment_funds,
-        'H' => :hedge_funds,
-        'B' => :real_estate_investment_trusts,
-        'E' => :exchange_traded_funds,
-        'S' => :pension_funds,
-        'F' => :funds_of_funds,
-        'P' => :private_equity_funds,
-        'M' => :miscellaneous
-      },
-      'D' => { # Debt Instruments
-        'B' => :bonds,
-        'C' => :convertible_bonds,
-        'W' => :bonds_with_warrants,
-        'T' => :medium_term_notes,
-        'Y' => :money_market_instruments,
-        'S' => :structured_instruments,
-        'E' => :mortgage_backed_securities,
-        'G' => :asset_backed_securities,
-        'A' => :municipal_bonds,
-        'N' => :municipal_notes,
-        'D' => :depositary_receipts,
-        'M' => :miscellaneous
-      },
-      'R' => { # Entitlements (Rights)
-        'A' => :allotment_rights,
-        'S' => :subscription_rights,
-        'P' => :purchase_rights,
-        'W' => :warrants,
-        'F' => :mini_future_certificates,
-        'D' => :depositary_receipts,
-        'M' => :miscellaneous
-      },
-      'O' => { # Listed Options
-        'C' => :call_options,
-        'P' => :put_options,
-        'M' => :miscellaneous
-      },
-      'F' => { # Futures
-        'F' => :financial_futures,
-        'C' => :commodities_futures,
-        'M' => :miscellaneous
-      },
-      'S' => { # Swaps
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'F' => :foreign_exchange,
-        'M' => :miscellaneous
-      },
-      'H' => { # Non-Listed (Complex) Options
-        'C' => :call_options,
-        'P' => :put_options,
-        'M' => :miscellaneous
-      },
-      'I' => { # Spot
-        'F' => :foreign_exchange,
-        'T' => :commodities,
-        'M' => :miscellaneous
-      },
-      'J' => { # Forwards
-        'F' => :foreign_exchange,
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'M' => :miscellaneous
-      },
-      'K' => { # Strategies
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'F' => :foreign_exchange,
-        'Y' => :mixed,
-        'M' => :miscellaneous
-      },
-      'L' => { # Financing
-        'S' => :loan_lease,
-        'R' => :repurchase_agreements,
-        'P' => :securities_lending,
-        'M' => :miscellaneous
-      },
-      'T' => { # Referential Instruments
-        'I' => :currencies,
-        'C' => :commodities,
-        'R' => :interest_rates,
-        'N' => :indices,
-        'B' => :baskets,
-        'D' => :stock_dividends,
-        'M' => :miscellaneous
-      },
-      'M' => { # Miscellaneous
-        'C' => :combined_instruments,
-        'M' => :miscellaneous
-      }
-    }.each_value(&:freeze).freeze
+    # Group codes per category per ISO 10962:2021, derived from
+    # {SecID::CFITables} (letter => { letter => symbol }).
+    GROUPS = CFITables::GROUPS.transform_values do |groups|
+      groups.transform_values { |group| group[:symbol] }.freeze
+    end.freeze
 
     # Returns the category codes hash.
     #
