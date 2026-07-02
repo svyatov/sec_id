@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SecID::CFITables do
+RSpec.describe SecID::CFI::Tables do
   # Expected group count per category, from docs/research/iso-10962-2021-cfi-tables.md §3.
   let(:group_counts) do
     { 'E' => 8, 'C' => 8, 'D' => 12, 'R' => 7, 'O' => 3, 'F' => 2, 'S' => 6,

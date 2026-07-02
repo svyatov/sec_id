@@ -41,15 +41,15 @@ module SecID
         (?<attr4>[A-Z]))
     \z/x
 
-    # Category codes per ISO 10962:2021, derived from {SecID::CFITables}
+    # Category codes per ISO 10962:2021, derived from {SecID::Tables}
     # (letter => symbol).
-    CATEGORIES = CFITables::CATEGORIES.transform_values(&:first).freeze
+    CATEGORIES = DeepFreeze.call(Tables::CATEGORIES.transform_values(&:first))
 
     # Group codes per category per ISO 10962:2021, derived from
-    # {SecID::CFITables} (letter => { letter => symbol }).
-    GROUPS = CFITables::GROUPS.transform_values do |groups|
-      groups.transform_values { |group| group[:symbol] }.freeze
-    end.freeze
+    # {SecID::Tables} (letter => { letter => symbol }).
+    GROUPS = DeepFreeze.call(
+      Tables::GROUPS.transform_values { |groups| groups.transform_values { |group| group[:symbol] } }
+    )
 
     # Returns the category codes hash.
     #
@@ -132,9 +132,9 @@ module SecID
     # @param random [Random] source of randomness
     # @return [String] a 6-character CFI code
     def self.generate_body(random)
-      category_code = CFITables::CATEGORIES.keys.sample(random: random)
-      group_code = CFITables::GROUPS[category_code].keys.sample(random: random)
-      attributes = CFITables::GROUPS[category_code][group_code][:attributes]
+      category_code = Tables::CATEGORIES.keys.sample(random: random)
+      group_code = Tables::GROUPS[category_code].keys.sample(random: random)
+      attributes = Tables::GROUPS[category_code][group_code][:attributes]
       letters = attributes.map { |position| sample_attribute(position, random) }
       enforce_ed_rule(category_code, group_code, letters, random)
       "#{category_code}#{group_code}#{letters.join}"
@@ -160,9 +160,9 @@ module SecID
     # @param random [Random] source of randomness
     # @return [void]
     def self.enforce_ed_rule(category_code, group_code, letters, random)
-      return unless CFITables.ed_rule_applies?(category_code, group_code, letters)
+      return unless Tables.ed_rule_applies?(category_code, group_code, letters)
 
-      rule = CFITables::ED_REDEMPTION_RULE
+      rule = Tables::ED_REDEMPTION_RULE
       letters[rule[:redemption_position]] = rule[:allowed_redemptions].sample(random: random)
     end
     private_class_method :enforce_ed_rule
@@ -229,7 +229,7 @@ module SecID
 
     # @return [Array<Array(Integer, String)>]
     def compute_attribute_violations
-      attributes = CFITables.group(category_code, group_code)[:attributes]
+      attributes = Tables.group(category_code, group_code)[:attributes]
       violations = attribute_letters.each_with_index.filter_map do |letter, index|
         [index + 3, letter] unless permitted_attribute?(attributes[index], letter)
       end
@@ -251,7 +251,7 @@ module SecID
     def ed_rule_violations
       return [] unless ed_rule_applies?
 
-      rule = CFITables::ED_REDEMPTION_RULE
+      rule = Tables::ED_REDEMPTION_RULE
       redemption = attribute_letters[rule[:redemption_position]]
       return [] if rule[:allowed_redemptions].include?(redemption)
 
@@ -261,7 +261,7 @@ module SecID
     # @return [Boolean] true when this is an ED code whose underlying triggers
     #   the redemption restriction
     def ed_rule_applies?
-      CFITables.ed_rule_applies?(category_code, group_code, attribute_letters)
+      Tables.ed_rule_applies?(category_code, group_code, attribute_letters)
     end
 
     # @return [Array<String>] the four attribute letters (positions 3-6)
@@ -279,4 +279,6 @@ module SecID
   end
 end
 
+require_relative 'cfi/field'
+require_relative 'cfi/attribute_set'
 require_relative 'cfi/classification'
