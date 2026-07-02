@@ -11,6 +11,11 @@ RSpec.describe SecID::CFI::AttributeSet do
     expect(set.to_a).to eq([voting, form])
   end
 
+  it 'returns an Enumerator when each is called without a block' do
+    expect(set.each).to be_a(Enumerator)
+    expect(set.each.to_a).to eq([voting, form])
+  end
+
   it 'reads a present field by its meaning name' do
     expect(set.voting_right).to eq(voting)
   end

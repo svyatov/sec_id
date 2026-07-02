@@ -41,12 +41,12 @@ module SecID
         (?<attr4>[A-Z]))
     \z/x
 
-    # Category codes per ISO 10962:2021, derived from {SecID::Tables}
+    # Category codes per ISO 10962:2021, derived from {SecID::CFI::Tables}
     # (letter => symbol).
     CATEGORIES = DeepFreeze.call(Tables::CATEGORIES.transform_values(&:first))
 
     # Group codes per category per ISO 10962:2021, derived from
-    # {SecID::Tables} (letter => { letter => symbol }).
+    # {SecID::CFI::Tables} (letter => { letter => symbol }).
     GROUPS = DeepFreeze.call(
       Tables::GROUPS.transform_values { |groups| groups.transform_values { |group| group[:symbol] } }
     )

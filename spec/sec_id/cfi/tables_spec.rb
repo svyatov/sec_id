@@ -45,6 +45,14 @@ RSpec.describe SecID::CFI::Tables do
     it 'never lists X in a value map (X is universal and implicit)' do
       expect(positions.select { |position| position&.last&.key?('X') }).to be_empty
     end
+
+    it 'gives every group distinct position meanings (AttributeSet keys by meaning)' do
+      bad = groups.reject do |group|
+        meanings = group[:attributes].filter_map { |position| position&.first }
+        meanings.uniq.size == meanings.size
+      end
+      expect(bad).to be_empty
+    end
   end
 
   describe 'immutability' do

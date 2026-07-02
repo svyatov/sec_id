@@ -51,6 +51,11 @@ RSpec.describe SecID::CFI::Classification do
       expect(SecID::CFI.new('ESXXXX').decode.attributes.voting_right.name).to eq(:not_applicable)
     end
 
+    it 'renders every meaningful X position as Not applicable in to_s' do
+      expect(SecID::CFI.new('ESXXXX').decode.to_s)
+        .to eq('Equities / Common/Ordinary shares: Not applicable, Not applicable, Not applicable, Not applicable')
+    end
+
     it 'omits pure-N/A positions from the attributes' do
       # FF position 6 is N/A and is absent from the decoded attributes.
       expect(SecID::CFI.new('FFSPSX').decode.attributes.map(&:meaning))

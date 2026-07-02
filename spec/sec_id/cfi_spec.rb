@@ -250,6 +250,11 @@ RSpec.describe SecID::CFI do
         .to eq("Invalid attribute(s) for group 'ED': position 4 'B'")
     end
 
+    it 'lists a position once when both the matrix and the ED rule flag it' do
+      expect(described_class.new('EDSZFB').errors.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ED': position 4 'Z'")
+    end
+
     it 'raises InvalidStructureError from validate! for a bad attribute' do
       expect { described_class.new('ESZZZZ').validate! }
         .to raise_error(SecID::InvalidStructureError, /Invalid attribute/)
