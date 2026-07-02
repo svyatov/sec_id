@@ -1,6 +1,6 @@
 # SecID [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
 
-> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, and generate.
+> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, generate, and classify.
 
 ## Table of Contents
 
@@ -182,7 +182,7 @@ match.raw                    # => "US-5949-1810-45"
 match.identifier.normalized  # => "US5949181045"
 ```
 
-> **Known limitations:** Format-only types (CIK, Valoren, WKN, CFI, BIC) can false-positive on
+> **Known limitations:** Format-only types (CIK, Valoren, WKN, BIC) can false-positive on
 > common numbers and short words in prose (a BIC8 is 8 letters with a valid country code in the
 > middle) — use the `types:` filter to restrict scanning when
 > this is a concern. Identifiers prefixed with special characters (e.g. `#US5949181045`) may be
@@ -232,6 +232,7 @@ SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 - `:invalid_prefix` - restricted FIGI prefix (FIGI)
 - `:invalid_category` - unknown CFI category code (CFI)
 - `:invalid_group` - unknown CFI group code for category (CFI)
+- `:invalid_attribute` - impermissible attribute letter for the group, or `K` code without `XXXX` (CFI)
 - `:invalid_bban` - BBAN format invalid for country (IBAN)
 - `:invalid_date` - unparseable expiration date (OCC)
 - `:invalid_country` - unrecognized ISO 3166 / SWIFT country code (BIC)
@@ -275,8 +276,9 @@ SecID::LEI.generate(random: Random.new(42)) == SecID::LEI.generate(random: Rando
 ```
 
 > **Generated identifiers are valid in format only — they are not real, registered securities.**
-> Country codes, FIGI prefixes, OCC expiry dates, and CFI attributes are random and do not map to
-> real-world instruments. Use them as test fixtures, not as references to actual securities.
+> Country codes, FIGI prefixes, OCC expiry dates, and CFI category/group/attribute choices are
+> randomly selected (from the values each standard permits) and do not map to real-world
+> instruments. Use them as test fixtures, not as references to actual securities.
 
 ### ISIN
 
@@ -579,12 +581,12 @@ valoren.to_isin('LI') # => #<SecID::ISIN> (LI ISIN)
 
 ### CFI
 
-> [Classification of Financial Instruments](https://en.wikipedia.org/wiki/ISO_10962) - a 6-character alphabetic code that classifies financial instruments per ISO 10962.
+> [Classification of Financial Instruments](https://en.wikipedia.org/wiki/ISO_10962) - a 6-character alphabetic code that classifies financial instruments per ISO 10962:2021.
 
 ```ruby
 # class level
-SecID::CFI.valid?('ESXXXX')        # => true
 SecID::CFI.valid?('ESVUFR')        # => true
+SecID::CFI.valid?('ESZZZZ')        # => false (Z is not a permissible equity attribute)
 # instance level
 cfi = SecID::CFI.new('ESVUFR')
 cfi.full_id        # => 'ESVUFR'
@@ -595,15 +597,24 @@ cfi.category       # => :equity
 cfi.group          # => :common_shares
 cfi.valid?         # => true
 
-# Equity-specific predicates
-cfi.equity?        # => true
-cfi.voting?        # => true
-cfi.restrictions?  # => false
-cfi.fully_paid?    # => true
-cfi.registered?    # => true
+# Decode the full ISO 10962:2021 classification
+d = cfi.decode
+d.category         # => :equity
+d.category_label   # => 'Equities'
+d.group            # => :common_shares
+d.group_label      # => 'Common/Ordinary shares'
+d.attributes       # => { voting_right: :voting, ownership_restrictions: :free_of_restrictions,
+                   #      payment_status: :fully_paid, form: :registered }
+d.voting?          # => true  (table-derived; true when any decoded attribute is :voting)
+d.fully_paid?      # => true
+d.to_s             # => 'Equities / Common/Ordinary shares: Voting, Free of restrictions, Fully paid, Registered'
+
+SecID::CFI.new('QQXXXX').decode    # => nil (decode returns nil for an invalid CFI)
 ```
 
-CFI validates the category code (position 1) against 14 valid values and the group code (position 2) against valid values for that category. Attribute positions 3-6 accept any letter A-Z, with X meaning "not applicable".
+CFI is validated strictly against the ISO 10962:2021 code tables for all 14 categories: the category (position 1), the group (position 2), and every attribute (positions 3-6) must be a value the standard defines for that group. `X` means "not applicable" and is accepted in every position; `Strategies` (`K`) codes carry no attributes and require `XXXX`. An impermissible attribute letter raises `InvalidStructureError` (`:invalid_attribute`).
+
+> **Migration from &lt; 6.0:** the old category-wide equity predicates (`cfi.voting?`, `cfi.fully_paid?`, …) are removed. Use `cfi.decode` and its table-derived predicates instead — `cfi.voting?` → `cfi.decode.voting?`. Several group letters and symbols also changed to match ISO 10962:2021 (e.g. non-listed options `H` are now classified by underlying, and `LS` → `:securities_lending`, `TI` → `:indices`).
 
 ```ruby
 # Introspect valid codes
