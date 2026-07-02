@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'cfi/tables'
+
 module SecID
   # Classification of Financial Instruments (CFI) - a 6-character alphabetic code
   # that classifies financial instruments per ISO 10962.

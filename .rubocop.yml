@@ -58,3 +58,4 @@ RSpec/SpecFilePathFormat:
     Checkable: concerns/checkable
     Validatable: concerns/validatable
     SecIdValidator: active_model
+    CFITables: cfi/tables
