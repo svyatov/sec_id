@@ -1,25 +1,29 @@
 # frozen_string_literal: true
 
+require_relative 'cfi/tables'
+
 module SecID
   # Classification of Financial Instruments (CFI) - a 6-character alphabetic code
-  # that classifies financial instruments per ISO 10962.
+  # that classifies financial instruments per ISO 10962:2021.
   #
   # Format: 6 uppercase letters A-Z
   # - Position 1: Category code (14 valid values)
   # - Position 2: Group code (varies by category)
-  # - Positions 3-6: Attribute codes (A-Z, with X meaning "not applicable")
+  # - Positions 3-6: Attribute codes, strictly validated per group (X = "not applicable")
   #
   # @see https://en.wikipedia.org/wiki/ISO_10962
   #
   # @example Validate a CFI code
-  #   SecID::CFI.valid?('ESXXXX')  #=> true
   #   SecID::CFI.valid?('ESVUFR')  #=> true
+  #   SecID::CFI.valid?('ESZZZZ')  #=> false (Z is not a permissible equity attribute)
   #
-  # @example Access CFI components
+  # @example Access CFI components and decode the classification
   #   cfi = SecID::CFI.new('ESVUFR')
-  #   cfi.category        #=> :equity
-  #   cfi.group           #=> :common_shares
-  #   cfi.voting?         #=> true
+  #   cfi.category                                #=> :equity
+  #   cfi.group                                   #=> :common_shares
+  #   cfi.decode.category.equity?                 #=> true
+  #   cfi.decode.attributes.voting_right.voting?  #=> true
+  #   cfi.decode.to_s                             #=> "Equities / Common/Ordinary shares: Voting, ..."
   class CFI < Base
     FULL_NAME = 'Classification of Financial Instruments'
     ID_LENGTH = 6
@@ -37,134 +41,15 @@ module SecID
         (?<attr4>[A-Z]))
     \z/x
 
-    # Category codes per ISO 10962.
-    CATEGORIES = {
-      'E' => :equity,
-      'C' => :collective_investment_vehicles,
-      'D' => :debt_instruments,
-      'R' => :entitlements,
-      'O' => :listed_options,
-      'F' => :futures,
-      'S' => :swaps,
-      'H' => :non_listed_options,
-      'I' => :spot,
-      'J' => :forwards,
-      'K' => :strategies,
-      'L' => :financing,
-      'T' => :referential_instruments,
-      'M' => :miscellaneous
-    }.freeze
+    # Category codes per ISO 10962:2021, derived from {SecID::CFI::Tables}
+    # (letter => symbol).
+    CATEGORIES = DeepFreeze.call(Tables::CATEGORIES.transform_values(&:first))
 
-    # Group codes per category per ISO 10962.
-    GROUPS = {
-      'E' => { # Equity
-        'S' => :common_shares,
-        'P' => :preferred_shares,
-        'C' => :convertible_common_shares,
-        'F' => :convertible_preferred_shares,
-        'L' => :limited_partnership_units,
-        'D' => :depositary_receipts,
-        'Y' => :structured_instruments,
-        'M' => :miscellaneous
-      },
-      'C' => { # Collective Investment Vehicles
-        'I' => :standard_investment_funds,
-        'H' => :hedge_funds,
-        'B' => :real_estate_investment_trusts,
-        'E' => :exchange_traded_funds,
-        'S' => :pension_funds,
-        'F' => :funds_of_funds,
-        'P' => :private_equity_funds,
-        'M' => :miscellaneous
-      },
-      'D' => { # Debt Instruments
-        'B' => :bonds,
-        'C' => :convertible_bonds,
-        'W' => :bonds_with_warrants,
-        'T' => :medium_term_notes,
-        'Y' => :money_market_instruments,
-        'S' => :structured_instruments,
-        'E' => :mortgage_backed_securities,
-        'G' => :asset_backed_securities,
-        'A' => :municipal_bonds,
-        'N' => :municipal_notes,
-        'D' => :depositary_receipts,
-        'M' => :miscellaneous
-      },
-      'R' => { # Entitlements (Rights)
-        'A' => :allotment_rights,
-        'S' => :subscription_rights,
-        'P' => :purchase_rights,
-        'W' => :warrants,
-        'F' => :mini_future_certificates,
-        'D' => :depositary_receipts,
-        'M' => :miscellaneous
-      },
-      'O' => { # Listed Options
-        'C' => :call_options,
-        'P' => :put_options,
-        'M' => :miscellaneous
-      },
-      'F' => { # Futures
-        'F' => :financial_futures,
-        'C' => :commodities_futures,
-        'M' => :miscellaneous
-      },
-      'S' => { # Swaps
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'F' => :foreign_exchange,
-        'M' => :miscellaneous
-      },
-      'H' => { # Non-Listed (Complex) Options
-        'C' => :call_options,
-        'P' => :put_options,
-        'M' => :miscellaneous
-      },
-      'I' => { # Spot
-        'F' => :foreign_exchange,
-        'T' => :commodities,
-        'M' => :miscellaneous
-      },
-      'J' => { # Forwards
-        'F' => :foreign_exchange,
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'M' => :miscellaneous
-      },
-      'K' => { # Strategies
-        'R' => :rates,
-        'T' => :commodities,
-        'E' => :equity,
-        'C' => :credit,
-        'F' => :foreign_exchange,
-        'Y' => :mixed,
-        'M' => :miscellaneous
-      },
-      'L' => { # Financing
-        'S' => :loan_lease,
-        'R' => :repurchase_agreements,
-        'P' => :securities_lending,
-        'M' => :miscellaneous
-      },
-      'T' => { # Referential Instruments
-        'I' => :currencies,
-        'C' => :commodities,
-        'R' => :interest_rates,
-        'N' => :indices,
-        'B' => :baskets,
-        'D' => :stock_dividends,
-        'M' => :miscellaneous
-      },
-      'M' => { # Miscellaneous
-        'C' => :combined_instruments,
-        'M' => :miscellaneous
-      }
-    }.each_value(&:freeze).freeze
+    # Group codes per category per ISO 10962:2021, derived from
+    # {SecID::CFI::Tables} (letter => { letter => symbol }).
+    GROUPS = DeepFreeze.call(
+      Tables::GROUPS.transform_values { |groups| groups.transform_values { |group| group[:symbol] } }
+    )
 
     # Returns the category codes hash.
     #
@@ -225,86 +110,13 @@ module SecID
       GROUPS.dig(category_code, group_code)
     end
 
-    # @return [Boolean] true if category is equity
-    def equity?
-      category_code == 'E'
-    end
-
-    # Voting rights (position 3 = V). Only meaningful for equity.
+    # Decodes this CFI into its full ISO 10962:2021 classification.
     #
-    # @return [Boolean]
-    def voting?
-      equity? && attr1 == 'V'
-    end
+    # @return [Classification, nil] the classification, or nil if this CFI is invalid
+    def decode
+      return nil unless valid?
 
-    # Non-voting (position 3 = N). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def non_voting?
-      equity? && attr1 == 'N'
-    end
-
-    # Restricted voting (position 3 = R). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def restricted_voting?
-      equity? && attr1 == 'R'
-    end
-
-    # Enhanced voting (position 3 = E). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def enhanced_voting?
-      equity? && attr1 == 'E'
-    end
-
-    # Ownership restrictions exist (position 4 = T). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def restrictions?
-      equity? && attr2 == 'T'
-    end
-
-    # No ownership restrictions (position 4 = U). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def no_restrictions?
-      equity? && attr2 == 'U'
-    end
-
-    # Fully paid shares (position 5 = F). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def fully_paid?
-      equity? && attr3 == 'F'
-    end
-
-    # Nil paid shares (position 5 = O). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def nil_paid?
-      equity? && attr3 == 'O'
-    end
-
-    # Partly paid shares (position 5 = P). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def partly_paid?
-      equity? && attr3 == 'P'
-    end
-
-    # Bearer form (position 6 = B). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def bearer?
-      equity? && attr4 == 'B'
-    end
-
-    # Registered form (position 6 = R). Only meaningful for equity.
-    #
-    # @return [Boolean]
-    def registered?
-      equity? && attr4 == 'R'
+      Classification.new(category_code, group_code, attribute_letters)
     end
 
     # @return [String]
@@ -312,16 +124,48 @@ module SecID
       identifier.to_s
     end
 
-    # Generates a random CFI: a category, a valid group for it, and 4 attribute letters.
+    # Generates a random CFI: a category, a valid group, and per-position
+    # attribute letters sampled only from the letters the tables permit (each
+    # position also allows X; pure-N/A positions allow only X). The ED
+    # cross-position rule is honored so every generated code is valid.
     #
     # @param random [Random] source of randomness
     # @return [String] a 6-character CFI code
     def self.generate_body(random)
-      category = CATEGORIES.keys.sample(random: random)
-      group = GROUPS[category].keys.sample(random: random)
-      "#{category}#{group}#{random_string(ALPHA, 4, random: random)}"
+      category_code = Tables::CATEGORIES.keys.sample(random: random)
+      group_code = Tables::GROUPS[category_code].keys.sample(random: random)
+      attributes = Tables::GROUPS[category_code][group_code][:attributes]
+      letters = attributes.map { |position| sample_attribute(position, random) }
+      enforce_ed_rule(category_code, group_code, letters, random)
+      "#{category_code}#{group_code}#{letters.join}"
     end
     private_class_method :generate_body
+
+    # @param position [Array, nil] a [meaning, value_map] pair or nil (N/A)
+    # @param random [Random] source of randomness
+    # @return [String] a permitted letter for the position (X for N/A positions)
+    def self.sample_attribute(position, random)
+      return 'X' if position.nil?
+
+      (position.last.keys + ['X']).sample(random: random)
+    end
+    private_class_method :sample_attribute
+
+    # Rewrites the redemption letter to a permitted value when the ED
+    # cross-position rule applies to the sampled underlying.
+    #
+    # @param category_code [String]
+    # @param group_code [String]
+    # @param letters [Array<String>] the four sampled attribute letters (mutated)
+    # @param random [Random] source of randomness
+    # @return [void]
+    def self.enforce_ed_rule(category_code, group_code, letters, random)
+      return unless Tables.ed_rule_applies?(category_code, group_code, letters)
+
+      rule = Tables::ED_REDEMPTION_RULE
+      letters[rule[:redemption_position]] = rule[:allowed_redemptions].sample(random: random)
+    end
+    private_class_method :enforce_ed_rule
 
     private
 
@@ -330,7 +174,7 @@ module SecID
 
     # @return [Boolean]
     def valid_format?
-      super && valid_category? && valid_group?
+      super && valid_category? && valid_group? && valid_attributes?
     end
 
     # @return [Array<Symbol>]
@@ -340,6 +184,7 @@ module SecID
       errors = []
       errors << :invalid_category unless valid_category?
       errors << :invalid_group unless valid_group?
+      errors << :invalid_attribute if errors.empty? && !valid_attributes?
       errors
     end
 
@@ -351,6 +196,8 @@ module SecID
         "Category '#{category_code}' is not a valid CFI category"
       when :invalid_group
         "Group '#{group_code}' is not valid for category '#{category_code}'"
+      when :invalid_attribute
+        attribute_error_message
       else
         super
       end
@@ -365,5 +212,73 @@ module SecID
     def valid_group?
       !GROUPS.dig(category_code, group_code).nil?
     end
+
+    # @return [Boolean] true when every attribute letter is permitted for its
+    #   position and the ED cross-position rule holds
+    def valid_attributes?
+      attribute_violations.empty?
+    end
+
+    # Positions (3-6) whose letter is not permitted by the attribute matrix or
+    # the ED cross-position rule, as [position, letter] pairs.
+    #
+    # @return [Array<Array(Integer, String)>]
+    def attribute_violations
+      @attribute_violations ||= compute_attribute_violations
+    end
+
+    # @return [Array<Array(Integer, String)>]
+    def compute_attribute_violations
+      attributes = Tables.group(category_code, group_code)[:attributes]
+      violations = attribute_letters.each_with_index.filter_map do |letter, index|
+        [index + 3, letter] unless permitted_attribute?(attributes[index], letter)
+      end
+      (violations + ed_rule_violations).uniq
+    end
+
+    # @param position [Array, nil] a [meaning, value_map] pair or nil (N/A)
+    # @param letter [String]
+    # @return [Boolean]
+    def permitted_attribute?(position, letter)
+      return true if letter == 'X'
+      return false if position.nil? # pure-N/A position accepts only X
+
+      position.last.key?(letter)
+    end
+
+    # @return [Array<Array(Integer, String)>] the redemption position when the
+    #   ED cross-position rule is violated, otherwise empty
+    def ed_rule_violations
+      return [] unless ed_rule_applies?
+
+      rule = Tables::ED_REDEMPTION_RULE
+      redemption = attribute_letters[rule[:redemption_position]]
+      return [] if rule[:allowed_redemptions].include?(redemption)
+
+      [[rule[:redemption_position] + 3, redemption]]
+    end
+
+    # @return [Boolean] true when this is an ED code whose underlying triggers
+    #   the redemption restriction
+    def ed_rule_applies?
+      Tables.ed_rule_applies?(category_code, group_code, attribute_letters)
+    end
+
+    # @return [Array<String>] the four attribute letters (positions 3-6)
+    def attribute_letters
+      [attr1, attr2, attr3, attr4]
+    end
+
+    # @return [String] a message naming the offending positions/letters/group
+    def attribute_error_message
+      return 'Strategies require XXXX in positions 3-6' if category_code == 'K'
+
+      offenders = attribute_violations.map { |position, letter| "position #{position} '#{letter}'" }.join(', ')
+      "Invalid attribute(s) for group '#{category_code}#{group_code}': #{offenders}"
+    end
   end
 end
+
+require_relative 'cfi/field'
+require_relative 'cfi/attribute_set'
+require_relative 'cfi/classification'

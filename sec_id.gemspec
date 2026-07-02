@@ -11,12 +11,13 @@ Gem::Specification.new do |spec|
   spec.email         = ['leonid@svyatov.ru']
 
   spec.summary       = 'A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, ' \
-                       'and generate.'
-  spec.description   = 'Validate, normalize, parse, convert, and generate securities identifiers. Auto-detect ' \
-                       'identifier type from any string. Calculate and restore check digits. Generate format-valid ' \
-                       'identifiers as test fixtures. Includes an opt-in ActiveModel/Rails validator that adds no ' \
-                       'runtime dependency. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, ' \
-                       'Valoren, CFI, FISN, and BIC.'
+                       'generate, and classify.'
+  spec.description   = 'Validate, normalize, parse, convert, generate, and classify securities identifiers. ' \
+                       'Auto-detect identifier type from any string. Calculate and restore check digits. Generate ' \
+                       'format-valid identifiers as test fixtures. Decode CFI codes to full ISO 10962:2021 ' \
+                       'classifications. Includes an opt-in ActiveModel/Rails validator that adds no runtime ' \
+                       'dependency. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, ' \
+                       'CFI, FISN, and BIC.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 

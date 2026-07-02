@@ -196,10 +196,10 @@ RSpec.describe SecID::Scanner do
         expect(matches.first.type).to eq(:isin)
       end
 
-      it 'matches RANDOM as CFI (valid category R, valid group A)' do
-        matches = SecID.extract('The word RANDOM here')
-        expect(matches.size).to eq(1)
-        expect(matches.first.type).to eq(:cfi)
+      it 'does not match RANDOM (RA carries no attributes, so NDOM is invalid)' do
+        # Under strict ISO 10962:2021 validation RA's positions 3-5 are N/A and
+        # accept only X; N/D/O are impermissible, and O excludes WKN.
+        expect(SecID.extract('The word RANDOM here')).to eq([])
       end
     end
 

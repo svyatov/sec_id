@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, and calculate check digits. Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, classify, and calculate check digits. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
 
 ### Directory Layout
 
@@ -145,7 +145,7 @@ Helper methods (private):
 
 #### Generatable (`generatable.rb`)
 
-Provides generation of new, format-valid identifiers for use as test fixtures. Included in `Base`, so every type inherits a `.generate` entry point. **Generated values are valid in format only — they are not real, registered securities** (random country codes, FIGI prefixes, OCC dates, CFI attributes).
+Provides generation of new, format-valid identifiers for use as test fixtures. Included in `Base`, so every type inherits a `.generate` entry point. **Generated values are valid in format only — they are not real, registered securities** (random country codes, FIGI prefixes, OCC dates, CFI category/group/attribute choices).
 
 Constants (charset building blocks): `ALPHA`, `DIGITS`, `ALPHANUMERIC`.
 
@@ -159,6 +159,7 @@ Per-type hooks:
 - IBAN composes a full-length body with placeholder `"00"` check digits in `generate_body`; the default `generate` then calls `restore!` to replace them with the real two-digit check value
 - OCC overrides `generate` entirely (via `OCC.build`)
 - FIGI resamples its prefix until it is not in `RESTRICTED_PREFIXES`; IBAN generates only numeric-BBAN countries (`NUMERIC_COUNTRY_RULES`); CIK/Valoren use a random integer (not a digit char-fill) to avoid leading-zero bodies
+- CFI samples each attribute position only from the letters `SecID::CFI::Tables` permits for that group (plus `X`; pure-N/A positions yield only `X`, so `K`'s `XXXX` falls out), then applies the `ED` cross-position rule — so every generated code passes strict `valid?`
 
 ### Identifier Classes
 
@@ -175,7 +176,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 **Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN, BIC):
 - Do not include `Checkable`
-- Validation based solely on format
+- Validation based solely on format (CFI additionally validates its category/group/attribute tables strictly — see below)
 
 **Type-specific normalization overrides:**
 - CIK: `normalized` returns `@identifier.rjust(10, '0')`; `normalize!` also updates `@padding`
@@ -185,7 +186,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 
 **Type-specific validation overrides:**
 - FIGI: `detect_errors` returns `:invalid_prefix` for restricted prefixes (BS, BM, GG, GB, GH, KY, VG)
-- CFI: `detect_errors` returns `:invalid_category` and/or `:invalid_group` for unrecognized codes; class methods `.categories` (returns `CATEGORIES` hash), `.groups_for(code)` (returns groups hash for a category)
+- CFI: strict ISO 10962:2021 validation — `detect_errors` returns `:invalid_category`, `:invalid_group`, and/or `:invalid_attribute` (impermissible attribute letter, `K` code missing `XXXX`, or an `ED` cross-position rule violation); attribute checks are skipped when the group is already invalid. All tables live in `SecID::CFI::Tables` (`lib/sec_id/cfi/tables.rb`), deeply frozen via `SecID::DeepFreeze.call` (`lib/sec_id/deep_freeze.rb`, a shared recursive Hash/Array freezer also used to freeze `CFI::CATEGORIES`/`GROUPS`); `CATEGORIES`/`GROUPS`/`.categories`/`.groups_for`/`#category`/`#group` are derived from it. `#decode` returns a frozen `CFI::Classification` (`lib/sec_id/cfi/classification.rb`); returns `nil` for an invalid CFI. Its `#category`, `#group`, and each attribute are `CFI::Field` objects (`lib/sec_id/cfi/field.rb`: `#code` letter, `#name` symbol, `#label` ISO string, `#meaning`, `#to_s`/`#to_h`/`#as_json`) that define a `<name>?` predicate per symbol in the field's own domain — so `category.equity?` and `attributes.voting_right.voting?` answer, but an out-of-domain predicate raises `NoMethodError` (this scoping is what replaced the old flat value-predicates). `#attributes` is a frozen `CFI::AttributeSet` (`lib/sec_id/cfi/attribute_set.rb`) — an `Enumerable` of the attribute fields with per-meaning readers (`attributes.voting_right`) and nil-safe `#[]` (`attributes[:form]`), keyed by each position's group meaning; pure-N/A positions are omitted and `X` decodes to `:not_applicable`. `Classification#to_h`/`#as_json` serialize the nested field hashes. `CFI#category`/`#group` (bare symbols) and `components`/`to_h` (raw letters) are unchanged — decoded field objects are reachable only through `#decode`. The old category-wide equity predicates were removed (migrate to `cfi.decode.attributes.<meaning>.<value>?`)
 - IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules; `.supported_countries` returns sorted array of all supported country codes
 - OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
 - BIC: `detect_errors` returns `:invalid_country` when positions 5-6 are not in the recognized set (`lib/sec_id/bic/country_codes.rb`); `.countries` returns the sorted frozen set of recognized ISO 3166 / SWIFT country codes
@@ -217,7 +218,7 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - `SecID::Error` - Base error class
 - `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
 - `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
-- `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_bban`, `:invalid_date`, `:invalid_country`)
+- `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_attribute`, `:invalid_bban`, `:invalid_date`, `:invalid_country`)
 - `SecID::AmbiguousMatchError` - Raised by `parse`/`parse!` when `on_ambiguous: :raise` and multiple types match
 - `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance

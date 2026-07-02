@@ -142,12 +142,14 @@ RSpec.describe SecID::CFI do
       'OCXXXX' => { category: :listed_options, group: :call_options },
       'FFXXXX' => { category: :futures, group: :financial_futures },
       'SRXXXX' => { category: :swaps, group: :rates },
-      'HCXXXX' => { category: :non_listed_options, group: :call_options },
+      'HCXXXX' => { category: :non_listed_options, group: :credit },
       'IFXXXX' => { category: :spot, group: :foreign_exchange },
       'JFXXXX' => { category: :forwards, group: :foreign_exchange },
       'KRXXXX' => { category: :strategies, group: :rates },
-      'LSXXXX' => { category: :financing, group: :loan_lease },
-      'TIXXXX' => { category: :referential_instruments, group: :currencies },
+      'LLXXXX' => { category: :financing, group: :loan_lease },
+      'LSXXXX' => { category: :financing, group: :securities_lending },
+      'TCXXXX' => { category: :referential_instruments, group: :currencies },
+      'TIXXXX' => { category: :referential_instruments, group: :indices },
       'MCXXXX' => { category: :miscellaneous, group: :combined_instruments }
     }.each do |code, expected|
       it "returns #{expected[:category]}/#{expected[:group]} for #{code}" do
@@ -158,66 +160,166 @@ RSpec.describe SecID::CFI do
     end
   end
 
-  describe 'equity predicate methods' do
-    context 'when equity with voting rights (ESVUFR)' do
-      let(:cfi_code) { 'ESVUFR' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(true) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restricted_voting?).to be(false) }
-      it { expect(cfi.enhanced_voting?).to be(false) }
-      it { expect(cfi.no_restrictions?).to be(true) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(true) }
-      it { expect(cfi.nil_paid?).to be(false) }
-      it { expect(cfi.partly_paid?).to be(false) }
-      it { expect(cfi.registered?).to be(true) }
-      it { expect(cfi.bearer?).to be(false) }
+  describe 'ISO 10962:2021 corrected group tables' do
+    it 'classifies H (non-listed options) by underlying, not call/put' do
+      expect(described_class.groups_for('H')).to eq(
+        'R' => :rates, 'T' => :commodities, 'E' => :equity,
+        'C' => :credit, 'F' => :foreign_exchange, 'M' => :miscellaneous
+      )
     end
 
-    context 'when equity with non-voting, restrictions, nil-paid, bearer (ESNTOB)' do
-      let(:cfi_code) { 'ESNTOB' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(true) }
-      it { expect(cfi.restrictions?).to be(true) }
-      it { expect(cfi.no_restrictions?).to be(false) }
-      it { expect(cfi.nil_paid?).to be(true) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(true) }
-      it { expect(cfi.registered?).to be(false) }
+    it 'corrects the L, T, D, and M group symbols' do
+      expect(described_class.groups_for('L')).to include('L' => :loan_lease, 'S' => :securities_lending)
+      expect(described_class.groups_for('T')).to include('C' => :currencies, 'T' => :commodities, 'I' => :indices)
+      expect(described_class.groups_for('D')).to include('E' => :structured_products_without_protection,
+                                                         'N' => :municipal_bonds)
+      expect(described_class.groups_for('M')).to include('M' => :other_assets)
     end
 
-    context 'when equity with restricted voting (ESRXXX)' do
-      let(:cfi_code) { 'ESRXXX' }
-
-      it { expect(cfi.restricted_voting?).to be(true) }
+    it 'drops the invented municipal_notes group' do
+      expect(described_class.groups_for('D').values).not_to include(:municipal_notes)
     end
 
-    context 'when equity with enhanced voting (ESEXXX)' do
-      let(:cfi_code) { 'ESEXXX' }
-
-      it { expect(cfi.enhanced_voting?).to be(true) }
+    it 'rejects the phantom FM/IM/JM/LM groups with :invalid_group' do
+      %w[FMXXXX IMXXXX JMXXXX LMXXXX].each do |code|
+        result = described_class.new(code).errors
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_group]), "expected #{code} invalid group"
+      end
     end
 
-    context 'when equity with partly paid (ESXXPX)' do
-      let(:cfi_code) { 'ESXXPX' }
+    it 'keeps the 14-letter category set unchanged' do
+      expect(described_class.categories.size).to eq(14)
+      expect(described_class.categories['E']).to eq(:equity)
+    end
+  end
 
-      it { expect(cfi.partly_paid?).to be(true) }
+  describe 'ISO 10962:2021 strict attribute validation' do
+    it 'accepts a non-listed option on rates (AE1)' do
+      expect(described_class.valid?('HRXXXX')).to be(true)
     end
 
-    context 'when non-equity (DBXXXX)' do
-      let(:cfi_code) { 'DBXXXX' }
+    it 'rejects impermissible equity attribute letters (AE2)' do
+      expect(described_class.valid?('ESZZZZ')).to be(false)
+    end
 
-      it { expect(cfi.equity?).to be(false) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(false) }
-      it { expect(cfi.registered?).to be(false) }
+    it 'requires XXXX for strategy codes (AE3)' do
+      expect(described_class.valid?('KRXXXX')).to be(true)
+      expect(described_class.valid?('KRAAAA')).to be(false)
+    end
+
+    it 'validates derivative categories as strictly as the rest (AE6)' do
+      expect(described_class.valid?('SRQQQQ')).to be(false)
+    end
+
+    it 'enforces the ED cross-position rule (AE7)' do
+      expect(described_class.valid?('EDSBFB')).to be(false)
+      expect(described_class.valid?('EDSNFB')).to be(true)
+    end
+
+    it 'accepts X in any meaningful position' do
+      expect(described_class.valid?('ESXXXX')).to be(true)
+    end
+
+    it 'accepts only X in a pure-N/A position' do
+      expect(described_class.valid?('FFSPSX')).to be(true)
+      expect(described_class.valid?('FFSPSA')).to be(false)
+    end
+
+    it 'keeps existing valid equity fixtures valid' do
+      %w[ESVUFR ESNTOB ESRXXX ESEXXX ESXXPX].each do |code|
+        expect(described_class.valid?(code)).to be(true), "expected #{code} valid"
+      end
+    end
+  end
+
+  describe 'attribute error surface' do
+    it 'reports :invalid_attribute with the offending positions and group' do
+      result = described_class.new('ESZZZZ').errors
+      expect(result.details.map { |d| d[:error] }).to eq([:invalid_attribute])
+      expect(result.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ES': position 3 'Z', position 4 'Z', position 5 'Z', position 6 'Z'")
+    end
+
+    it 'phrases the strategy violation as requiring XXXX' do
+      expect(described_class.new('KRAAAA').errors.details.first[:message])
+        .to eq('Strategies require XXXX in positions 3-6')
+    end
+
+    it 'names the redemption position for an ED rule violation' do
+      expect(described_class.new('EDSBFB').errors.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ED': position 4 'B'")
+    end
+
+    it 'lists a position once when both the matrix and the ED rule flag it' do
+      expect(described_class.new('EDSZFB').errors.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ED': position 4 'Z'")
+    end
+
+    it 'raises InvalidStructureError from validate! for a bad attribute' do
+      expect { described_class.new('ESZZZZ').validate! }
+        .to raise_error(SecID::InvalidStructureError, /Invalid attribute/)
+    end
+
+    it 'does not report attribute errors when the group is already invalid' do
+      expect(described_class.new('EZXXXX').errors.details.map { |d| d[:error] }).to eq([:invalid_group])
+    end
+
+    it 'is surfaced by SecID.explain' do
+      cfi_result = SecID.explain('ESZZZZ')[:candidates].find { |c| c[:type] == :cfi }
+      expect(cfi_result[:valid]).to be(false)
+      expect(cfi_result[:errors]).to include(a_hash_including(error: :invalid_attribute))
+    end
+  end
+
+  describe 'generation honors the attribute tables' do
+    it 'generates only valid codes across many seeds' do
+      invalid = (0...500).map { |s| described_class.generate(random: Random.new(s)) }.reject(&:valid?)
+      expect(invalid).to be_empty
+    end
+
+    it 'ends every strategy code in XXXX' do
+      strategies = (0...2000).map { |s| described_class.generate(random: Random.new(s)).identifier }
+                             .select { |id| id.start_with?('K') }
+      expect(strategies).to all(end_with('XXXX'))
+    end
+
+    it 'honors the ED conditional for a seed that lands on it' do
+      cfi = described_class.generate(random: Random.new(360))
+      expect(cfi.identifier).to start_with('EDL')
+      expect(cfi.attr2).to eq('N') # redemption restricted to N/X for LP-unit underlying
+      expect(cfi).to be_valid
+    end
+  end
+
+  describe 'detection fallout from strict validation' do
+    it 'no longer extracts RANDOM (invalid RA attributes)' do
+      expect(SecID.extract('The word RANDOM here')).to eq([])
+    end
+
+    it 'still detects ESVUFR as WKN and CFI' do
+      expect(SecID.detect('ESVUFR')).to eq(%i[wkn cfi])
+    end
+  end
+
+  describe '#decode' do
+    it 'returns a Classification for a valid CFI' do
+      expect(described_class.new('ESVUFR').decode).to be_a(SecID::CFI::Classification)
+    end
+
+    it 'returns nil for an invalid CFI (AE5)' do
+      expect(described_class.new('QQXXXX').decode).to be_nil
+    end
+
+    it 'returns nil for an unparsed/garbage instance without raising' do
+      expect(described_class.new('INVALID').decode).to be_nil
+    end
+
+    it 'no longer responds to the removed equity predicates' do
+      cfi = described_class.new('ESVUFR')
+      %i[equity? voting? non_voting? restricted_voting? enhanced_voting? restrictions?
+         no_restrictions? fully_paid? nil_paid? partly_paid? bearer? registered?].each do |predicate|
+        expect(cfi).not_to respond_to(predicate)
+      end
     end
   end
 
@@ -346,25 +448,6 @@ RSpec.describe SecID::CFI do
 
     it 'returns the normalized (uppercased) full id' do
       expect(cfi.full_id).to eq('ESVUFR')
-    end
-  end
-
-  describe 'X attribute handling in predicates' do
-    context 'when all attributes are X (not applicable)' do
-      let(:cfi_code) { 'ESXXXX' }
-
-      it { expect(cfi.equity?).to be(true) }
-      it { expect(cfi.voting?).to be(false) }
-      it { expect(cfi.non_voting?).to be(false) }
-      it { expect(cfi.restricted_voting?).to be(false) }
-      it { expect(cfi.enhanced_voting?).to be(false) }
-      it { expect(cfi.restrictions?).to be(false) }
-      it { expect(cfi.no_restrictions?).to be(false) }
-      it { expect(cfi.fully_paid?).to be(false) }
-      it { expect(cfi.nil_paid?).to be(false) }
-      it { expect(cfi.partly_paid?).to be(false) }
-      it { expect(cfi.bearer?).to be(false) }
-      it { expect(cfi.registered?).to be(false) }
     end
   end
 
