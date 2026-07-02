@@ -195,16 +195,49 @@ module SecID
       identifier.to_s
     end
 
-    # Generates a random CFI: a category, a valid group for it, and 4 attribute letters.
+    # Generates a random CFI: a category, a valid group, and per-position
+    # attribute letters sampled only from the letters the tables permit (each
+    # position also allows X; pure-N/A positions allow only X). The ED
+    # cross-position rule is honored so every generated code is valid.
     #
     # @param random [Random] source of randomness
     # @return [String] a 6-character CFI code
     def self.generate_body(random)
-      category = CATEGORIES.keys.sample(random: random)
-      group = GROUPS[category].keys.sample(random: random)
-      "#{category}#{group}#{random_string(ALPHA, 4, random: random)}"
+      category_code = CFITables::CATEGORIES.keys.sample(random: random)
+      group_code = CFITables::GROUPS[category_code].keys.sample(random: random)
+      attributes = CFITables::GROUPS[category_code][group_code][:attributes]
+      letters = attributes.map { |position| sample_attribute(position, random) }
+      enforce_ed_rule(category_code, group_code, letters, random)
+      "#{category_code}#{group_code}#{letters.join}"
     end
     private_class_method :generate_body
+
+    # @param position [Array, nil] a [meaning, value_map] pair or nil (N/A)
+    # @param random [Random] source of randomness
+    # @return [String] a permitted letter for the position (X for N/A positions)
+    def self.sample_attribute(position, random)
+      return 'X' if position.nil?
+
+      (position.last.keys + ['X']).sample(random: random)
+    end
+    private_class_method :sample_attribute
+
+    # Rewrites the redemption letter to a permitted value when the ED
+    # cross-position rule applies to the sampled underlying.
+    #
+    # @param category_code [String]
+    # @param group_code [String]
+    # @param letters [Array<String>] the four sampled attribute letters (mutated)
+    # @param random [Random] source of randomness
+    # @return [void]
+    def self.enforce_ed_rule(category_code, group_code, letters, random)
+      rule = CFITables::ED_REDEMPTION_RULE
+      return unless category_code == rule[:category] && group_code == rule[:group]
+      return unless rule[:restricted_underlyings].include?(letters[rule[:underlying_position]])
+
+      letters[rule[:redemption_position]] = rule[:allowed_redemptions].sample(random: random)
+    end
+    private_class_method :enforce_ed_rule
 
     private
 
@@ -213,7 +246,7 @@ module SecID
 
     # @return [Boolean]
     def valid_format?
-      super && valid_category? && valid_group?
+      super && valid_category? && valid_group? && valid_attributes?
     end
 
     # @return [Array<Symbol>]
@@ -223,6 +256,7 @@ module SecID
       errors = []
       errors << :invalid_category unless valid_category?
       errors << :invalid_group unless valid_group?
+      errors << :invalid_attribute if errors.empty? && !valid_attributes?
       errors
     end
 
@@ -234,6 +268,8 @@ module SecID
         "Category '#{category_code}' is not a valid CFI category"
       when :invalid_group
         "Group '#{group_code}' is not valid for category '#{category_code}'"
+      when :invalid_attribute
+        attribute_error_message
       else
         super
       end
@@ -247,6 +283,72 @@ module SecID
     # @return [Boolean]
     def valid_group?
       !GROUPS.dig(category_code, group_code).nil?
+    end
+
+    # @return [Boolean] true when every attribute letter is permitted for its
+    #   position and the ED cross-position rule holds
+    def valid_attributes?
+      attribute_violations.empty?
+    end
+
+    # Positions (3-6) whose letter is not permitted by the attribute matrix or
+    # the ED cross-position rule, as [position, letter] pairs.
+    #
+    # @return [Array<Array(Integer, String)>]
+    def attribute_violations
+      @attribute_violations ||= compute_attribute_violations
+    end
+
+    # @return [Array<Array(Integer, String)>]
+    def compute_attribute_violations
+      attributes = CFITables.group(category_code, group_code)[:attributes]
+      violations = attribute_letters.each_with_index.filter_map do |letter, index|
+        [index + 3, letter] unless permitted_attribute?(attributes[index], letter)
+      end
+      (violations + ed_rule_violations).uniq
+    end
+
+    # @param position [Array, nil] a [meaning, value_map] pair or nil (N/A)
+    # @param letter [String]
+    # @return [Boolean]
+    def permitted_attribute?(position, letter)
+      return true if letter == 'X'
+      return false if position.nil? # pure-N/A position accepts only X
+
+      position.last.key?(letter)
+    end
+
+    # @return [Array<Array(Integer, String)>] the redemption position when the
+    #   ED cross-position rule is violated, otherwise empty
+    def ed_rule_violations
+      return [] unless ed_rule_applies?
+
+      rule = CFITables::ED_REDEMPTION_RULE
+      redemption = attribute_letters[rule[:redemption_position]]
+      return [] if rule[:allowed_redemptions].include?(redemption)
+
+      [[rule[:redemption_position] + 3, redemption]]
+    end
+
+    # @return [Boolean] true when this is an ED code whose underlying triggers
+    #   the redemption restriction
+    def ed_rule_applies?
+      rule = CFITables::ED_REDEMPTION_RULE
+      category_code == rule[:category] && group_code == rule[:group] &&
+        rule[:restricted_underlyings].include?(attribute_letters[rule[:underlying_position]])
+    end
+
+    # @return [Array<String>] the four attribute letters (positions 3-6)
+    def attribute_letters
+      [attr1, attr2, attr3, attr4]
+    end
+
+    # @return [String] a message naming the offending positions/letters/group
+    def attribute_error_message
+      return 'Strategies require XXXX in positions 3-6' if category_code == 'K'
+
+      offenders = attribute_violations.map { |position, letter| "position #{position} '#{letter}'" }.join(', ')
+      "Invalid attribute(s) for group '#{category_code}#{group_code}': #{offenders}"
     end
   end
 end

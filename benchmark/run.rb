@@ -14,6 +14,7 @@ VALID_ISIN  = 'US5949181045'
 BAD_CD_ISIN = 'US5949181040' # valid format, wrong check digit
 CUSIP       = '594918104'
 SEDOL       = '2046251'
+CFI         = 'ESVUFR' # exercises the per-position attribute lookups
 # Deliberate, deterministic match set: 2 ISIN, 1 SEDOL, 1 CUSIP, 1 BIC. Avoid
 # stray 8-letter words, which can validate as a BIC8 (e.g. "Holdings" -> HOLD/IN/GS).
 TEXT = 'Portfolio: US5949181045, DE000BAY0017 and 2046251 plus BIC DEUTDEFF500 with ' \
@@ -24,6 +25,7 @@ CASES = {
   'ISIN.valid? (bad check digit)' => -> { SecID::ISIN.valid?(BAD_CD_ISIN) },
   'CUSIP.valid?' => -> { SecID::CUSIP.valid?(CUSIP) },
   'SEDOL.valid?' => -> { SecID::SEDOL.valid?(SEDOL) },
+  'CFI.valid?' => -> { SecID::CFI.valid?(CFI) },
   'SecID.valid? (unknown -> detector)' => -> { SecID.valid?(VALID_ISIN) },
   'SecID.detect' => -> { SecID.detect(VALID_ISIN) },
   'SecID.parse' => -> { SecID.parse(VALID_ISIN) },

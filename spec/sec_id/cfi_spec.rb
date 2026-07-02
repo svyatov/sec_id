@@ -193,6 +193,109 @@ RSpec.describe SecID::CFI do
     end
   end
 
+  describe 'ISO 10962:2021 strict attribute validation' do
+    it 'accepts a non-listed option on rates (AE1)' do
+      expect(described_class.valid?('HRXXXX')).to be(true)
+    end
+
+    it 'rejects impermissible equity attribute letters (AE2)' do
+      expect(described_class.valid?('ESZZZZ')).to be(false)
+    end
+
+    it 'requires XXXX for strategy codes (AE3)' do
+      expect(described_class.valid?('KRXXXX')).to be(true)
+      expect(described_class.valid?('KRAAAA')).to be(false)
+    end
+
+    it 'validates derivative categories as strictly as the rest (AE6)' do
+      expect(described_class.valid?('SRQQQQ')).to be(false)
+    end
+
+    it 'enforces the ED cross-position rule (AE7)' do
+      expect(described_class.valid?('EDSBFB')).to be(false)
+      expect(described_class.valid?('EDSNFB')).to be(true)
+    end
+
+    it 'accepts X in any meaningful position' do
+      expect(described_class.valid?('ESXXXX')).to be(true)
+    end
+
+    it 'accepts only X in a pure-N/A position' do
+      expect(described_class.valid?('FFSPSX')).to be(true)
+      expect(described_class.valid?('FFSPSA')).to be(false)
+    end
+
+    it 'keeps existing valid equity fixtures valid' do
+      %w[ESVUFR ESNTOB ESRXXX ESEXXX ESXXPX].each do |code|
+        expect(described_class.valid?(code)).to be(true), "expected #{code} valid"
+      end
+    end
+  end
+
+  describe 'attribute error surface' do
+    it 'reports :invalid_attribute with the offending positions and group' do
+      result = described_class.new('ESZZZZ').errors
+      expect(result.details.map { |d| d[:error] }).to eq([:invalid_attribute])
+      expect(result.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ES': position 3 'Z', position 4 'Z', position 5 'Z', position 6 'Z'")
+    end
+
+    it 'phrases the strategy violation as requiring XXXX' do
+      expect(described_class.new('KRAAAA').errors.details.first[:message])
+        .to eq('Strategies require XXXX in positions 3-6')
+    end
+
+    it 'names the redemption position for an ED rule violation' do
+      expect(described_class.new('EDSBFB').errors.details.first[:message])
+        .to eq("Invalid attribute(s) for group 'ED': position 4 'B'")
+    end
+
+    it 'raises InvalidStructureError from validate! for a bad attribute' do
+      expect { described_class.new('ESZZZZ').validate! }
+        .to raise_error(SecID::InvalidStructureError, /Invalid attribute/)
+    end
+
+    it 'does not report attribute errors when the group is already invalid' do
+      expect(described_class.new('EZXXXX').errors.details.map { |d| d[:error] }).to eq([:invalid_group])
+    end
+
+    it 'is surfaced by SecID.explain' do
+      cfi_result = SecID.explain('ESZZZZ')[:candidates].find { |c| c[:type] == :cfi }
+      expect(cfi_result[:valid]).to be(false)
+      expect(cfi_result[:errors]).to include(a_hash_including(error: :invalid_attribute))
+    end
+  end
+
+  describe 'generation honors the attribute tables' do
+    it 'generates only valid codes across many seeds' do
+      invalid = (0...500).map { |s| described_class.generate(random: Random.new(s)) }.reject(&:valid?)
+      expect(invalid).to be_empty
+    end
+
+    it 'ends every strategy code in XXXX' do
+      strategies = (0...2000).map { |s| described_class.generate(random: Random.new(s)).identifier }
+                             .select { |id| id.start_with?('K') }
+      expect(strategies).to all(end_with('XXXX'))
+    end
+
+    it 'honors the ED conditional for a seed that lands on it' do
+      cfi = described_class.generate(random: Random.new(360))
+      expect(cfi.identifier).to start_with('EDL')
+      expect(cfi.attr2).to eq('N') # redemption restricted to N/X for LP-unit underlying
+      expect(cfi).to be_valid
+    end
+  end
+
+  describe 'detection fallout from strict validation' do
+    it 'no longer extracts RANDOM (invalid RA attributes)' do
+      expect(SecID.extract('The word RANDOM here')).to eq([])
+    end
+
+    it 'still detects ESVUFR as WKN and CFI' do
+      expect(SecID.detect('ESVUFR')).to eq(%i[wkn cfi])
+    end
+  end
+
   describe 'equity predicate methods' do
     context 'when equity with voting rights (ESVUFR)' do
       let(:cfi_code) { 'ESVUFR' }

@@ -11,6 +11,7 @@ module SecID
       invalid_prefix: InvalidStructureError,
       invalid_category: InvalidStructureError,
       invalid_group: InvalidStructureError,
+      invalid_attribute: InvalidStructureError,
       invalid_bban: InvalidStructureError,
       invalid_date: InvalidStructureError,
       invalid_country: InvalidStructureError
