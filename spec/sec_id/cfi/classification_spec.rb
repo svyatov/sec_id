@@ -84,4 +84,26 @@ RSpec.describe SecID::CFI::Classification do
       expect(classification.to_s).to eq('Strategies / Rates')
     end
   end
+
+  describe '#to_h and #as_json' do
+    it 'returns the populated classification keyed by field' do
+      expect(SecID::CFI.new('ESVUFR').decode.to_h).to include(
+        category: :equity, category_label: 'Equities', group: :common_shares,
+        attributes: { voting_right: :voting, ownership_restrictions: :free_of_restrictions,
+                      payment_status: :fully_paid, form: :registered }
+      )
+    end
+
+    it 'returns the complete key set with empty attributes for a strategy code' do
+      expect(SecID::CFI.new('KRXXXX').decode.to_h).to eq(
+        category: :strategies, category_label: 'Strategies',
+        group: :rates, group_label: 'Rates', attributes: {}, attribute_labels: {}
+      )
+    end
+
+    it 'as_json delegates to to_h' do
+      classification = SecID::CFI.new('ESVUFR').decode
+      expect(classification.as_json).to eq(classification.to_h)
+    end
+  end
 end

@@ -66,6 +66,28 @@ module SecID
         "#{category_label} / #{group_label}: #{values}"
       end
 
+      # Returns a hash representation of this classification for serialization.
+      #
+      # @return [Hash] hash with :category, :category_label, :group,
+      #   :group_label, :attributes, and :attribute_labels keys
+      def to_h
+        {
+          category: category,
+          category_label: category_label,
+          group: group,
+          group_label: group_label,
+          attributes: attributes,
+          attribute_labels: attribute_labels
+        }
+      end
+
+      # Returns a JSON-compatible hash representation.
+      #
+      # @return [Hash]
+      def as_json(*)
+        to_h
+      end
+
       # One `<value>?` predicate per distinct attribute value symbol in the
       # tables — true when any decoded attribute holds that value.
       CFITables::VALUE_SYMBOLS.each do |symbol|

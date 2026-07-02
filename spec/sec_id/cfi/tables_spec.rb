@@ -126,6 +126,21 @@ RSpec.describe SecID::CFITables do
     end
   end
 
+  describe '.ed_rule_applies?' do
+    it 'is true for an ED code with a restricted underlying (S or L)' do
+      expect(described_class.ed_rule_applies?('E', 'D', %w[S B F B])).to be(true)
+      expect(described_class.ed_rule_applies?('E', 'D', %w[L B F B])).to be(true)
+    end
+
+    it 'is false for an ED code with a non-restricted underlying' do
+      expect(described_class.ed_rule_applies?('E', 'D', %w[B B F B])).to be(false)
+    end
+
+    it 'is false for a non-ED group' do
+      expect(described_class.ed_rule_applies?('E', 'S', %w[S B F B])).to be(false)
+    end
+  end
+
   describe 'VALUE_SYMBOLS' do
     it 'exposes distinct decoded value symbols including the AE-required ones' do
       expect(described_class::VALUE_SYMBOLS).to include(:voting, :fully_paid, :registered, :others)

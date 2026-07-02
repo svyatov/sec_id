@@ -1,3 +1,99 @@
+# Upgrading to SecID 6.0
+
+This guide covers all breaking changes when upgrading from SecID 5.x to 6.0. Every one is
+confined to `SecID::CFI`, which became a full ISO 10962:2021 classifier (strict attribute
+validation, corrected group tables, and a new `#decode` classification object replacing the
+old category-wide predicates).
+
+## Quick Reference
+
+| What changed | Before | After |
+|---|---|---|
+| CFI attribute validation is strict | `CFI.valid?('ESZZZZ')` was `true` | now `false` — positions 3-6 must match the ISO tables for the group |
+| CFI group letters/symbols corrected | old `H`/`D`/`L`/`T` groups; `FM`/`IM`/`JM`/`LM` | ISO 10962:2021 groups; e.g. `LS` → `:securities_lending`, `TI` → `:indices` |
+| Equity predicates removed | `cfi.voting?`, `cfi.fully_paid?`, … | `cfi.decode.voting?`, `cfi.decode.fully_paid?`, … |
+| `equity?` (category-wide) removed | `cfi.equity?` | `cfi.category == :equity` |
+| `no_restrictions?` uses ISO name | `cfi.no_restrictions?` | `cfi.decode.free_of_restrictions?` |
+
+## Step-by-Step
+
+### 1. Update Gemfile
+
+```ruby
+gem 'sec_id', '~> 6.0'
+```
+
+Then run `bundle update sec_id`.
+
+### 2. Expect stricter CFI validation
+
+`SecID::CFI.valid?` now validates positions 3-6 against the ISO 10962:2021 attribute tables
+for every category, not just the code's shape. Codes carrying attribute letters outside the
+tables were accepted before and are now invalid. There is no leniency option, matching every
+other identifier type.
+
+```ruby
+# Before (5.x) — shape-only
+SecID::CFI.valid?('ESZZZZ')   # => true
+
+# After (6.0) — Z is not a permissible equity attribute
+SecID::CFI.valid?('ESZZZZ')   # => false
+```
+
+Conversely, real codes the old (incorrect) group tables rejected — notably non-listed options
+(`H`), now classified by underlying (`HR` Rates, `HT` Commodities, `HE` Equity, `HC` Credit,
+`HF` FX, `HM` Miscellaneous) — now validate. If you generate CFIs as test fixtures,
+`SecID::CFI.generate` now samples only table-permitted letters, so every generated code is valid.
+
+### 3. Replace removed CFI predicates with `cfi.decode`
+
+The 12 hardcoded equity predicates (`equity?`, `voting?`, `non_voting?`, `restricted_voting?`,
+`enhanced_voting?`, `restrictions?`, `no_restrictions?`, `fully_paid?`, `nil_paid?`,
+`partly_paid?`, `bearer?`, `registered?`) are removed — they were category-wide and
+semantically wrong for non-equity groups. Use `cfi.decode` and its table-derived predicates,
+which answer only where the group defines the concept.
+
+```ruby
+# Before (5.x)
+cfi = SecID::CFI.new('ESVUFR')
+cfi.voting?        # => true
+cfi.fully_paid?    # => true
+
+# After (6.0)
+d = SecID::CFI.new('ESVUFR').decode
+d.voting?          # => true
+d.fully_paid?      # => true
+```
+
+`decode` returns `nil` for an invalid CFI, so guard before chaining:
+
+```ruby
+SecID::CFI.new('QQXXXX').decode    # => nil
+```
+
+Two names do not map name-for-name:
+
+```ruby
+# `equity?` was category-wide, not a table value:
+cfi.equity?                        # before
+cfi.category == :equity            # after — CFI#category is unchanged
+# (cfi.decode.equity? exists but is value-level — true only when an attribute *value*
+#  is :equity, e.g. an equity underlying — so it is NOT the equivalent of the old equity?.)
+
+# `no_restrictions?` uses the ISO value name:
+cfi.no_restrictions?               # before
+cfi.decode.free_of_restrictions?   # after
+```
+
+### 4. Check group symbols if you branch on them
+
+Several group symbols changed to match ISO 10962:2021 (e.g. `LS` → `:securities_lending`,
+`TI` → `:indices`, `MM` → `:other_assets`) and the phantom `FM`/`IM`/`JM`/`LM` groups were
+removed. If you match on `cfi.group`, review `SecID::CFI.groups_for(category_code)` for the
+current values.
+
+---
+
 # Upgrading to SecID 5.0
 
 This guide covers all breaking changes when upgrading from SecID 4.x to 5.0.

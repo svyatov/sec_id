@@ -991,6 +991,22 @@ module SecID
       allowed_redemptions: %w[N X].freeze
     }.freeze
 
+    # Whether the ED (depositary receipts on equities) cross-position redemption
+    # rule applies to the given group and attribute letters — i.e. this is an
+    # E/D code whose underlying triggers the redemption restriction, so the
+    # redemption position must hold one of {ED_REDEMPTION_RULE}'s allowed values.
+    # Shared by generation (enforcement) and validation so the two never drift.
+    #
+    # @param category_code [String]
+    # @param group_code [String]
+    # @param letters [Array<String>] the four attribute letters (positions 3-6)
+    # @return [Boolean]
+    def self.ed_rule_applies?(category_code, group_code, letters)
+      rule = ED_REDEMPTION_RULE
+      category_code == rule[:category] && group_code == rule[:group] &&
+        rule[:restricted_underlyings].include?(letters[rule[:underlying_position]])
+    end
+
     # Deeply freezes the given structure so every nested hash and array is
     # immutable (string labels are already frozen by the magic comment).
     #

@@ -159,10 +159,9 @@ module SecID
     # @param random [Random] source of randomness
     # @return [void]
     def self.enforce_ed_rule(category_code, group_code, letters, random)
-      rule = CFITables::ED_REDEMPTION_RULE
-      return unless category_code == rule[:category] && group_code == rule[:group]
-      return unless rule[:restricted_underlyings].include?(letters[rule[:underlying_position]])
+      return unless CFITables.ed_rule_applies?(category_code, group_code, letters)
 
+      rule = CFITables::ED_REDEMPTION_RULE
       letters[rule[:redemption_position]] = rule[:allowed_redemptions].sample(random: random)
     end
     private_class_method :enforce_ed_rule
@@ -261,9 +260,7 @@ module SecID
     # @return [Boolean] true when this is an ED code whose underlying triggers
     #   the redemption restriction
     def ed_rule_applies?
-      rule = CFITables::ED_REDEMPTION_RULE
-      category_code == rule[:category] && group_code == rule[:group] &&
-        rule[:restricted_underlyings].include?(attribute_letters[rule[:underlying_position]])
+      CFITables.ed_rule_applies?(category_code, group_code, attribute_letters)
     end
 
     # @return [Array<String>] the four attribute letters (positions 3-6)
