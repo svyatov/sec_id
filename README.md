@@ -599,22 +599,26 @@ cfi.valid?         # => true
 
 # Decode the full ISO 10962:2021 classification
 d = cfi.decode
-d.category         # => :equity
-d.category_label   # => 'Equities'
-d.group            # => :common_shares
-d.group_label      # => 'Common/Ordinary shares'
-d.attributes       # => { voting_right: :voting, ownership_restrictions: :free_of_restrictions,
-                   #      payment_status: :fully_paid, form: :registered }
-d.voting?          # => true  (table-derived; true when any decoded attribute is :voting)
-d.fully_paid?      # => true
-d.to_s             # => 'Equities / Common/Ordinary shares: Voting, Free of restrictions, Fully paid, Registered'
+d.category.name                     # => :equity
+d.category.label                    # => 'Equities'
+d.category.equity?                  # => true  (scoped to the category domain)
+d.group.name                        # => :common_shares
+d.group.label                       # => 'Common/Ordinary shares'
 
-SecID::CFI.new('QQXXXX').decode    # => nil (decode returns nil for an invalid CFI)
+# attributes is an Enumerable of fields keyed by each position's group meaning
+d.attributes.map(&:name)            # => [:voting, :free_of_restrictions, :fully_paid, :registered]
+d.attributes.voting_right.name      # => :voting
+d.attributes.voting_right.voting?   # => true   (scoped to that position's values)
+d.attributes.payment_status.label   # => 'Fully paid'
+d.attributes[:form].code            # => 'R'    (nil-safe lookup; .form also works)
+d.to_s                              # => 'Equities / Common/Ordinary shares: Voting, Free of restrictions, Fully paid, Registered'
+
+SecID::CFI.new('QQXXXX').decode     # => nil (decode returns nil for an invalid CFI)
 ```
 
 CFI is validated strictly against the ISO 10962:2021 code tables for all 14 categories: the category (position 1), the group (position 2), and every attribute (positions 3-6) must be a value the standard defines for that group. `X` means "not applicable" and is accepted in every position; `Strategies` (`K`) codes carry no attributes and require `XXXX`. An impermissible attribute letter raises `InvalidStructureError` (`:invalid_attribute`).
 
-> **Migration from &lt; 6.0:** the old category-wide equity predicates (`cfi.voting?`, `cfi.fully_paid?`, …) are removed. Use `cfi.decode` and its table-derived predicates instead — `cfi.voting?` → `cfi.decode.voting?`. Two do not map name-for-name: `cfi.equity?` → `cfi.category == :equity` (the removed helper was category-wide, not a table value), and `cfi.no_restrictions?` → `cfi.decode.free_of_restrictions?`. Several group letters and symbols also changed to match ISO 10962:2021 (e.g. non-listed options `H` are now classified by underlying, and `LS` → `:securities_lending`, `TI` → `:indices`).
+> **Migration from &lt; 6.0:** the old category-wide equity predicates (`cfi.voting?`, `cfi.fully_paid?`, …) are removed. Use `cfi.decode` and its scoped fields instead — a predicate now lives on the field whose domain defines it: `cfi.voting?` → `cfi.decode.attributes.voting_right.voting?`. Two do not map name-for-name: `cfi.equity?` → `cfi.decode.category.equity?` (or `cfi.category == :equity`), and `cfi.no_restrictions?` → `cfi.decode.attributes.ownership_restrictions.free_of_restrictions?`. Several group letters and symbols also changed to match ISO 10962:2021 (e.g. non-listed options `H` are now classified by underlying, and `LS` → `:securities_lending`, `TI` → `:indices`).
 
 ```ruby
 # Introspect valid codes

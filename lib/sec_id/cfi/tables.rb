@@ -1024,14 +1024,6 @@ module SecID
     deep_freeze(CATEGORIES)
     deep_freeze(GROUPS)
 
-    # Every distinct decoded value symbol across all attribute tables, used to
-    # generate the classification object's predicate methods.
-    VALUE_SYMBOLS = GROUPS.each_value.flat_map do |groups|
-      groups.each_value.flat_map do |group|
-        group[:attributes].compact.flat_map { |(_meaning, values)| values.each_value.map(&:first) }
-      end
-    end.uniq.sort.freeze
-
     # @param category_code [String]
     # @param group_code [String]
     # @return [Hash, nil] the group definition, or nil if unknown

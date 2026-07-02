@@ -19,10 +19,11 @@ module SecID
   #
   # @example Access CFI components and decode the classification
   #   cfi = SecID::CFI.new('ESVUFR')
-  #   cfi.category           #=> :equity
-  #   cfi.group              #=> :common_shares
-  #   cfi.decode.voting?     #=> true
-  #   cfi.decode.to_s        #=> "Equities / Common/Ordinary shares: Voting, ..."
+  #   cfi.category                                #=> :equity
+  #   cfi.group                                   #=> :common_shares
+  #   cfi.decode.category.equity?                 #=> true
+  #   cfi.decode.attributes.voting_right.voting?  #=> true
+  #   cfi.decode.to_s                             #=> "Equities / Common/Ordinary shares: Voting, ..."
   class CFI < Base
     FULL_NAME = 'Classification of Financial Instruments'
     ID_LENGTH = 6

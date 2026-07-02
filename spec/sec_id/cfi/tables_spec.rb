@@ -141,16 +141,6 @@ RSpec.describe SecID::CFITables do
     end
   end
 
-  describe 'VALUE_SYMBOLS' do
-    it 'exposes distinct decoded value symbols including the AE-required ones' do
-      expect(described_class::VALUE_SYMBOLS).to include(:voting, :fully_paid, :registered, :others)
-    end
-
-    it 'contains no duplicates' do
-      expect(described_class::VALUE_SYMBOLS).to eq(described_class::VALUE_SYMBOLS.uniq)
-    end
-  end
-
   def groups
     described_class::GROUPS.each_value.flat_map(&:values)
   end

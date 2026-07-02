@@ -11,9 +11,9 @@ old category-wide predicates).
 |---|---|---|
 | CFI attribute validation is strict | `CFI.valid?('ESZZZZ')` was `true` | now `false` — positions 3-6 must match the ISO tables for the group |
 | CFI group letters/symbols corrected | old `H`/`D`/`L`/`T` groups; `FM`/`IM`/`JM`/`LM` | ISO 10962:2021 groups; e.g. `LS` → `:securities_lending`, `TI` → `:indices` |
-| Equity predicates removed | `cfi.voting?`, `cfi.fully_paid?`, … | `cfi.decode.voting?`, `cfi.decode.fully_paid?`, … |
-| `equity?` (category-wide) removed | `cfi.equity?` | `cfi.category == :equity` |
-| `no_restrictions?` uses ISO name | `cfi.no_restrictions?` | `cfi.decode.free_of_restrictions?` |
+| Equity predicates removed | `cfi.voting?`, `cfi.fully_paid?`, … | `cfi.decode.attributes.voting_right.voting?`, … |
+| `equity?` (category-wide) removed | `cfi.equity?` | `cfi.decode.category.equity?` |
+| `no_restrictions?` uses ISO name | `cfi.no_restrictions?` | `cfi.decode.attributes.ownership_restrictions.free_of_restrictions?` |
 
 ## Step-by-Step
 
@@ -50,8 +50,9 @@ Conversely, real codes the old (incorrect) group tables rejected — notably non
 The 12 hardcoded equity predicates (`equity?`, `voting?`, `non_voting?`, `restricted_voting?`,
 `enhanced_voting?`, `restrictions?`, `no_restrictions?`, `fully_paid?`, `nil_paid?`,
 `partly_paid?`, `bearer?`, `registered?`) are removed — they were category-wide and
-semantically wrong for non-equity groups. Use `cfi.decode` and its table-derived predicates,
-which answer only where the group defines the concept.
+semantically wrong for non-equity groups. `cfi.decode` returns a classification whose
+category, group, and attributes are each a **field** object; a predicate lives on the field
+whose ISO domain defines it, so it can only answer where the concept is meaningful.
 
 ```ruby
 # Before (5.x)
@@ -61,9 +62,15 @@ cfi.fully_paid?    # => true
 
 # After (6.0)
 d = SecID::CFI.new('ESVUFR').decode
-d.voting?          # => true
-d.fully_paid?      # => true
+d.attributes.voting_right.voting?      # => true
+d.attributes.payment_status.fully_paid? # => true
 ```
+
+Each field exposes `#code` (the CFI letter), `#name` (the symbol), `#label` (the ISO string),
+and `<name>?` predicates scoped to its own domain — asking a field a predicate outside its
+domain raises `NoMethodError` (e.g. `d.attributes.payment_status.voting?`), which is what
+makes the answers unambiguous. `attributes` is an `Enumerable`; look positions up by meaning
+with `d.attributes.voting_right` or the nil-safe `d.attributes[:voting_right]`.
 
 `decode` returns `nil` for an invalid CFI, so guard before chaining:
 
@@ -74,15 +81,13 @@ SecID::CFI.new('QQXXXX').decode    # => nil
 Two names do not map name-for-name:
 
 ```ruby
-# `equity?` was category-wide, not a table value:
+# `equity?` was category-wide, not an attribute value:
 cfi.equity?                        # before
-cfi.category == :equity            # after — CFI#category is unchanged
-# (cfi.decode.equity? exists but is value-level — true only when an attribute *value*
-#  is :equity, e.g. an equity underlying — so it is NOT the equivalent of the old equity?.)
+cfi.decode.category.equity?        # after (or cfi.category == :equity — CFI#category is unchanged)
 
-# `no_restrictions?` uses the ISO value name:
-cfi.no_restrictions?               # before
-cfi.decode.free_of_restrictions?   # after
+# `no_restrictions?` uses the ISO value name, on the ownership_restrictions field:
+cfi.no_restrictions?                               # before
+cfi.decode.attributes.ownership_restrictions.free_of_restrictions?   # after
 ```
 
 ### 4. Check group symbols if you branch on them
