@@ -31,4 +31,4 @@ gem 'rbs', '~> 4.0', require: false
 gem 'steep', '~> 2.0', require: false
 
 gem 'simplecov', '~> 0.22', require: false
-gem 'simplecov_json_formatter', require: false
+gem 'simplecov-cobertura', require: false

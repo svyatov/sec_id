@@ -6,8 +6,8 @@ if ENV['COVERAGE']
   require 'simplecov'
 
   if ENV['CI']
-    require 'simplecov_json_formatter'
-    SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+    require 'simplecov-cobertura'
+    SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
   end
 
   SimpleCov.start do

@@ -77,7 +77,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: svyatov/sec_id
-        files: ./coverage/coverage.json
+        files: ./coverage/coverage.xml
         fail_ci_if_error: true
       # Only upload coverage for the latest stable Ruby version
       if: ${{ matrix.ruby_version == '4.0' }}
