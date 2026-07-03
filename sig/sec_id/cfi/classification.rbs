@@ -1,0 +1,23 @@
+module SecID
+  class CFI < Base
+    # The decoded ISO 10962:2021 classification of a valid CFI, built by {CFI#decode}.
+    class Classification
+      attr_reader category: Field
+      attr_reader group: Field
+      attr_reader attributes: AttributeSet
+
+      def initialize: (String category_code, String group_code, Array[String] letters) -> void
+      def to_s: () -> String
+      def to_h: () -> Hash[Symbol, untyped]
+      def as_json: (*untyped) -> Hash[Symbol, untyped]
+
+      private
+
+      def build_category: (String code) -> Field
+      def build_group: (String category_code, String code) -> Field
+      def build_attributes: (String category_code, String group_code, Array[String] letters) -> AttributeSet
+      def build_attribute: (untyped position, String letter) -> Field
+      def decode_value: (untyped value_map, String letter) -> [Symbol, String]
+    end
+  end
+end

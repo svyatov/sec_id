@@ -16,7 +16,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 ## Running Tests and Linting
 
 ```bash
-bundle exec rake          # Run both RuboCop and RSpec (recommended)
+bundle exec rake          # Run RuboCop, RBS validation, and RSpec (recommended)
 bundle exec rspec         # Run tests only
 bundle exec rubocop       # Run linter only
 bundle exec rubocop -a    # Auto-fix safe lint issues

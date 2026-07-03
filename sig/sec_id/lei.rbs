@@ -1,0 +1,32 @@
+module SecID
+  # Legal Entity Identifier (LEI).
+  class LEI < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    attr_reader lou_id: String?
+    attr_reader reserved: String?
+    attr_reader entity_id: String?
+
+    # Used unguarded after validation (`#numeric_identifier`); typed loosely so static
+    # Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    def identifier: () -> untyped
+
+    def initialize: (SecID::input lei) -> void
+    def to_pretty_s: () -> String?
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def check_digit_width: () -> Integer
+    def numeric_identifier: () -> String
+  end
+end

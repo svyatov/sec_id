@@ -1,0 +1,42 @@
+module SecID
+  # Host surface Validatable's instance methods call through `self`. The refined
+  # `class` return lets `self.class::ID_LENGTH` and the class metadata resolve.
+  interface _ValidatableHost
+    def identifier: () -> String?
+    def full_id: () -> String
+    def class: () -> singleton(SecID::Base)
+  end
+
+  # Provides validation methods for identifier types.
+  module Validatable : SecID::_ValidatableHost
+    ERROR_MAP: Hash[Symbol, singleton(SecID::Error)]
+
+    def self.included: (Module base) -> void
+
+    # Class methods added when Validatable is included.
+    module ClassMethods : SecID::_IdentifierClass
+      def valid?: (SecID::input id) -> bool
+      def validate: (SecID::input id) -> Base
+      def validate!: (SecID::input id) -> Base
+      def error_class_for: (Symbol code) -> singleton(SecID::Error)
+    end
+
+    def valid?: () -> bool
+    def validate: () -> self
+    def errors: () -> Errors
+    def validate!: () -> self
+
+    private
+
+    def valid_format?: () -> bool
+    def error_codes: () -> Array[Symbol]
+    def detect_errors: () -> Array[Symbol]
+    def valid_length?: () -> bool
+    def valid_characters?: () -> bool
+    def check_digit_width: () -> Integer
+    def validation_message: (Symbol code) -> String?
+    def build_error: (Symbol code, String? message) -> Errors::detail
+
+    @errors: Errors
+  end
+end

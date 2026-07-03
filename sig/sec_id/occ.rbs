@@ -1,0 +1,45 @@
+module SecID
+  # OCC Option Symbol.
+  class OCC < Base
+    FULL_NAME: String
+    ID_LENGTH: ::Range[Integer]
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    SEPARATORS: ::Regexp
+    ID_REGEX: ::Regexp
+
+    # Used unguarded as non-nil after validation; typed loosely so static Steep and
+    # runtime RBS::Test (which sees nil for invalid) agree.
+    attr_reader underlying: untyped
+    attr_reader date_str: untyped
+    attr_reader type: untyped
+    attr_reader strike_mills: untyped
+
+    def self.generate: (?random: Random) -> OCC
+    # build/compose accept any Numeric strike (e.g. Rational) and a String or Symbol type.
+    def self.build: (underlying: untyped, date: String | Date, type: untyped, strike: Integer | Float | Rational | String) -> OCC
+    def self.compose_symbol: (untyped underlying, untyped date_str, untyped type, untyped strike_mills) -> String
+
+    def initialize: (SecID::input symbol) -> void
+    def normalized: () -> String
+    def valid?: () -> bool
+    def date: () -> Date?
+    alias date_obj date
+    def strike: () -> Float?
+    def to_s: () -> String
+    def to_pretty_s: () -> String?
+
+    private
+
+    # `Integer | Float | Rational` (not `Numeric`, which lacks `#*` in RBS) so the
+    # `when Numeric then strike * 1000` branch type-checks; String is the 8-digit form.
+    def self.normalize_strike_mills: (Integer | Float | Rational | String strike) -> String
+
+    def components: () -> Hash[Symbol, untyped]
+    def error_codes: () -> Array[Symbol]
+    def validation_message: (Symbol code) -> String?
+
+    @date: Date?
+    @strike: Float?
+  end
+end

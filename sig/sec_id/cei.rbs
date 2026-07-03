@@ -1,0 +1,25 @@
+module SecID
+  # CUSIP Entity Identifier (CEI).
+  class CEI < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    attr_reader prefix: String?
+    attr_reader numeric: String?
+    attr_reader entity_id: String?
+
+    def initialize: (SecID::input cei) -> void
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+  end
+end

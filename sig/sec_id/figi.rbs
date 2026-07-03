@@ -1,0 +1,30 @@
+module SecID
+  # Financial Instrument Global Identifier (FIGI).
+  class FIGI < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    RESTRICTED_PREFIXES: Set[String]
+    GENERATE_CHARSET: Array[String]
+
+    attr_reader prefix: String?
+    attr_reader random_part: String?
+
+    def initialize: (SecID::input figi) -> void
+    def to_pretty_s: () -> String?
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def valid_format?: () -> bool
+    def detect_errors: () -> Array[Symbol]
+    def validation_message: (Symbol code) -> String?
+  end
+end

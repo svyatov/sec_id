@@ -1,0 +1,68 @@
+module SecID
+  class CFI < Base
+    # ISO 10962:2021 CFI code tables.
+    #
+    # @api private
+    module Tables
+      # `{ letter => [value_symbol, value_label] }` for one attribute position.
+      # Values are typed loosely: the `[symbol, label]` tuple literals widen to
+      # `Array[Symbol | String]` under `Hash#freeze`, and `map(&:first)` on them feeds
+      # Field domains (Array[Symbol]) — untyped keeps both sides consistent.
+      type value_map = Hash[String, untyped]
+
+      # A group definition and the (loosely-typed, deeply-nested) group table.
+      type group_def = Hash[Symbol, untyped]
+
+      NA: nil
+
+      FORM: value_map
+      VOTING: value_map
+      OWNERSHIP: value_map
+      PAYMENT: value_map
+      PREF_REDEMPTION: value_map
+      PREF_INCOME: value_map
+      DEBT_GUARANTEE: value_map
+      DEBT_REDEMPTION: value_map
+      DEBT_INTEREST_FZVK: value_map
+      DEBT_INTEREST_FZV: value_map
+      STRUCTURED_DISTRIBUTION: value_map
+      STRUCTURED_UNDERLYING: value_map
+      WARRANT_UNDERLYING: value_map
+      EXERCISE_STYLE: value_map
+      CIV_CLOSED_OPEN: value_map
+      CIV_DISTRIBUTION: value_map
+      CIV_ASSETS: value_map
+      CIV_SECURITY_FULL: value_map
+      CIV_SECURITY_SHORT: value_map
+      OPTION_STYLE: value_map
+      OPTION_UNDERLYING: value_map
+      STANDARDIZED: value_map
+      COMMODITY_ASSETS: value_map
+      RETURN_TRIGGER: value_map
+      H_OPTION_STYLE: value_map
+      H_VALUATION: value_map
+      DELIVERY_CP: value_map
+      DELIVERY_PN: value_map
+      DELIVERY_PCN: value_map
+      DELIVERY_CPE: value_map
+      H_DELIVERY: value_map
+      H_DELIVERY_N: value_map
+      H_DELIVERY_NA: value_map
+      FWD_TRIGGER_CSF: value_map
+      FWD_TRIGGER_SF: value_map
+      FWD_TRIGGER_CF: value_map
+
+      # `{ letter => [category_symbol, category_label] }`. Typed loosely (widening tuple
+      # values; generation also indexes with nilable `.keys.sample` results).
+      CATEGORIES: Hash[untyped, untyped]
+
+      # `{ cat_letter => { grp_letter => group_def } }` (typed loosely, as above).
+      GROUPS: Hash[untyped, untyped]
+
+      ED_REDEMPTION_RULE: Hash[Symbol, untyped]
+
+      def self.ed_rule_applies?: (untyped category_code, untyped group_code, untyped letters) -> bool
+      def self.group: (untyped category_code, untyped group_code) -> untyped
+    end
+  end
+end

@@ -1,0 +1,58 @@
+module SecID
+  # Base error class for all SecID errors.
+  class Error < StandardError
+  end
+
+  # Raised for invalid format, length, or characters.
+  class InvalidFormatError < Error
+  end
+
+  # Raised when the check digit does not match the calculated value.
+  class InvalidCheckDigitError < Error
+  end
+
+  # Raised for type-specific structural errors.
+  class InvalidStructureError < Error
+  end
+
+  # Raised when multiple identifier types match and on_ambiguous: :raise is used.
+  class AmbiguousMatchError < Error
+  end
+
+  def self.[]: (Symbol key) -> singleton(Base)
+  def self.identifiers: () -> Array[singleton(Base)]
+  def self.detect: (SecID::input str) -> Array[Symbol]
+  def self.valid?: (SecID::input str, ?types: Array[Symbol]?) -> bool
+  def self.extract: (String? text, ?types: Array[Symbol]?) -> Array[Match]
+  def self.scan: (String? text, ?types: Array[Symbol]?) { (Match) -> void } -> void
+               | (String? text, ?types: Array[Symbol]?) -> Enumerator[Match, void]
+  def self.explain: (SecID::input str, ?types: Array[Symbol]?) -> Hash[Symbol, untyped]
+  def self.parse: (SecID::input str, ?types: Array[Symbol]?, on_ambiguous: :all) -> Array[Base]
+                | (SecID::input str, ?types: Array[Symbol]?, ?on_ambiguous: (:first | :raise)) -> Base?
+                | (SecID::input str, ?types: Array[Symbol]?, ?on_ambiguous: Symbol) -> untyped
+  # Single broad return, not per-`on_ambiguous` overloads: the shared `parse!` body calls
+  # `result.empty?` on the `:all` path, so precise overloads would make Steep check `.empty?`
+  # against the `:first`/`:raise` arm's `Base?` and fail. Widening here keeps `result` untyped.
+  def self.parse!: (SecID::input str, ?types: Array[Symbol]?, ?on_ambiguous: Symbol) -> (Base | Array[Base])
+  def self.generate: (Symbol key, ?random: Random) -> Base
+
+  # Singleton-method privacy must be declared inline (`private def self.…`); a bare
+  # `private` section only affects instance methods, leaving these public.
+  private def self.register_identifier: (singleton(Base) klass) -> void
+  private def self.parse_any: (SecID::input str) -> Base?
+  private def self.parse_from: (SecID::input str, Array[Symbol] types) -> Base?
+  private def self.parse_strict: (SecID::input str, Array[Symbol]? types) -> Base?
+  private def self.parse_all: (SecID::input str, Array[Symbol]? types) -> Array[Base]
+  private def self.resolve_candidates: (SecID::input str, Array[Symbol]? types) -> Array[Symbol]
+  private def self.ambiguous_message: (SecID::input str, Array[Symbol] candidates) -> String
+  private def self.parse_error_message: (SecID::input str, Array[Symbol]? types) -> String
+  private def self.detector: () -> Detector
+  private def self.scanner: () -> Scanner
+  private def self.identifier_map: () -> Hash[Symbol, singleton(Base)]
+  private def self.identifier_list: () -> Array[singleton(Base)]
+
+  self.@identifier_map: Hash[Symbol, singleton(Base)]
+  self.@identifier_list: Array[singleton(Base)]
+  self.@detector: Detector?
+  self.@scanner: Scanner?
+end

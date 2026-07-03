@@ -1,0 +1,29 @@
+module SecID
+  class Valoren < Base
+    FULL_NAME: String
+    # Typed loosely: `#normalized` does `ID_LENGTH.max` and Range#max is nilable in RBS.
+    ID_LENGTH: untyped
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    ISIN_COUNTRY_CODES: Set[String]
+
+    attr_reader padding: String?
+
+    # Used unguarded after validation (`#normalized`/`#to_pretty_s`); typed loosely so
+    # static Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    def identifier: () -> untyped
+
+    def initialize: (SecID::input valoren) -> void
+    def to_pretty_s: () -> String?
+    def to_isin: (?String country_code) -> ISIN
+    def normalized: () -> String
+    def normalize!: () -> self
+    def to_s: () -> String
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+  end
+end

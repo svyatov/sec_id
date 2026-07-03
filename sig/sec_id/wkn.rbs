@@ -1,0 +1,15 @@
+module SecID
+  # Wertpapierkennnummer (WKN).
+  class WKN < Base
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    GENERATE_CHARSET: Array[String]
+
+    def initialize: (SecID::input wkn) -> void
+    def to_isin: (?String country_code) -> ISIN
+    private def self.generate_body: (Random random) -> String
+  end
+end

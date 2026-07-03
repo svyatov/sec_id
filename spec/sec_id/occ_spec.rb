@@ -72,7 +72,7 @@ RSpec.describe SecID::OCC do
         expect(occ.date_obj).to eq(Date.new(2026, 1, 16))
       end
 
-      it 'is an alias of #date' do
+      it 'is an alias of #date', :rbs_test_incompatible do
         expect(occ.method(:date_obj)).to eq(occ.method(:date))
       end
     end
@@ -309,7 +309,7 @@ RSpec.describe SecID::OCC do
     end
 
     context 'with invalid inputs' do
-      it 'raises error when missing keywords' do
+      it 'raises error when missing keywords', :rbs_test_incompatible do
         components = { underlying: 'AAPL', date: '250919', type: 'C' }
         expect { described_class.build(**components) }.to raise_error(ArgumentError, 'missing keyword: :strike')
       end

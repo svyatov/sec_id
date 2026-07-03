@@ -26,5 +26,9 @@ gem 'rspec_junit_formatter'
 gem 'rubocop', '~> 1.88.0'
 gem 'rubocop-rspec', '~> 3.10.0'
 
+# Type signatures (sig/) — dev/test only; the gem keeps zero runtime dependencies.
+gem 'rbs', '~> 4.0', require: false
+gem 'steep', '~> 2.0', require: false
+
 gem 'simplecov', '~> 0.22', require: false
 gem 'simplecov_json_formatter', require: false

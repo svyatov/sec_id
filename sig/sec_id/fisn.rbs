@@ -1,0 +1,24 @@
+module SecID
+  # Financial Instrument Short Name (FISN).
+  class FISN < Base
+    FULL_NAME: String
+    ID_LENGTH: ::Range[Integer]
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    SEPARATORS: ::Regexp
+    ID_REGEX: ::Regexp
+    FISN_CHARSET: Array[String]
+
+    attr_reader issuer: String?
+    attr_reader description: String?
+
+    def initialize: (SecID::input fisn) -> void
+    def to_s: () -> String
+    private def self.generate_body: (Random random) -> String
+    private def self.generate_part: (Integer length, Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+  end
+end

@@ -1,0 +1,41 @@
+module SecID
+  # Provides check-digit validation and calculation for identifiers with a check digit.
+  module Checkable : SecID::Base
+    CHAR_TO_DIGITS: Hash[String, Integer | Array[Integer]]
+    CHAR_TO_DIGIT: Hash[String, Integer]
+
+    def self.included: (Module base) -> void
+
+    attr_reader check_digit: Integer?
+
+    # Class methods added when Checkable is included.
+    module ClassMethods : SecID::_IdentifierClass
+      def restore: (SecID::input id_without_check_digit) -> String
+      def restore!: (SecID::input id_without_check_digit) -> Base
+      def check_digit: (SecID::input id) -> Integer
+    end
+
+    def valid?: () -> bool
+    def restore: () -> String
+    def restore!: () -> self
+    def calculate_check_digit: () -> Integer
+    def to_s: () -> String
+
+    private
+
+    def luhn_sum_double_add_double: (Array[Integer] digits) -> Integer
+    def luhn_sum_indexed: (Array[Integer] digits) -> Integer
+    def luhn_sum_standard: (Array[Integer] digits) -> Integer
+    def reversed_digits_single: (untyped id) -> Array[Integer]
+    def reversed_digits_multi: (untyped id) -> Array[Integer]
+    def error_codes: () -> Array[Symbol]
+    def check_digit_width: () -> Integer
+    def validation_message: (Symbol code) -> String?
+    def validate_format_for_calculation!: () -> void
+    def mod10: (Integer sum) -> Integer
+    def div10mod10: (Integer number) -> Integer
+    def mod97: (String numeric_string) -> Integer
+
+    @check_digit: Integer?
+  end
+end

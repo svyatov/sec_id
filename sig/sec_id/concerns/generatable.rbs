@@ -1,0 +1,26 @@
+module SecID
+  # Provides generation of new, format-valid identifiers for use as test fixtures.
+  module Generatable
+    ALPHA: Array[String]
+    DIGITS: Array[String]
+    ALPHANUMERIC: Array[String]
+
+    def self.included: (Module base) -> void
+
+    # The class-object surface Generatable's methods call once extended.
+    interface _GeneratableClass
+      def new: (SecID::input) -> Base
+      def has_check_digit?: () -> bool
+    end
+
+    # Class methods added when Generatable is included.
+    module ClassMethods : SecID::Generatable::_GeneratableClass
+      def generate: (?random: Random) -> Base
+
+      private
+
+      def generate_body: (Random _random) -> String
+      def random_string: (Array[String] charset, Integer length, random: Random) -> String
+    end
+  end
+end

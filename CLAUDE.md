@@ -11,7 +11,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Run linter**: `bundle exec rake rubocop` or `bundle exec rubocop`
 - **Safe auto-fix lint issues**: `bundle exec rubocop -a`
 - **Auto-fix ALL lint issues (potentially unsafe)**: `bundle exec rubocop -A`
-- **Run both lint and tests**: `bundle exec rake` (default task)
+- **Run both lint and tests**: `bundle exec rake` (default task: `rubocop` + `rbs` + `spec`)
+- **Validate RBS signatures**: `bundle exec rake rbs` (also in the default task)
+- **Type-check (Steep, strict)**: `bundle exec rake steep`
+- **Type coverage gate**: `bundle exec rake steep:coverage` (fails if untyped calls exceed the pinned baseline)
+- **Runtime signature check**: `bundle exec rake rbs:test` (runs the spec suite under RBS::Test)
+- **Regenerate CFI dynamic-method sigs**: `bundle exec rake sig:cfi`
 - **Run tests with coverage**: `COVERAGE=1 bundle exec rspec`
 - **Run benchmarks**: `bundle exec rake bench` (validation/detection throughput + allocations; machine-dependent, for catching regressions)
 - **Install dependencies**: `bin/setup`
@@ -24,12 +29,14 @@ This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI
 ### Directory Layout
 
 - `lib/` — gem source (shipped in the gem)
+- `sig/` — hand-written RBS type signatures mirroring the core `lib/` scope (shipped in the gem; see RBS Type Signatures below)
+- `tasks/` — build-time helpers not shipped in the gem (currently `cfi_signature_generator.rb`, shared by `rake sig:cfi` and the drift spec)
 - `spec/` — RSpec tests
 - `examples/` — runnable integration examples (not shipped in gem, linted by rubocop)
 - `docs/guides/` — lookup service integration guides (not shipped in gem)
 - `docs/solutions/` — documented solutions to past problems (bugs, best practices, design patterns), organized by category with YAML frontmatter (`module`, `tags`, `problem_type`); relevant when implementing or debugging in documented areas (not shipped in gem)
 - `CONCEPTS.md` — shared domain vocabulary (identifier anatomy, named processes); relevant when orienting to the codebase or discussing domain concepts
-- `sec_id.gemspec` `spec.files` includes only `lib/**/*.rb` and select markdown files — `docs/` and `examples/` are intentionally excluded
+- `sec_id.gemspec` `spec.files` includes `lib/**/*.rb`, `sig/**/*`, and select markdown files — `docs/` and `examples/` are intentionally excluded
 
 ### Class Hierarchy
 
@@ -223,6 +230,24 @@ Frozen, immutable value object returned by `#errors`. Contains:
 - `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
 - **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
+
+### RBS Type Signatures (`sig/`)
+
+Hand-written RBS signatures mirror the core `lib/` scope (everything except `lib/sec_id/active_model.rb` and `lib/sec_id/railtie.rb`), shipped in the gem (`sig/**/*` in `spec.files`). Checked by Steep in strict mode (`Steepfile`, `configure_code_diagnostics(D::Ruby.strict)`) and verified at runtime against the spec suite by RBS::Test (`rake rbs:test`; the generated CFI per-instance methods are the documented exception — see below). `rbs` and `steep` are dev/test-only (`require: false`); the gem stays zero-runtime-dependency. `sig/manifest.yaml` declares the one stdlib dependency (`date`; `Set` is core in rbs 4.0).
+
+Key facts for working in `sig/`:
+
+- **`lib/**/*.rb` is byte-identical to the pre-types source — a deliberate property, not a limitation**: types were added with zero edits to the securities logic, so no check-digit or classification behavior could be altered. The pragmatic choices below are driven by *inherent* runtime nilability and RBS/stdlib limits — they would remain even if `lib/` were editable, since the only alternative is dead "can't-happen" guards in check-digit math (verified redundant by RBS::Test). All are documented inline in the sigs:
+  - **Concern mixins**: `Base` includes the four concerns and `extend`s their `ClassMethods` (RBS doesn't run `self.included` hooks). Instance concerns use host-interface self-types (`_NormalizableHost`, `_ValidatableHost` with a refined `def class: () -> singleton(Base)`); `Checkable`'s self-type is `SecID::Base` (Base doesn't include it, so no ancestor cycle). Class-method modules use the `_IdentifierClass`/`_GeneratableClass` interfaces (whose `new` returns `Base`).
+  - **`untyped` where a value is legitimately nilable but used as non-nil after runtime validation** (e.g. component readers, `identifier` overrides in SEDOL/LEI/Valoren, `@identifier` on Base). `untyped` — not a non-nil "happy-path" lie — because RBS::Test sees the real `nil` for invalid input; a non-nil type would fail the runtime gate.
+  - **`restore`/`restore!`/`calculate_check_digit` are declared on `Base`** (only check-digit types implement them) so `Generatable#generate` and `Checkable::ClassMethods` type-check without narrowing on `has_check_digit?`.
+  - **Input type**: `SecID::input = String | Integer | nil` (numeric input is accepted by Valoren/CIK/CUSIP).
+  - Two Steep diagnostics are relaxed in the `Steepfile` for idioms RBS simply can't express: `UnannotatedEmptyCollection` (base.rb's `regexp.match(...) || {}`) and `UnknownConstant` (`Normalizable::ClassMethods`' polymorphic `self::SEPARATORS`). Neither affects the untyped-call gate.
+- **Coverage gate is a pinned baseline**, not literal zero: `Rakefile`'s `STEEP_UNTYPED_BASELINE` caps the residual untyped calls that are intrinsic, not a gap to close — receivers that are genuinely nilable at runtime (the `valid?`/`errors` design) plus idioms RBS/stdlib can't express (nilable stdlib `MatchData` in the scanner, `Array#map!`'s type-invariance, `freeze`-after-`case` in `DeepFreeze`, widening CFI table literals). Forcing them to zero would only add dead guards to check-digit/classification math; `rake rbs:test` verifies them at runtime instead. `rake steep:coverage` fails if the count exceeds the baseline — lower it whenever it drops.
+- **CFI dynamic methods are generated**: `Field`'s `<symbol>?` predicates and `AttributeSet`'s `<meaning>` readers are per-instance singleton methods RBS can't express per-instance, so `rake sig:cfi` emits the union of all names from `SecID::CFI::Tables` into `sig/sec_id/cfi/{field,attribute_set}.rbs` (marked generated; don't hand-edit). `tasks/cfi_signature_generator.rb` holds the walk; `spec/sig/cfi_signatures_spec.rb` regenerates in memory and fails if the committed files drift from the tables. Because these predicates/readers are defined per-instance via `define_singleton_method`, RBS::Test cannot hook them — `rake rbs:test` does **not** runtime-verify the generated CFI sigs; their guardrail is the drift spec (name-set equality against `SecID::CFI::Tables`) plus Steep's static call-site checks.
+- **RBS::Test exclusions**: four specs are tagged `:rbs_test_incompatible` and skipped under `rake rbs:test` (performance/timing budgets, an alias-identity check via `#method`, and a missing-keyword `ArgumentError` assertion) — the instrumentation changes their runtime behavior; they aren't signature-conformance tests.
+
+When editing `lib/` in the typed scope, update the corresponding `sig/` file and keep `bundle exec rake steep` / `rake steep:coverage` / `rake rbs:test` green.
 
 ## Code Style
 

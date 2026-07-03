@@ -1,0 +1,39 @@
+module SecID
+  # International Securities Identification Number (ISIN).
+  class ISIN < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    CGS_COUNTRY_CODES: Set[String]
+    NSIN_COUNTRY_TYPES: Hash[String, Symbol]
+
+    # Used unguarded as non-nil after validation (indexed/looked-up); typed loosely
+    # so both static Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    attr_reader country_code: untyped
+    attr_reader nsin: untyped
+
+    def initialize: (SecID::input isin) -> void
+    def to_pretty_s: () -> String?
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+    def to_cusip: () -> CUSIP
+    def cgs?: () -> bool
+    def sedol?: () -> bool
+    def wkn?: () -> bool
+    def valoren?: () -> bool
+    def to_sedol: () -> SEDOL
+    def to_wkn: () -> WKN
+    def to_valoren: () -> Valoren
+    def nsin_type: () -> Symbol
+    def to_nsin: () -> (CUSIP | SEDOL | WKN | Valoren | String | nil)
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+  end
+end

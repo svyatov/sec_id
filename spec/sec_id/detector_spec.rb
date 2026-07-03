@@ -267,7 +267,7 @@ RSpec.describe SecID::Detector do
     end
 
     context 'with performance' do
-      it 'detects within acceptable time' do
+      it 'detects within acceptable time', :rbs_test_incompatible do
         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         1000.times { detector.call('US5949181045') }
         elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
