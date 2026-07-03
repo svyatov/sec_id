@@ -1,4 +1,11 @@
-# SecID [![Gem Version](https://img.shields.io/gem/v/sec_id)](https://rubygems.org/gems/sec_id) [![Codecov](https://img.shields.io/codecov/c/github/svyatov/sec_id)](https://app.codecov.io/gh/svyatov/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/svyatov/sec_id/actions?query=workflow%3ACI)
+# SecID
+
+[![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://rubygems.org/gems/sec_id)
+[![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg)](https://github.com/svyatov/sec_id/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/svyatov/sec_id/branch/main/graph/badge.svg)](https://codecov.io/gh/svyatov/sec_id)
+[![Documentation](https://img.shields.io/badge/docs-rubydoc.info-blue.svg)](https://rubydoc.info/gems/sec_id)
+[![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.2-CC342D.svg)](https://www.ruby-lang.org)
+[![Types: RBS](https://img.shields.io/badge/types-RBS-8A2BE2.svg)](https://github.com/svyatov/sec_id/tree/main/sig)
 
 > A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, generate, and classify.
 
