@@ -27,9 +27,13 @@ module SecID
   #   bic.location_code  #=> "FF"
   #   bic.branch_code    #=> "500"
   class BIC < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Business Identifier Code'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = [8, 11].freeze
+    # A representative valid identifier.
     EXAMPLE = 'DEUTDEFF500'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing BIC components.

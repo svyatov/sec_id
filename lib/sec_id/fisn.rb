@@ -21,10 +21,15 @@ module SecID
   #   fisn.issuer       #=> 'APPLE INC'
   #   fisn.description  #=> 'SH'
   class FISN < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Financial Instrument Short Name'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = (3..35)
+    # A representative valid identifier.
     EXAMPLE = 'APPLE INC/SH'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = %r{\A[A-Z0-9 /]+\z}
+    # Separators stripped during normalization; spaces are structural here, so only hyphens.
     SEPARATORS = /-/
 
     # Regular expression for parsing FISN components.

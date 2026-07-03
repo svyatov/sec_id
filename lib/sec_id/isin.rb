@@ -16,9 +16,13 @@ module SecID
   class ISIN < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'International Securities Identification Number'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 12
+    # A representative valid identifier.
     EXAMPLE = 'US5949181045'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing ISIN components.

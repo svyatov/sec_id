@@ -17,9 +17,13 @@ module SecID
   class LEI < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'Legal Entity Identifier'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 20
+    # A representative valid identifier.
     EXAMPLE = '7LTWFZYICNSX8D621K86'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[0-9A-Z]+\z/
 
     # Regular expression for parsing LEI components.

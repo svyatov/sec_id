@@ -17,9 +17,13 @@ module SecID
   class CUSIP < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'Committee on Uniform Securities Identification Procedures'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 9
+    # A representative valid identifier.
     EXAMPLE = '037833100'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9*@#]+\z/
 
     # Regular expression for parsing CUSIP components.

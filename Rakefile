@@ -5,6 +5,7 @@ require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'steep/rake_task'
+require 'yard'
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -93,6 +94,17 @@ end
 desc 'Run validation/detection throughput and allocation benchmarks'
 task :bench do
   ruby '-Ilib benchmark/run.rb'
+end
+
+YARD::Rake::YardocTask.new
+
+namespace :yard do
+  desc 'Fail unless 100% of the public API is documented'
+  task :stats do
+    out = `yard stats --list-undoc`
+    puts out
+    abort 'Undocumented public API found' unless out.include?('100.00% documented')
+  end
 end
 
 task default: %i[rubocop rbs spec]

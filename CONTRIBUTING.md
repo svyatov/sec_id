@@ -87,7 +87,7 @@ docs: update README with LEI usage examples
 - Keep changes focused — one feature or fix per PR
 - Add tests for new functionality
 - Follow existing code patterns and conventions
-- Update YARD documentation for public methods
+- Update YARD documentation for the public API — 100% coverage is enforced in CI (`bundle exec rake yard:stats`)
 
 ## Questions?
 

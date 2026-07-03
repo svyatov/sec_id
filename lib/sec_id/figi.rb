@@ -17,9 +17,13 @@ module SecID
   class FIGI < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'Financial Instrument Global Identifier'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 12
+    # A representative valid identifier.
     EXAMPLE = 'BBG000BLNNH6'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[B-DF-HJ-NP-TV-Z0-9]+\z/
 
     # Regular expression for parsing FIGI components.

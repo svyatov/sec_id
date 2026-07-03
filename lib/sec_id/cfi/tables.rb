@@ -284,24 +284,31 @@ module SecID
 
       # Delivery variants.
       DELIVERY_CP = { 'C' => [:cash, 'Cash'], 'P' => [:physical, 'Physical'] }.freeze
+      # Delivery variants: physical or non-deliverable.
       DELIVERY_PN = { 'P' => [:physical, 'Physical'], 'N' => [:non_deliverable, 'Non-deliverable'] }.freeze
+      # Delivery variant: physical only.
       DELIVERY_P  = { 'P' => [:physical, 'Physical'] }.freeze
+      # Delivery variants: physical, cash, or non-deliverable.
       DELIVERY_PCN = {
         'P' => [:physical, 'Physical'],
         'C' => [:cash, 'Cash'],
         'N' => [:non_deliverable, 'Non-deliverable']
       }.freeze
+      # Delivery variants: cash, physical, or elect-at-settlement.
       DELIVERY_CPE = {
         'C' => [:cash, 'Cash'],
         'P' => [:physical, 'Physical'],
         'E' => [:elect_at_settlement, 'Elect at settlement']
       }.freeze
+      # Non-listed option delivery variants: cash, physical, or elect-at-exercise.
       H_DELIVERY = {
         'C' => [:cash, 'Cash'],
         'P' => [:physical, 'Physical'],
         'E' => [:elect_at_exercise, 'Elect at exercise']
       }.freeze
+      # H_DELIVERY variants plus non-deliverable.
       H_DELIVERY_N = H_DELIVERY.merge('N' => [:non_deliverable, 'Non-deliverable']).freeze
+      # H_DELIVERY_N variants plus auction.
       H_DELIVERY_NA = H_DELIVERY_N.merge('A' => [:auction, 'Auction']).freeze
 
       # Forward return/payout trigger variants.
@@ -310,10 +317,12 @@ module SecID
         'S' => [:spread_bet, 'Spread-bet'],
         'F' => [:forward_price, 'Forward price of underlying']
       }.freeze
+      # Forward trigger variants: spread-bet or forward price.
       FWD_TRIGGER_SF = {
         'S' => [:spread_bet, 'Spread-bet'],
         'F' => [:forward_price, 'Forward price of underlying']
       }.freeze
+      # Forward trigger variants: contract-for-difference or forward price.
       FWD_TRIGGER_CF = {
         'C' => [:contract_for_difference, 'Contract for difference'],
         'F' => [:forward_price, 'Forward price of underlying']

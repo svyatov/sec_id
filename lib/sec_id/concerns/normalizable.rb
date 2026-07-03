@@ -5,6 +5,7 @@ module SecID
   #
   # Including classes may override `SEPARATORS` (default `/[\s-]/`) and `#normalized`.
   module Normalizable
+    # Characters stripped during normalization (whitespace and hyphens); classes may override.
     SEPARATORS = /[\s-]/
 
     # @api private

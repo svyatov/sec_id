@@ -19,10 +19,15 @@ module SecID
   #   occ = SecID::OCC.build(underlying: 'AAPL', date: '2021-09-17', type: 'C', strike: 150.0)
   #   occ.to_s  #=> 'AAPL  210917C00150000'
   class OCC < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'OCC Option Symbol'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = (16..21)
+    # A representative valid identifier.
     EXAMPLE = 'AAPL  210917C00150000'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9 ]+\z/
+    # Separators stripped during normalization; spaces are structural here, so only hyphens.
     SEPARATORS = /-/
 
     # Regular expression for parsing OCC symbol components.

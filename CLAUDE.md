@@ -17,6 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Type coverage gate**: `bundle exec rake steep:coverage` (fails if untyped calls exceed the pinned baseline)
 - **Runtime signature check**: `bundle exec rake rbs:test` (runs the spec suite under RBS::Test)
 - **Regenerate CFI dynamic-method sigs**: `bundle exec rake sig:cfi`
+- **Generate API docs (YARD)**: `bundle exec rake yard` (HTML output in `doc/`, driven by `.yardopts`)
+- **Documentation coverage gate**: `bundle exec rake yard:stats` (fails unless 100% of the public API is documented; a CI step)
 - **Run tests with coverage**: `COVERAGE=1 bundle exec rspec`
 - **Run benchmarks**: `bundle exec rake bench` (validation/detection throughput + allocations; machine-dependent, for catching regressions)
 - **Install dependencies**: `bin/setup`
