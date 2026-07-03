@@ -27,8 +27,6 @@ module SecID
   #   bic.location_code  #=> "FF"
   #   bic.branch_code    #=> "500"
   class BIC < Base
-    include BICCountryCodes
-
     FULL_NAME = 'Business Identifier Code'
     ID_LENGTH = [8, 11].freeze
     EXAMPLE = 'DEUTDEFF500'

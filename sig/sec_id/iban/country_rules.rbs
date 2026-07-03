@@ -1,8 +1,5 @@
 module SecID
-  # Country-specific BBAN validation rules for IBAN.
-  #
-  # @api private
-  module IBANCountryRules
+  class IBAN < Base
     # `{ length: Integer, format: Regexp, components?: {name => [start, length]} }`, but
     # the nested literal infers as a broad Hash, so it is modelled loosely.
     type rule = Hash[Symbol, untyped]

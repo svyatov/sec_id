@@ -1,8 +1,6 @@
 module SecID
   # Business Identifier Code (BIC / SWIFT code).
   class BIC < Base
-    include BICCountryCodes
-
     FULL_NAME: String
     ID_LENGTH: Array[Integer]
     EXAMPLE: String

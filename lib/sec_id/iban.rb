@@ -19,7 +19,6 @@ module SecID
   #   SecID::IBAN.restore!('DE00370400440532013000')  #=> #<SecID::IBAN>
   class IBAN < Base
     include Checkable
-    include IBANCountryRules
 
     FULL_NAME = 'International Bank Account Number'
     ID_LENGTH = (15..34)
