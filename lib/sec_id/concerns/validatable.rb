@@ -6,6 +6,7 @@ module SecID
   # Including classes should override `#valid_format?` and optionally `#detect_errors`
   # for type-specific validation.
   module Validatable
+    # Maps error-code symbols to their exception classes; unmapped codes default to InvalidFormatError.
     ERROR_MAP = {
       invalid_check_digit: InvalidCheckDigitError,
       invalid_prefix: InvalidStructureError,

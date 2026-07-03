@@ -2,6 +2,11 @@
 
 require 'sec_id/version'
 
+# Toolkit for securities identifiers — validate, normalize, parse, detect, convert,
+# generate, and classify ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN,
+# Valoren, CFI, FISN, and BIC.
+#
+# @see https://github.com/svyatov/sec_id
 module SecID
   # Base error class for all SecID errors.
   class Error < StandardError; end

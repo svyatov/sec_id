@@ -27,6 +27,9 @@ jobs:
 
     - run: bundle exec rake rubocop
 
+    - name: Documentation coverage
+      run: bundle exec rake yard:stats
+
   types:
     runs-on: ubuntu-latest
     name: Types (Steep + RBS)

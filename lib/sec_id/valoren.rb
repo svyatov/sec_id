@@ -17,9 +17,13 @@ module SecID
   # @example Normalize a Valoren to 9 digits
   #   SecID::Valoren.normalize('3886335')  #=> '003886335'
   class Valoren < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Valoren Number'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = (5..9)
+    # A representative valid identifier.
     EXAMPLE = '3886335'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[0-9]+\z/
 
     # Regular expression for parsing Valoren components.

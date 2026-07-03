@@ -20,9 +20,13 @@ module SecID
   class IBAN < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'International Bank Account Number'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = (15..34)
+    # A representative valid identifier.
     EXAMPLE = 'GB29NWBK60161331926819'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing IBAN components.

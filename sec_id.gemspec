@@ -25,9 +25,10 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ['lib']
   spec.files = Dir['lib/**/*.rb'] + Dir['sig/**/*'] +
-               %w[CHANGELOG.md LICENSE.txt MIGRATION.md README.md sec_id.gemspec]
+               %w[.yardopts CHANGELOG.md LICENSE.txt MIGRATION.md README.md sec_id.gemspec]
 
   spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.metadata['documentation_uri'] = 'https://rubydoc.info/gems/sec_id'
   spec.metadata['source_code_uri'] = 'https://github.com/svyatov/sec_id'
   spec.metadata['changelog_uri'] = 'https://github.com/svyatov/sec_id/blob/main/CHANGELOG.md'
   spec.metadata['bug_tracker_uri'] = 'https://github.com/svyatov/sec_id/issues'

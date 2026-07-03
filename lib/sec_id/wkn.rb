@@ -13,9 +13,13 @@ module SecID
   #   SecID::WKN.valid?('514000')  #=> true
   #   SecID::WKN.valid?('CBK100')  #=> true
   class WKN < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Wertpapierkennnummer'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 6
+    # A representative valid identifier.
     EXAMPLE = '514000'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[0-9A-HJ-NP-Z]+\z/
 
     # Regular expression for parsing WKN components.

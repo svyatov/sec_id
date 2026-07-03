@@ -17,9 +17,13 @@ module SecID
   class SEDOL < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'Stock Exchange Daily Official List'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 7
+    # A representative valid identifier.
     EXAMPLE = 'B0YBKJ7'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[0-9BCDFGHJKLMNPQRSTVWXYZ]+\z/
 
     # Regular expression for parsing SEDOL components.

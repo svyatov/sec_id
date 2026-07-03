@@ -15,9 +15,13 @@ module SecID
   # @example Normalize a CIK to 10 digits
   #   SecID::CIK.normalize('1521365')  #=> '0001521365'
   class CIK < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Central Index Key'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = (1..10)
+    # A representative valid identifier.
     EXAMPLE = '0001521365'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[0-9]+\z/
 
     # Regular expression for parsing CIK components.

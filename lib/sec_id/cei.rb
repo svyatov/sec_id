@@ -13,9 +13,13 @@ module SecID
   class CEI < Base
     include Checkable
 
+    # Human-readable name of the standard.
     FULL_NAME = 'CUSIP Entity Identifier'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 10
+    # A representative valid identifier.
     EXAMPLE = 'A0BCDEFGH1'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing CEI components.

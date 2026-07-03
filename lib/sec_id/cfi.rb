@@ -25,9 +25,13 @@ module SecID
   #   cfi.decode.attributes.voting_right.voting?  #=> true
   #   cfi.decode.to_s                             #=> "Equities / Common/Ordinary shares: Voting, ..."
   class CFI < Base
+    # Human-readable name of the standard.
     FULL_NAME = 'Classification of Financial Instruments'
+    # Valid length(s) of a normalized identifier.
     ID_LENGTH = 6
+    # A representative valid identifier.
     EXAMPLE = 'ESVUFR'
+    # Pattern matching the identifier's permitted character set.
     VALID_CHARS_REGEX = /\A[A-Z]+\z/
 
     # Regular expression for parsing CFI components.
