@@ -1,0 +1,56 @@
+module SecID
+  # Classification of Financial Instruments (CFI) — ISO 10962:2021.
+  class CFI < Base
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    # Derived semantic maps (letter => symbol).
+    CATEGORIES: Hash[String, Symbol]
+    GROUPS: Hash[String, Hash[String, Symbol]]
+
+    def self.categories: () -> Hash[String, Symbol]
+    def self.groups_for: (String category_code) -> Hash[String, Symbol]?
+
+    # Used unguarded as non-nil after validation (indexed into the tables); typed loosely
+    # so static Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    attr_reader category_code: untyped
+    attr_reader group_code: untyped
+    attr_reader attr1: untyped
+    attr_reader attr2: untyped
+    attr_reader attr3: untyped
+    attr_reader attr4: untyped
+
+    def initialize: (SecID::input cfi) -> void
+    def category: () -> Symbol?
+    def group: () -> Symbol?
+    def decode: () -> Classification?
+    def to_s: () -> String
+
+    private def self.generate_body: (Random random) -> String
+    private def self.sample_attribute: (untyped position, Random random) -> String
+    private def self.enforce_ed_rule: (untyped category_code, untyped group_code, untyped letters, Random random) -> void
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def valid_format?: () -> bool
+    def detect_errors: () -> Array[Symbol]
+    def validation_message: (Symbol code) -> String?
+    def valid_category?: () -> bool
+    def valid_group?: () -> bool
+    def valid_attributes?: () -> bool
+    # `[position, letter]` pairs; typed loosely since the tuple literals widen.
+    def attribute_violations: () -> Array[untyped]
+    def compute_attribute_violations: () -> Array[untyped]
+    def permitted_attribute?: (untyped position, String letter) -> bool
+    def ed_rule_violations: () -> Array[untyped]
+    def ed_rule_applies?: () -> bool
+    def attribute_letters: () -> Array[String]
+    def attribute_error_message: () -> String
+
+    @attribute_violations: Array[untyped]
+  end
+end

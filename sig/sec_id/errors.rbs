@@ -1,0 +1,28 @@
+module SecID
+  # Immutable value object representing validation errors for an identifier.
+  class Errors
+    # A single error entry. `{ error:, message: }` in the source, but `Hash#freeze`
+    # in `build_error` widens the record literal, so it is modelled as a Hash.
+    type detail = Hash[Symbol, untyped]
+
+    attr_reader details: Array[detail]
+
+    def initialize: (Array[detail] errors) -> void
+
+    def messages: () -> Array[String?]
+
+    def any?: () -> bool
+
+    def empty?: () -> bool
+
+    alias none? empty?
+
+    def size: () -> Integer
+
+    def each: () { (detail) -> void } -> Array[detail]
+
+    def to_a: () -> Array[String?]
+
+    def as_json: (*untyped) -> Array[detail]
+  end
+end

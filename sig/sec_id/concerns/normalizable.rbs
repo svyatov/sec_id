@@ -1,0 +1,34 @@
+module SecID
+  # Host surface Normalizable's instance methods call through `self`.
+  interface _NormalizableHost
+    def identifier: () -> String?
+    def valid?: () -> bool
+    def validate!: () -> void
+  end
+
+  # Provides normalization and display-formatting methods for identifier types.
+  #
+  # `ClassMethods#normalize`/`#to_pretty_s` read `self::SEPARATORS` (polymorphic
+  # constant dispatch); the extend-module `self` can't be typed as `singleton(Base)`,
+  # so that access resolves via the relaxed UnknownConstant diagnostic (see Steepfile).
+  module Normalizable : SecID::_NormalizableHost
+    SEPARATORS: ::Regexp
+
+    def self.included: (Module base) -> void
+
+    # Class methods added when Normalizable is included.
+    module ClassMethods : SecID::_IdentifierClass
+      def normalize: (_ToS id) -> String
+      def to_pretty_s: (_ToS id) -> String?
+    end
+
+    def normalized: () -> String
+    alias normalize normalized
+    def normalize!: () -> self
+    def to_pretty_s: () -> String?
+    def to_s: () -> String
+    def to_str: () -> String
+
+    @full_id: String
+  end
+end

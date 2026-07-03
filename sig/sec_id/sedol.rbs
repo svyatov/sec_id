@@ -1,0 +1,33 @@
+module SecID
+  # Stock Exchange Daily Official List (SEDOL).
+  class SEDOL < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    CHARACTER_WEIGHTS: Array[Integer]
+    GENERATE_CHARSET: Array[String]
+    ISIN_COUNTRY_CODES: Set[String]
+
+    # Used unguarded as non-nil after validation (`#id_digits`); typed loosely so static
+    # Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    def identifier: () -> untyped
+
+    def initialize: (SecID::input sedol) -> void
+    def to_isin: (?String country_code) -> ISIN
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def weighted_sum: () -> Integer
+    def id_digits: () -> Array[Integer]
+
+    @id_digits: Array[Integer]
+  end
+end

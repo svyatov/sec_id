@@ -1,0 +1,32 @@
+module SecID
+  # Business Identifier Code (BIC / SWIFT code).
+  class BIC < Base
+    include BICCountryCodes
+
+    FULL_NAME: String
+    ID_LENGTH: Array[Integer]
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    def self.countries: () -> Array[String]
+
+    attr_reader bank_code: String?
+    attr_reader country_code: String?
+    attr_reader location_code: String?
+    attr_reader branch_code: String?
+
+    def initialize: (SecID::input bic) -> void
+    private def self.generate_body: (Random random) -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def valid_format?: () -> bool
+    def detect_errors: () -> Array[Symbol]
+    def validation_message: (Symbol code) -> String?
+    def recognized_country?: () -> bool
+
+    self.@countries: Array[String]
+  end
+end

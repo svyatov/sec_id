@@ -30,4 +30,11 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  # Under RBS::Test (rake rbs:test), skip examples that are incompatible with its
+  # runtime instrumentation — performance/timing budgets (hook overhead), alias
+  # identity via #method (hooks wrap aliases separately), and missing-keyword
+  # ArgumentError assertions (the type hook pre-empts Ruby's own error). These
+  # exercise runtime behavior, not signature conformance.
+  config.filter_run_excluding(:rbs_test_incompatible) if ENV['RBS_TEST_TARGET']
 end

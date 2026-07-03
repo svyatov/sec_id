@@ -1,0 +1,72 @@
+module SecID
+  # Accepted raw input for parsing/validating an identifier: a String, an Integer
+  # (Valoren/CIK/CUSIP accept numeric input), or nil.
+  type input = String | Integer | nil
+
+  # The class-object surface the concern ClassMethods modules call through `self`
+  # once extended onto an identifier class (they construct instances via `new`).
+  interface _IdentifierClass
+    def new: (SecID::input) -> Base
+  end
+
+  # Base class for securities identifiers, providing a common interface for
+  # validation, normalization, parsing, and generation.
+  class Base
+    include Normalizable
+    include Validatable
+    include Generatable
+    extend Normalizable::ClassMethods
+    extend Validatable::ClassMethods
+    extend Generatable::ClassMethods
+
+    # Metadata constants each subclass overrides with its concrete shape. Declared
+    # here (as the widest shape) so the shared concern method bodies type-check.
+    FULL_NAME: String
+    ID_LENGTH: Integer | ::Range[Integer] | ::Array[Integer]
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    attr_reader full_id: String
+    # Reader is nilable (nil for invalid input, checked by `valid_format?`); the ivar is
+    # typed `untyped` because subclasses use `@identifier` as non-nil after validation and
+    # RBS forbids narrowing an inherited ivar's type.
+    def identifier: () -> String?
+
+    def self.short_name: () -> String
+    def self.full_name: () -> String
+    def self.id_length: () -> (Integer | ::Range[Integer] | ::Array[Integer])
+    def self.length_values: () -> (::Array[Integer] | ::Range[Integer])
+    def self.length_specificity: () -> (Integer | Float | nil)
+    def self.example: () -> String
+    def self.has_check_digit?: () -> bool
+    def self.inherited: (singleton(Base) subclass) -> void
+
+    def initialize: (SecID::input _sec_id_number) -> void
+
+    def ==: (Base other) -> bool
+    alias eql? ==
+    def hash: () -> Integer
+    def to_h: () -> Hash[Symbol, untyped]
+    def as_json: (*untyped) -> Hash[Symbol, untyped]
+
+    # Check-digit surface. Only the types that `include Checkable` implement these
+    # (they raise/NoMethodError otherwise); declared on Base so `Generatable#generate`
+    # and `Checkable::ClassMethods` type-check without narrowing on `has_check_digit?`.
+    def restore: () -> String
+    def restore!: () -> self
+    def calculate_check_digit: () -> Integer
+
+    def comparison_id: () -> String
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def parse: (SecID::input sec_id_number) -> (::MatchData | ::Hash[Symbol, untyped])
+
+    @full_id: String
+    @identifier: untyped
+    self.@short_name: String
+    self.@has_check_digit: bool
+  end
+end

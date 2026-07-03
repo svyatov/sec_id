@@ -28,6 +28,7 @@
   - [BIC](#bic) - Business Identifier Code / SWIFT code
 - [ActiveModel / Rails Validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
 - [Lookup Service Integration](#lookup-service-integration)
+- [Type Signatures (RBS)](#type-signatures-rbs)
 - [Development](#development)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -742,6 +743,32 @@ SecID validates identifiers but does not include HTTP clients. The [`docs/guides
 | [Eurex](docs/guides/eurex.md) | [Eurex Reference Data](https://www.eurex.com/ex-en/data/free-reference-data-api) | ISIN |
 
 Each guide includes a complete adapter class and a [runnable example](examples/).
+
+## Type Signatures (RBS)
+
+sec_id ships hand-written [RBS](https://github.com/ruby/rbs) signatures under `sig/`,
+packaged in the gem — so if you use [Steep](https://github.com/soutaro/steep) or an
+RBS-aware editor, sec_id's types resolve automatically on install, no `rbs collection`
+entry required. The only standard-library signature referenced is `date`, declared in
+`sig/manifest.yaml`.
+
+The core library is checked by Steep in strict mode and verified at runtime against the
+test suite via RBS::Test. The optional ActiveModel/Rails adapter is excluded from the
+typed scope (it lives off the default require path).
+
+Contributor commands:
+
+```bash
+bundle exec rake rbs             # validate the signatures (also part of `rake`)
+bundle exec rake steep           # strict Steep type check
+bundle exec rake steep:coverage  # untyped-call coverage gate
+bundle exec rake rbs:test        # verify runtime values against the signatures
+bundle exec rake sig:cfi         # regenerate the CFI dynamic-method signatures
+```
+
+The CFI per-instance dynamic methods (`Field` predicates and `AttributeSet` readers) are
+generated from `SecID::CFI::Tables` by `rake sig:cfi`; a drift-guard spec fails if the
+committed signatures fall out of sync with the tables.
 
 ## Development
 

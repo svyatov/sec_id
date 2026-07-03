@@ -1,0 +1,19 @@
+module SecID
+  # Central Index Key (CIK).
+  class CIK < Base
+    FULL_NAME: String
+    # Typed loosely: `#normalized` does `ID_LENGTH.max` and Range#max is nilable in RBS.
+    ID_LENGTH: untyped
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    attr_reader padding: String?
+
+    def initialize: (SecID::input cik) -> void
+    def normalized: () -> String
+    def normalize!: () -> self
+    def to_s: () -> String
+    private def self.generate_body: (Random random) -> String
+  end
+end

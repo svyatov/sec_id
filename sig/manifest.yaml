@@ -1,0 +1,8 @@
+# Standard-library signatures these RBS files reference. Consumers' RBS/Steep
+# load these automatically when they depend on sec_id. (The gem has no runtime
+# gem dependencies, so none are auto-derived from the gemspec.)
+#
+# Set (ISIN, SEDOL, FIGI, Valoren, BIC) is a core class in rbs 4.0 — always
+# loaded, so it needs no manifest entry.
+dependencies:
+  - name: date  # Date in OCC

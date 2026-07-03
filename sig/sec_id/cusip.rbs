@@ -1,0 +1,28 @@
+module SecID
+  # Committee on Uniform Securities Identification Procedures (CUSIP).
+  class CUSIP < Base
+    include Checkable
+    extend Checkable::ClassMethods
+
+    FULL_NAME: String
+    ID_LENGTH: Integer
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+
+    # `#cins?` indexes `cusip6[0]` (nilable even for a non-nil String); typed loosely.
+    attr_reader cusip6: untyped
+    attr_reader issue: String?
+
+    def initialize: (SecID::input cusip) -> void
+    def to_pretty_s: () -> String?
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+    def to_isin: (String country_code) -> ISIN
+    def cins?: () -> bool
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+  end
+end

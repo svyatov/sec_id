@@ -255,7 +255,7 @@ RSpec.describe SecID::Scanner do
   end
 
   describe 'performance' do
-    it 'scans 1000-word text with identifiers in reasonable time' do
+    it 'scans 1000-word text with identifiers in reasonable time', :rbs_test_incompatible do
       words = Array.new(990) { ('a'..'z').to_a.sample(5).join }
       identifiers = %w[US5949181045 594918104 B0YBKJ7 BBG000BLNNH6 7LTWFZYICNSX8D621K86
                        DE89370400440532013000 0000320193 514000 A0BCDEFGH1 ESVUFR]

@@ -1,0 +1,54 @@
+module SecID
+  # International Bank Account Number (IBAN).
+  class IBAN < Base
+    include Checkable
+    extend Checkable::ClassMethods
+    include IBANCountryRules
+
+    FULL_NAME: String
+    ID_LENGTH: ::Range[Integer]
+    EXAMPLE: String
+    VALID_CHARS_REGEX: ::Regexp
+    ID_REGEX: ::Regexp
+    NUMERIC_COUNTRY_RULES: Array[[String, IBANCountryRules::rule]]
+
+    def self.supported_countries: () -> Array[String]
+
+    # country_code/bban are used unguarded after validation; typed loosely so static
+    # Steep and runtime RBS::Test (which sees nil for invalid) agree.
+    attr_reader country_code: untyped
+    attr_reader bban: untyped
+    # Optional BBAN components; typed loosely so `#components` (which conditionally
+    # assigns them into an inferred hash) type-checks.
+    attr_reader bank_code: untyped
+    attr_reader branch_code: untyped
+    attr_reader account_number: untyped
+    attr_reader national_check: untyped
+
+    def initialize: (SecID::input iban) -> void
+    def restore: () -> String
+    def calculate_check_digit: () -> Integer
+    private def self.generate_body: (Random random) -> String
+    def valid_bban_format?: () -> bool
+    def country_rule: () -> IBANCountryRules::rule?
+    def known_country?: () -> bool
+    def to_s: () -> String
+    def to_pretty_s: () -> String?
+
+    private
+
+    def components: () -> Hash[Symbol, untyped]
+    def check_digit_width: () -> Integer
+    def valid_format?: () -> bool
+    def detect_errors: () -> Array[Symbol]
+    def validation_message: (Symbol code) -> String?
+    def extract_check_digit_and_bban: (String rest) -> void
+    def expected_bban_length_for_country: () -> Integer?
+    def check_digits?: (untyped rest, Integer? expected_bban_length) -> bool
+    def extract_bban_components: () -> void
+    def valid_bban_length_only?: () -> bool
+    def numeric_string_for_check: () -> String
+
+    self.@supported_countries: Array[String]
+  end
+end

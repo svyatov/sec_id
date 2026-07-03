@@ -1,0 +1,46 @@
+module SecID
+  # Immutable value object representing a matched identifier found in text.
+  class Match < Data
+    attr_reader type: Symbol
+    attr_reader raw: String
+    attr_reader range: Range[Integer]
+    attr_reader identifier: Base
+
+    def self.new: (type: Symbol, raw: String, range: Range[Integer], identifier: Base) -> instance
+                | (Symbol type, String raw, Range[Integer] range, Base identifier) -> instance
+    def self.[]: (type: Symbol, raw: String, range: Range[Integer], identifier: Base) -> instance
+               | (Symbol type, String raw, Range[Integer] range, Base identifier) -> instance
+  end
+
+  # Finds securities identifiers in freeform text.
+  #
+  # @api private
+  class Scanner
+    # Regex plumbing works with nilable MatchData throughout; typed `untyped` so the
+    # nil-unguarded capture access in the internal helpers stays free of noise.
+    CANDIDATE_RE: untyped
+
+    def initialize: (Array[singleton(Base)] identifier_list) -> void
+    def call: (String? text, ?classes: Array[singleton(Base)]?) { (Match) -> void } -> void
+            | (String? text, ?classes: Array[singleton(Base)]?) -> Enumerator[Match, void]
+            | (String? text, ?classes: Array[singleton(Base)]?) ?{ (Match) -> void } -> Enumerator[Match, void]?
+
+    private
+
+    def precompute: () -> void
+    def build_key_table: () -> void
+    def build_priority_table: () -> void
+    def scan_text: (String input, Array[singleton(Base)] target_classes) { (Match) -> void } -> void
+    def identify_candidate: (untyped match_data, Array[singleton(Base)] target_classes) -> Match?
+    def try_classes: (String raw, String cleaned, Integer start_pos, Array[singleton(Base)] classes) -> Match?
+    def best_match: (String cleaned, Array[singleton(Base)] classes) -> singleton(Base)?
+
+    @classes: Array[singleton(Base)]
+    @fisn_classes: Array[singleton(Base)]
+    @occ_classes: Array[singleton(Base)]
+    @simple_classes: Array[singleton(Base)]
+    @candidates_by_length: Hash[Integer, Array[singleton(Base)]]
+    @priority_for: Hash[singleton(Base), Array[Integer | Float | nil]]
+    @key_for: Hash[singleton(Base), Symbol]
+  end
+end

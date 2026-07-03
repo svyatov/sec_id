@@ -27,6 +27,29 @@ jobs:
 
     - run: bundle exec rake rubocop
 
+  types:
+    runs-on: ubuntu-latest
+    name: Types (Steep + RBS)
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '4.0'
+        bundler-cache: true
+
+    - name: Validate RBS signatures
+      run: bundle exec rake rbs
+
+    - name: Type check (Steep, strict)
+      run: bundle exec rake steep
+
+    - name: Type coverage gate (untyped-call baseline)
+      run: bundle exec rake steep:coverage
+
+    - name: Runtime signature check (RBS::Test)
+      run: bundle exec rake rbs:test
+
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby_version }}
