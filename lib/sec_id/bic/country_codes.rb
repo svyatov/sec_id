@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module SecID
-  # Recognized country codes for BIC (ISO 9362).
-  #
-  # The set is the ISO 3166-1 alpha-2 officially-assigned codes, extended with
-  # SWIFT-recognized codes that are not (yet) in ISO 3166-1 — currently `XK`
-  # (Kosovo), which SWIFT assigns BICs under.
-  #
-  # @api private
-  module BICCountryCodes
+  class BIC < Base
     # Frozen set of country codes accepted in a BIC's positions 5-6.
     #
+    # The set is the ISO 3166-1 alpha-2 officially-assigned codes, extended with
+    # SWIFT-recognized codes that are not (yet) in ISO 3166-1 — currently `XK`
+    # (Kosovo), which SWIFT assigns BICs under.
+    #
+    # @api private
     # @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
     # rubocop:disable Metrics/CollectionLiteralLength
     COUNTRY_CODES = Set.new(

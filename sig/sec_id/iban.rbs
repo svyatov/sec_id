@@ -3,14 +3,13 @@ module SecID
   class IBAN < Base
     include Checkable
     extend Checkable::ClassMethods
-    include IBANCountryRules
 
     FULL_NAME: String
     ID_LENGTH: ::Range[Integer]
     EXAMPLE: String
     VALID_CHARS_REGEX: ::Regexp
     ID_REGEX: ::Regexp
-    NUMERIC_COUNTRY_RULES: Array[[String, IBANCountryRules::rule]]
+    NUMERIC_COUNTRY_RULES: Array[[String, rule]]
 
     def self.supported_countries: () -> Array[String]
 
@@ -30,7 +29,7 @@ module SecID
     def calculate_check_digit: () -> Integer
     private def self.generate_body: (Random random) -> String
     def valid_bban_format?: () -> bool
-    def country_rule: () -> IBANCountryRules::rule?
+    def country_rule: () -> rule?
     def known_country?: () -> bool
     def to_s: () -> String
     def to_pretty_s: () -> String?

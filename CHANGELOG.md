@@ -19,6 +19,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- Internal `@api private` country-data modules dissolved into their owning classes, so constant names match their file paths per Ruby convention: `SecID::IBANCountryRules::COUNTRY_RULES` / `LENGTH_ONLY_COUNTRIES` are now `SecID::IBAN::COUNTRY_RULES` / `SecID::IBAN::LENGTH_ONLY_COUNTRIES`, and `SecID::BICCountryCodes::COUNTRY_CODES` is now `SecID::BIC::COUNTRY_CODES`
 - `SecID.valid?` and `SecID.parse` are faster and allocate less — `SecID.valid?` short-circuits on the first matching type instead of running a full detect-and-sort, and `SecID.parse` reuses the instance built during detection instead of instantiating the matched type a second time
 - **BREAKING:** `SecID::CFI.valid?` is now strict at the attribute level for all 14 categories (including the derivative categories `S`, `H`, `J`) — codes with attribute letters outside the ISO 10962:2021 tables, previously accepted, are now invalid (e.g. `CFI.valid?('ESZZZZ')` returns `false`). There is no leniency option, matching every other identifier type in the gem. The ActiveModel validator inherits this strictness automatically
 - **BREAKING:** `SecID::CFI.generate` now samples only letters the tables permit for each position (and honors the `ED` rule), so generated codes are always valid; it no longer emits random attribute letters

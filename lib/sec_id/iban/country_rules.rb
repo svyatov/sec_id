@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
 module SecID
-  # Country-specific BBAN validation rules for IBAN.
-  #
-  # @api private
-  # rubocop:disable Metrics/ModuleLength
-  module IBANCountryRules
+  # rubocop:disable Metrics/ClassLength
+  class IBAN < Base
     # Country-specific BBAN rules for EU/EEA countries
     # Each entry defines:
     #   - :length => total BBAN length
@@ -15,6 +12,8 @@ module SecID
     # Sources:
     # - https://en.wikipedia.org/wiki/International_Bank_Account_Number
     # - https://www.swift.com/standards/data-standards/iban-international-bank-account-number
+    #
+    # @api private
     COUNTRY_RULES = {
       # Austria - 16 chars: 5-digit bank code + 11-digit account
       'AT' => {
@@ -224,6 +223,8 @@ module SecID
 
     # Countries where only length validation is performed (non-EU/EEA countries)
     # Format: country_code => expected BBAN length
+    #
+    # @api private
     LENGTH_ONLY_COUNTRIES = {
       'AD' => 20, # Andorra
       'AE' => 19, # UAE
@@ -264,5 +265,5 @@ module SecID
       'XK' => 16  # Kosovo
     }.freeze
   end
-  # rubocop:enable Metrics/ModuleLength
+  # rubocop:enable Metrics/ClassLength
 end

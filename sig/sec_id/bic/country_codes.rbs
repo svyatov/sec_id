@@ -1,8 +1,5 @@
 module SecID
-  # Recognized country codes for BIC (ISO 9362).
-  #
-  # @api private
-  module BICCountryCodes
+  class BIC < Base
     COUNTRY_CODES: Set[String]
   end
 end

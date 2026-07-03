@@ -569,8 +569,8 @@ RSpec.describe SecID::IBAN do
     end
 
     it 'has size matching COUNTRY_RULES + LENGTH_ONLY_COUNTRIES' do
-      expected = (SecID::IBANCountryRules::COUNTRY_RULES.keys +
-                  SecID::IBANCountryRules::LENGTH_ONLY_COUNTRIES.keys).uniq.size
+      expected = (SecID::IBAN::COUNTRY_RULES.keys +
+                  SecID::IBAN::LENGTH_ONLY_COUNTRIES.keys).uniq.size
       expect(described_class.supported_countries.size).to eq(expected)
     end
   end
