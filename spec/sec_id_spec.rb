@@ -8,15 +8,15 @@ RSpec.describe SecID do
   end
 
   describe '.identifiers' do
-    it 'returns all 14 identifier classes' do
-      expect(described_class.identifiers.size).to eq(14)
+    it 'returns all 15 identifier classes' do
+      expect(described_class.identifiers.size).to eq(15)
     end
 
     it 'includes all expected classes' do
       expected = [
         SecID::ISIN, SecID::CUSIP, SecID::SEDOL, SecID::FIGI, SecID::LEI,
         SecID::IBAN, SecID::CIK, SecID::OCC, SecID::WKN, SecID::Valoren,
-        SecID::CEI, SecID::CFI, SecID::FISN, SecID::BIC,
+        SecID::CEI, SecID::CFI, SecID::FISN, SecID::BIC, SecID::DTI,
       ]
       expect(described_class.identifiers).to match_array(expected)
     end
@@ -24,7 +24,7 @@ RSpec.describe SecID do
     it 'returns a copy that does not affect the internal list' do
       list = described_class.identifiers
       list.clear
-      expect(described_class.identifiers.size).to eq(14)
+      expect(described_class.identifiers.size).to eq(15)
     end
   end
 
@@ -435,6 +435,51 @@ RSpec.describe SecID do
     it 'generates a valid BIC via the central entry point' do
       result = described_class.generate(:bic)
       expect(result).to be_a(SecID::BIC)
+      expect(result).to be_valid
+    end
+  end
+
+  describe 'DTI integration' do # covers AE5, R7, R9
+    it 'does not misdetect an all-digit CIK/Valoren as a DTI' do
+      expect(described_class.detect('123456789')).to eq(%i[valoren cik])
+    end
+
+    it 'detects a DTI' do
+      expect(described_class.detect('X9J9K872S')).to eq([:dti])
+    end
+
+    it 'detects a code that is both a valid CUSIP and a valid DTI, ranking CUSIP first' do
+      expect(described_class.detect('10ZW1X3N5')).to eq(%i[cusip dti])
+      expect(described_class.parse('10ZW1X3N5')).to be_a(SecID::CUSIP)
+    end
+
+    it 'validates a DTI restricted to :dti' do
+      expect(described_class.valid?('4H95J0R2X', types: [:dti])).to be(true)
+    end
+
+    it 'parses a DTI into a SecID::DTI instance' do
+      expect(described_class.parse('X9J9K872S')).to be_a(SecID::DTI)
+    end
+
+    it 'extracts a DTI embedded in freeform text' do
+      matches = described_class.extract('Reporting DTI X9J9K872S under MiCA')
+      expect(matches.map(&:type)).to include(:dti)
+    end
+
+    it 'restricts scanning to DTI with types:' do
+      matches = described_class.scan('X9J9K872S', types: [:dti]).to_a
+      expect(matches.map(&:type)).to eq([:dti])
+    end
+
+    it 'explains per-type results for a DTI string' do
+      result = described_class.explain('X9J9K872S', types: %i[dti cusip])
+      dti_candidate = result[:candidates].find { |c| c[:type] == :dti }
+      expect(dti_candidate[:valid]).to be(true)
+    end
+
+    it 'generates a valid DTI via the central entry point' do
+      result = described_class.generate(:dti)
+      expect(result).to be_a(SecID::DTI)
       expect(result).to be_valid
     end
   end

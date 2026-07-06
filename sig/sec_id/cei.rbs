@@ -16,6 +16,7 @@ module SecID
 
     def initialize: (SecID::input cei) -> void
     def calculate_check_digit: () -> Integer
+    def self.check_digit: (SecID::input id) -> Integer
     private def self.generate_body: (Random random) -> String
 
     private

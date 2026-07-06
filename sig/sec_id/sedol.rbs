@@ -20,6 +20,7 @@ module SecID
     def initialize: (SecID::input sedol) -> void
     def to_isin: (?String country_code) -> ISIN
     def calculate_check_digit: () -> Integer
+    def self.check_digit: (SecID::input id) -> Integer
     private def self.generate_body: (Random random) -> String
 
     private

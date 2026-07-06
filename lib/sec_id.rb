@@ -4,7 +4,7 @@ require 'sec_id/version'
 
 # Toolkit for securities identifiers — validate, normalize, parse, detect, convert,
 # generate, and classify ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN,
-# Valoren, CFI, FISN, and BIC.
+# Valoren, CFI, FISN, BIC, and DTI.
 #
 # @see https://github.com/svyatov/sec_id
 module SecID
@@ -219,6 +219,7 @@ require 'sec_id/cei'
 require 'sec_id/cfi'
 require 'sec_id/fisn'
 require 'sec_id/bic'
+require 'sec_id/dti'
 
 # Auto-activate the ActiveModel validator inside Rails; a no-op everywhere else (keeps the
 # default require zero-dependency). See SecID::Railtie and lib/sec_id/active_model.rb.

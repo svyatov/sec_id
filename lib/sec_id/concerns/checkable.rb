@@ -83,7 +83,7 @@ module SecID
       end
 
       # @param id [String] the identifier to calculate check digit for
-      # @return [Integer] the calculated check digit
+      # @return [Integer, String] the calculated check digit
       # @raise [InvalidFormatError] if the identifier format is invalid
       def check_digit(id)
         new(id).calculate_check_digit
@@ -117,7 +117,7 @@ module SecID
 
     # Subclasses must override this method to implement their check-digit algorithm.
     #
-    # @return [Integer] the calculated check digit
+    # @return [Integer, String] the calculated check digit
     # @raise [NotImplementedError] if subclass doesn't implement
     # @raise [InvalidFormatError] if the identifier format is invalid
     def calculate_check_digit

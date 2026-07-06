@@ -37,7 +37,10 @@ end
 # add dead "can't-happen" guards to check-digit math, so RBS::Test verifies them at
 # runtime instead. The gate pins that floor so coverage cannot silently regress; lower
 # BASELINE whenever it drops.
-STEEP_UNTYPED_BASELINE = 118
+# 119: DTI's calculate_check_digit passes the nilable `identifier` reader into
+# grandfathered_check_digit/iso7064_mod31_30_check_char, both typed `(untyped base)` per
+# the same nilable-but-runtime-safe convention as Checkable#reversed_digits_single.
+STEEP_UNTYPED_BASELINE = 119
 
 desc 'Fail if Steep reports more untyped calls than the pinned baseline'
 task 'steep:coverage' do
