@@ -55,7 +55,7 @@ module SecID
     # and `Checkable::ClassMethods` type-check without narrowing on `has_check_digit?`.
     def restore: () -> String
     def restore!: () -> self
-    def calculate_check_digit: () -> Integer
+    def calculate_check_digit: () -> (Integer | String)
 
     def comparison_id: () -> String
 

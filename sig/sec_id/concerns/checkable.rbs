@@ -6,19 +6,19 @@ module SecID
 
     def self.included: (Module base) -> void
 
-    attr_reader check_digit: Integer?
+    attr_reader check_digit: (Integer | String)?
 
     # Class methods added when Checkable is included.
     module ClassMethods : SecID::_IdentifierClass
       def restore: (SecID::input id_without_check_digit) -> String
       def restore!: (SecID::input id_without_check_digit) -> Base
-      def check_digit: (SecID::input id) -> Integer
+      def check_digit: (SecID::input id) -> (Integer | String)
     end
 
     def valid?: () -> bool
     def restore: () -> String
     def restore!: () -> self
-    def calculate_check_digit: () -> Integer
+    def calculate_check_digit: () -> (Integer | String)
     def to_s: () -> String
 
     private
@@ -36,6 +36,6 @@ module SecID
     def div10mod10: (Integer number) -> Integer
     def mod97: (String numeric_string) -> Integer
 
-    @check_digit: Integer?
+    @check_digit: (Integer | String)?
   end
 end

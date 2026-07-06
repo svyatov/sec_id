@@ -10,7 +10,8 @@
 # @param restored_id [String] the expected full identifier after restoration
 # @param invalid_format_id [String] an identifier with invalid format
 # @param invalid_check_digit_id [String] an identifier with wrong check-digit
-# @param expected_check_digit [Integer] the expected check-digit value
+# @param expected_check_digit [Integer, String] the expected check-digit value
+# @param expected_check_digit_class [Class] the expected check-digit type (default: Integer)
 RSpec.shared_examples 'a check-digit identifier' do |params|
   let(:identifier_class) { described_class }
   let(:valid_id) { params[:valid_id] }
@@ -19,6 +20,7 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
   let(:invalid_format_id) { params[:invalid_format_id] }
   let(:invalid_check_digit_id) { params[:invalid_check_digit_id] }
   let(:expected_check_digit) { params[:expected_check_digit] }
+  let(:expected_check_digit_class) { params.fetch(:expected_check_digit_class, Integer) }
 
   describe 'instance methods' do
     context 'when identifier is valid with correct check-digit' do
@@ -39,9 +41,9 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.full_id).to eq(valid_id)
       end
 
-      it 'returns an Integer for #calculate_check_digit' do
+      it 'returns the expected type for #calculate_check_digit' do
         result = instance.calculate_check_digit
-        expect(result).to be_a(Integer)
+        expect(result).to be_a(expected_check_digit_class)
         expect(result).to eq(expected_check_digit)
       end
     end
@@ -187,8 +189,8 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
     end
 
     describe '.check_digit' do
-      it 'returns an Integer' do
-        expect(identifier_class.check_digit(valid_id)).to be_a(Integer)
+      it 'returns the expected type' do
+        expect(identifier_class.check_digit(valid_id)).to be_a(expected_check_digit_class)
       end
 
       it 'calculates check-digit for valid identifier' do

@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
                        'format-valid identifiers as test fixtures. Decode CFI codes to full ISO 10962:2021 ' \
                        'classifications. Includes an opt-in ActiveModel/Rails validator that adds no runtime ' \
                        'dependency. Supports ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, ' \
-                       'CFI, FISN, and BIC.'
+                       'CFI, FISN, BIC, and DTI.'
   spec.homepage      = 'https://github.com/svyatov/sec_id'
   spec.license       = 'MIT'
 

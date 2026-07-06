@@ -26,6 +26,7 @@
   - [CFI](#cfi) - Classification of Financial Instruments
   - [FISN](#fisn) - Financial Instrument Short Name
   - [BIC](#bic) - Business Identifier Code / SWIFT code
+  - [DTI](#dti) - Digital Token Identifier
 - [ActiveModel / Rails Validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
 - [Lookup Service Integration](#lookup-service-integration)
 - [Type Signatures (RBS)](#type-signatures-rbs)
@@ -99,7 +100,7 @@ a.eql?(b) # => true
 Set.new([a, b]).size         # => 1
 ```
 
-**Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN) also provide:
+**Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
 - `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
@@ -126,7 +127,7 @@ SecID::ISIN.has_check_digit?              # => true
 
 # Filter with standard Ruby
 SecID.identifiers.select(&:has_check_digit?).map(&:short_name)
-# => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI"]
+# => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI", "DTI"]
 
 # Detect identifier type from an unknown string
 # Results are sorted by specificity: check-digit types first, then by length precision
@@ -229,7 +230,7 @@ SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 - `:invalid_format` - correct length and characters but wrong structure
 
 **Type-specific error codes:**
-- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI)
+- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI)
 - `:invalid_prefix` - restricted FIGI prefix (FIGI)
 - `:invalid_category` - unknown CFI category code (CFI)
 - `:invalid_group` - unknown CFI group code for category (CFI)
@@ -675,6 +676,37 @@ SecID::BIC.countries                # => ['AD', 'AE', 'AF', ...] (sorted, includ
 ```
 
 BIC validation confirms structure and a real country code only. It does **not** verify that the institution, location, or branch corresponds to a registered SWIFT participant — that requires the licensed SWIFT registry.
+
+### DTI
+
+> [Digital Token Identifier](https://www.dtif.org) - a 9-character code identifying digital tokens (e.g. cryptocurrencies) per ISO 24165, used in EU MiCA/ESMA regulatory reporting.
+
+```ruby
+# class level
+SecID::DTI.valid?('X9J9K872S')      # => true
+SecID::DTI.restore('X9J9K872')      # => 'X9J9K872S'
+SecID::DTI.restore!('X9J9K872')     # => #<SecID::DTI>
+SecID::DTI.check_digit('X9J9K872')  # => 'S'
+
+# instance level
+dti = SecID::DTI.new('X9J9K872S')
+dti.full_id               # => 'X9J9K872S'
+dti.identifier             # => 'X9J9K872'
+dti.check_digit            # => 'S'
+dti.valid?                 # => true
+dti.restore                # => 'X9J9K872S'
+dti.restore!                # => #<SecID::DTI> (mutates instance)
+dti.calculate_check_digit  # => 'S'
+```
+
+DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike every other check-digit type in this gem, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
+
+> **Grandfathered code:** Bitcoin's registered code (`4H95J0R2X`) predates the algorithm and fails the MOD 31,30 computation (which yields `4H95J0R2T`). A frozen exception map honors the registry's assignment across `valid?`, `restore`, and `check_digit` alike:
+>
+> ```ruby
+> SecID::DTI.valid?('4H95J0R2X')  # => true  (registered code, via the exception map)
+> SecID::DTI.valid?('4H95J0R2T')  # => false (algorithmic form is not the registered one)
+> ```
 
 ## ActiveModel / Rails Validator
 

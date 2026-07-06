@@ -20,6 +20,7 @@ module SecID
     def initialize: (SecID::input isin) -> void
     def to_pretty_s: () -> String?
     def calculate_check_digit: () -> Integer
+    def self.check_digit: (SecID::input id) -> Integer
     private def self.generate_body: (Random random) -> String
     def to_cusip: () -> CUSIP
     def cgs?: () -> bool

@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC) — validate, normalize, parse, detect, convert, generate, classify, and calculate check digits. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC, DTI) — validate, normalize, parse, detect, convert, generate, classify, and calculate check digits. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
 
 ### Directory Layout
 
@@ -129,7 +129,7 @@ Provides validation methods. Defines `ERROR_MAP` constant (maps error code symbo
 
 #### Checkable (`checkable.rb`)
 
-Provides check-digit validation and calculation for identifiers with check digits. Include this in classes that have a check digit (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI).
+Provides check-digit validation and calculation for identifiers with check digits. Include this in classes that have a check digit (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI).
 
 Constants:
 - `CHAR_TO_DIGITS` - Multi-digit mapping for ISIN (letters expand to two digits)
@@ -178,10 +178,11 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
 - Private `components` method returning a hash of parsed attributes (for `#to_h` serialization); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
 
-**Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI):
+**Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI):
 - Include `Checkable` concern
 - Implement `calculate_check_digit` with standard-specific algorithm
 - LEI and IBAN override `check_digit_width` → `2` (two-character check digit)
+- DTI's check "digit" is a `String` (can be a letter), not an `Integer` — the only type where this differs; `Checkable`'s `check_digit`/`calculate_check_digit` contracts are typed `Integer | String` to admit it
 
 **Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN, BIC):
 - Do not include `Checkable`
@@ -199,6 +200,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules; `.supported_countries` returns sorted array of all supported country codes
 - OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
 - BIC: `detect_errors` returns `:invalid_country` when positions 5-6 are not in the recognized set (`lib/sec_id/bic/country_codes.rb`); `.countries` returns the sorted frozen set of recognized ISO 3166 / SWIFT country codes
+- DTI: `calculate_check_digit` consults `GRANDFATHERED_CODES` (a frozen `Hash[String, String]`, base → registered code) before running the ISO 7064 hybrid MOD 31,30 algorithm; a hit means the registry's hand-assigned code (currently only Bitcoin, `4H95J0R2` → `4H95J0R2X`) wins over the algorithmic result, and this is honored API-wide (`valid?`, `restore`, `restore!`, `check_digit`) since they all route through `calculate_check_digit`
 
 ### Conversion Methods
 
