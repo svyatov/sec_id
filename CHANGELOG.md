@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-07-08
+
 ### Added
 
 - Hand-written RBS type signatures under `sig/`, shipped in the gem, so consumers running Steep or an RBS-aware editor resolve sec_id's types on install. The core library is checked by Steep in strict mode with zero errors and verified at runtime against the specs via RBS::Test. New dev/test tooling (`rbs` and `steep`, `require: false` — the gem stays zero-runtime-dependency) and rake tasks: `rake steep` (strict type check), `rake steep:coverage` (untyped-call gate), `rake rbs:test` (runtime signature verification), `rake rbs` (validate signatures, in the default task), and `rake sig:cfi` (regenerate the CFI dynamic-method signatures from `SecID::CFI::Tables`, guarded by a drift spec). CI gains a `types` job on Ruby 4.0. The optional ActiveModel adapter and Railtie are excluded from the typed scope
