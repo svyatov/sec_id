@@ -93,7 +93,7 @@ class SecIdValidator < ActiveModel::EachValidator
   #
   # @return [Array<Symbol>]
   def candidate_types
-    configured_types || SecID.identifiers.map { |klass| klass.short_name.downcase.to_sym }
+    configured_types || SecID.identifiers.map(&:type_key)
   end
 
   # sec_id's specific failure reason, only when `details: true` and a single `type:` is set;

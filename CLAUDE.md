@@ -48,7 +48,7 @@ All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin
 - `Generatable` — generation: `.generate(random:)`, `random_string(charset, length, random:)` helper, `ALPHA`/`DIGITS`/`ALPHANUMERIC` charset constants
 
 Base itself keeps:
-- Class-level metadata methods: `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`
+- Class-level metadata methods: `type_key` (the registry symbol — single authority, read by the registry, `to_h`, `explain`, the validator, `Detector`, and `Scanner`), `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, and the `@api private` `detection_priority` (composite specificity sort key: check-digit rank, `length_specificity`, registration order — `Float::INFINITY` for an unregistered class)
 - `attr_reader :full_id, :identifier`
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
@@ -91,7 +91,7 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 2. **Length lookup** — pre-computed `Hash{Integer => Array<Class>}` from `ID_LENGTH` constants
 3. **Charset pre-filter** — survivors filtered by `VALID_CHARS_REGEX` before calling `valid?`
 
-Specificity sort: check-digit types first, then smaller length range, then load order.
+Specificity sort: reads each class's `Base.detection_priority` (check-digit types first, then smaller length range, then load order).
 
 Fast paths bypass the full sort: `#matches?` (used by `SecID.valid?`) short-circuits on the first valid candidate; `#first_match` (used by `SecID.parse`) builds the winning instance once and selects it via `min_by`, avoiding a second instantiation.
 

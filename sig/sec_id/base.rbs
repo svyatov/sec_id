@@ -33,6 +33,9 @@ module SecID
     # RBS forbids narrowing an inherited ivar's type.
     def identifier: () -> String?
 
+    def self.type_key: () -> Symbol
+    # `@api private` in YARD, but public here: Detector and Scanner call it from outside.
+    def self.detection_priority: () -> Array[Integer | Float | nil]
     def self.short_name: () -> String
     def self.full_name: () -> String
     def self.id_length: () -> (Integer | ::Range[Integer] | ::Array[Integer])
@@ -68,5 +71,7 @@ module SecID
     @identifier: untyped
     self.@short_name: String
     self.@has_check_digit: bool
+    self.@type_key: Symbol
+    self.@detection_priority: Array[Integer | Float | nil]
   end
 end

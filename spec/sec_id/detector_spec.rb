@@ -235,9 +235,7 @@ RSpec.describe SecID::Detector do
 
       it 'sets specificity to the count of discrete lengths' do
         # Base.length_specificity: a discrete [8, 11] contributes size 2.
-        # Scanner's build_priority_table calls the same helper.
-        priority = described_class.new([stub]).instance_variable_get(:@priority_for)
-        expect(priority[stub][1]).to eq(2)
+        expect(stub.detection_priority[1]).to eq(2)
       end
     end
 

@@ -119,6 +119,7 @@ SecID.identifiers                         # => [SecID::ISIN, SecID::CUSIP, ...]
 SecID.identifiers.map(&:short_name)       # => ["ISIN", "CUSIP", "SEDOL", ...]
 
 # Query metadata
+SecID::ISIN.type_key                      # => :isin  (SecID[SecID::ISIN.type_key] == SecID::ISIN)
 SecID::ISIN.short_name                    # => "ISIN"
 SecID::ISIN.full_name                     # => "International Securities Identification Number"
 SecID::ISIN.id_length                     # => 12
