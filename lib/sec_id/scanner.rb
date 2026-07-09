@@ -51,34 +51,29 @@ module SecID
     private
 
     # @return [void]
-    def precompute # rubocop:disable Metrics/AbcSize
-      build_key_table
-      build_priority_table
+    def precompute
+      build_candidate_partitions
+      build_length_table
+    end
+
+    # Splits the registered classes by which CANDIDATE_RE group routes to them.
+    #
+    # @return [void]
+    def build_candidate_partitions
       @fisn_classes = @classes.select { |k| k.short_name == 'FISN' }
       @occ_classes = @classes.select { |k| k.short_name == 'OCC' }
       @simple_classes = @classes - @fisn_classes - @occ_classes
+    end
+
+    # Builds a Hash mapping each possible length to the classes that accept it.
+    #
+    # @return [void]
+    def build_length_table
       @candidates_by_length = Hash.new { |h, k| h[k] = [] }
       @classes.each do |klass|
         klass.length_values.each { |len| @candidates_by_length[len] << klass }
       end
       @candidates_by_length.each_value(&:freeze)
-    end
-
-    # @return [void]
-    def build_key_table
-      @key_for = {}
-      @classes.each { |klass| @key_for[klass] = klass.short_name.downcase.to_sym }
-      @key_for.freeze
-    end
-
-    # @return [void]
-    def build_priority_table
-      @priority_for = {}
-      @classes.each_with_index do |klass, index|
-        check_digit_rank = klass.has_check_digit? ? 0 : 1
-        @priority_for[klass] = [check_digit_rank, klass.length_specificity, index].freeze
-      end
-      @priority_for.freeze
     end
 
     # @param input [String]
@@ -123,7 +118,7 @@ module SecID
       return unless best
 
       end_pos = start_pos + raw.length
-      Match.new(type: @key_for[best], raw: raw, range: start_pos...end_pos, identifier: best.new(cleaned))
+      Match.new(type: best.type_key, raw: raw, range: start_pos...end_pos, identifier: best.new(cleaned))
     end
 
     # @return [Class, nil]
@@ -134,7 +129,7 @@ module SecID
       return if candidates.empty?
 
       validated = candidates.select { |k| cleaned.match?(k::VALID_CHARS_REGEX) && k.valid?(cleaned) }
-      validated.min_by { |k| @priority_for[k] }
+      validated.min_by(&:detection_priority)
     end
   end
 end

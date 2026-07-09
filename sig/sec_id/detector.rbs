@@ -3,8 +3,6 @@ module SecID
   #
   # @api private
   class Detector
-    type priority = Array[Integer | Float | nil]
-
     def initialize: (Array[singleton(Base)] identifier_list) -> void
     def call: (SecID::input str) -> Array[Symbol]
     def matches?: (SecID::input str) -> bool
@@ -17,8 +15,6 @@ module SecID
     def precompute: () -> void
     def build_discriminator_sets: () -> void
     def build_length_table: () -> void
-    def build_priority_table: () -> void
-    def build_key_table: () -> void
     def stage1_special_chars: (String upcased) -> Array[singleton(Base)]?
     def stage2_length: (Integer length) -> Array[singleton(Base)]
     def stage3_charset: (String upcased, Array[singleton(Base)] candidates) -> Array[singleton(Base)]
@@ -29,7 +25,5 @@ module SecID
     @space_only_types: Array[singleton(Base)]
     @special_types: Array[singleton(Base)]
     @candidates_by_length: Hash[Integer, Array[singleton(Base)]]
-    @priority_for: Hash[singleton(Base), priority]
-    @key_for: Hash[singleton(Base), Symbol]
   end
 end

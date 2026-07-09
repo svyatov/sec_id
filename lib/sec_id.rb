@@ -85,7 +85,7 @@ module SecID
     # @return [Hash] hash with :input and :candidates keys
     def explain(str, types: nil)
       input = str.to_s.strip
-      target_keys = types || identifier_list.map { |k| k.short_name.downcase.to_sym }
+      target_keys = types || identifier_list.map(&:type_key)
       candidates = target_keys.map do |key|
         instance = self[key].new(input)
         { type: key, valid: instance.valid?, errors: instance.errors.details }
@@ -143,8 +143,7 @@ module SecID
 
     # @return [void]
     def register_identifier(klass)
-      key = klass.name.split('::').last.downcase.to_sym
-      identifier_map[key] = klass
+      identifier_map[klass.type_key] = klass
       identifier_list << klass
       @detector = nil
       @scanner = nil

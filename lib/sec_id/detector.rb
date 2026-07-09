@@ -58,7 +58,7 @@ module SecID
 
       candidates = filter_candidates(input.upcase)
       matches = candidates.filter_map { |klass| (i = klass.new(input)).valid? ? i : nil }
-      matches.min_by { |instance| @priority_for[instance.class] }
+      matches.min_by { |instance| instance.class.detection_priority }
     end
 
     private
@@ -81,16 +81,14 @@ module SecID
     # @return [Array<Symbol>]
     def validate_and_sort(input, candidates)
       matches = candidates.select { |klass| klass.valid?(input) }
-      matches.sort_by! { |klass| @priority_for[klass] }
-      matches.map! { |klass| @key_for[klass] }
+      matches.sort_by!(&:detection_priority)
+      matches.map!(&:type_key)
     end
 
     # @return [void]
     def precompute
       build_discriminator_sets
       build_length_table
-      build_priority_table
-      build_key_table
     end
 
     # Classifies types by which special characters their VALID_CHARS_REGEX accepts.
@@ -112,27 +110,6 @@ module SecID
         klass.length_values.each { |len| @candidates_by_length[len] << klass }
       end
       @candidates_by_length.each_value(&:freeze)
-    end
-
-    # Builds composite sort keys: check-digit types first, then smaller range, then load order.
-    #
-    # @return [void]
-    def build_priority_table
-      @priority_for = {}
-      @classes.each_with_index do |klass, index|
-        check_digit_rank = klass.has_check_digit? ? 0 : 1
-        @priority_for[klass] = [check_digit_rank, klass.length_specificity, index].freeze
-      end
-      @priority_for.freeze
-    end
-
-    # Maps each class to its registry symbol key.
-    #
-    # @return [void]
-    def build_key_table
-      @key_for = {}
-      @classes.each { |klass| @key_for[klass] = klass.short_name.downcase.to_sym }
-      @key_for.freeze
     end
 
     # Stage 1: route strings with special characters to the only types that accept them.

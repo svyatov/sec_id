@@ -61,6 +61,56 @@ RSpec.describe SecID::Base do
     it '.has_check_digit? returns false for non-Checkable types' do
       expect(SecID::CIK.has_check_digit?).to be(false)
     end
+
+    it '.type_key returns the registry symbol' do
+      expect(SecID::ISIN.type_key).to eq(:isin)
+    end
+  end
+
+  describe '.type_key' do
+    it 'round-trips through SecID[] for every registered type' do
+      SecID.identifiers.each { |klass| expect(SecID[klass.type_key]).to be(klass) }
+    end
+  end
+
+  describe '.detection_priority' do
+    let(:unregistered) do
+      klass = Class.new(described_class)
+      klass.const_set(:ID_LENGTH, 9)
+      klass
+    end
+
+    it 'ranks check-digit types ahead of non-check-digit types' do
+      expect(SecID::ISIN.detection_priority[0]).to eq(0)
+      expect(SecID::CIK.detection_priority[0]).to eq(1)
+    end
+
+    it 'uses length_specificity as the second element' do
+      expect(SecID::ISIN.detection_priority[1]).to eq(1)
+      expect(SecID::BIC.detection_priority[1]).to eq(2)
+    end
+
+    it 'uses registration order as the third element' do
+      keys = SecID.identifiers.map { |klass| klass.detection_priority[2] }
+      expect(keys).to eq((0...SecID.identifiers.size).to_a)
+    end
+
+    it 'sorts an unregistered class last without raising' do
+      expect(unregistered.detection_priority[2]).to eq(Float::INFINITY)
+      expect(unregistered.detection_priority <=> SecID::ISIN.detection_priority).to eq(1)
+    end
+
+    it 'returns a memoized frozen tuple' do
+      expect(SecID::ISIN.detection_priority).to be_frozen.and be(SecID::ISIN.detection_priority)
+    end
+  end
+
+  describe '#to_h' do
+    it 'emits type_key as the :type value for every registered type' do
+      SecID.identifiers.each do |klass|
+        expect(klass.new(klass.example).to_h[:type]).to eq(klass.type_key)
+      end
+    end
   end
 
   describe '#== / #eql? / #hash' do

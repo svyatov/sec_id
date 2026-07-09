@@ -50,6 +50,22 @@ module SecID
     attr_reader :identifier
 
     class << self
+      # The type's registry symbol: `SecID[SecID::ISIN.type_key] == SecID::ISIN`.
+      #
+      # @return [Symbol] the registry key (e.g. :isin, :cusip)
+      def type_key = @type_key ||= short_name.downcase.to_sym
+
+      # Composite sort key ranking detection specificity: check-digit types first,
+      # then narrower length range, then registration order. A class the registry
+      # never saw sorts last.
+      #
+      # @api private
+      # @return [Array] frozen [check-digit rank, length specificity, registration order]
+      def detection_priority
+        @detection_priority ||=
+          [has_check_digit? ? 0 : 1, length_specificity, SecID.identifiers.index(self) || Float::INFINITY].freeze
+      end
+
       # @return [String] the unqualified class name (e.g. "ISIN", "CUSIP")
       def short_name = @short_name ||= name.split('::').last
 
@@ -114,7 +130,7 @@ module SecID
     # @return [Hash] hash with :type, :full_id, :normalized, :valid, and :components keys
     def to_h
       {
-        type: self.class.short_name.downcase.to_sym,
+        type: self.class.type_key,
         full_id: full_id,
         normalized: valid? ? normalized : nil,
         valid: valid?,
