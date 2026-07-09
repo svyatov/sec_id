@@ -109,10 +109,12 @@ RSpec.describe SecID::Base do
   end
 
   describe '#to_h' do
-    it 'emits type_key as the :type value for every registered type' do
-      SecID.identifiers.each do |klass|
-        expect(klass.new(klass.example).to_h[:type]).to eq(klass.type_key)
-      end
+    # Expected symbols are hardcoded, not derived from type_key: comparing to_h[:type]
+    # against klass.type_key would be x == x, since to_h returns self.class.type_key.
+    it 'emits the registry symbol as the :type value for every registered type' do
+      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic dti]
+      emitted = SecID.identifiers.map { |klass| klass.new(klass.example).to_h[:type] }
+      expect(emitted).to eq(expected)
     end
   end
 
