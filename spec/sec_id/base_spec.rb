@@ -74,9 +74,11 @@ RSpec.describe SecID::Base do
   end
 
   describe '.detection_priority' do
+    # Mirrors ISIN's check-digit rank and ID_LENGTH so a comparison against ISIN ties on the
+    # first two elements and is decided by the third — the only slot that can hold Infinity.
     let(:unregistered) do
-      klass = Class.new(described_class)
-      klass.const_set(:ID_LENGTH, 9)
+      klass = Class.new(described_class) { include SecID::Checkable }
+      klass.const_set(:ID_LENGTH, 12)
       klass
     end
 
@@ -97,6 +99,7 @@ RSpec.describe SecID::Base do
 
     it 'sorts an unregistered class last without raising' do
       expect(unregistered.detection_priority[2]).to eq(Float::INFINITY)
+      expect(unregistered.detection_priority.take(2)).to eq(SecID::ISIN.detection_priority.take(2))
       expect(unregistered.detection_priority <=> SecID::ISIN.detection_priority).to eq(1)
     end
 
