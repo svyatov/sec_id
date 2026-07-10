@@ -118,6 +118,77 @@ RSpec.describe SecID::Base do
     end
   end
 
+  describe '#deconstruct_keys' do
+    # AE1: a valid identifier through SecID.parse destructures to its components.
+    it 'binds components from a parsed identifier' do
+      case SecID.parse('US5949181045')
+      in SecID::ISIN[country_code:, nsin:]
+        expect([country_code, nsin]).to eq(%w[US 594918104])
+      end
+    end
+
+    # AE2: SecID.parse is the validity channel; an invalid check digit yields nil.
+    it 'falls to the nil branch for an identifier SecID.parse rejects' do
+      matched =
+        case SecID.parse('US6949181045')
+        in SecID::ISIN then :isin
+        in nil then :nil
+        end
+
+      expect(matched).to eq(:nil)
+    end
+
+    # AE3: the protocol does not gate on valid?.
+    it 'destructures an instance with an invalid check digit' do
+      isin = SecID::ISIN.new('US6949181045')
+      expect(isin).not_to be_valid
+      expect(isin.deconstruct_keys(nil)).to eq(country_code: 'US', nsin: '694918104', check_digit: 5)
+    end
+
+    # AE4: unparseable input binds nil, mirroring MatchData#deconstruct_keys.
+    it 'binds nil for components of unparseable input' do
+      case SecID::ISIN.new('GARBAGE')
+      in SecID::ISIN[nsin:]
+        expect(nsin).to be_nil
+      end
+    end
+
+    # AE6: Match is a Data, and the identifier it wraps now destructures too.
+    it 'destructures nested inside a scan result' do
+      match = SecID.extract('holding US5949181045 today').first
+
+      case match
+      in { type: :isin, identifier: SecID::ISIN[country_code:] }
+        expect(country_code).to eq('US')
+      end
+    end
+
+    it 'ignores the keys argument' do
+      isin = SecID::ISIN.new('US5949181045')
+      expect(isin.deconstruct_keys([:country_code])).to eq(isin.deconstruct_keys(nil))
+    end
+
+    it 'does not define deconstruct, so array patterns do not match' do
+      expect(SecID::ISIN.new('US5949181045')).not_to respond_to(:deconstruct)
+      expect do
+        case SecID::ISIN.new('US5949181045')
+        in SecID::ISIN[_first]
+          nil
+        end
+      end.to raise_error(NoMatchingPatternError)
+    end
+
+    it 'returns a fresh hash on every call' do
+      isin = SecID::ISIN.new('US5949181045')
+      isin.deconstruct_keys(nil)[:country_code] = 'ZZ'
+      expect(isin.deconstruct_keys(nil)[:country_code]).to eq('US')
+    end
+
+    it 'keeps components private' do
+      expect(described_class.private_method_defined?(:components)).to be(true)
+    end
+  end
+
   describe '#== / #eql? / #hash' do
     it 'considers same type with same normalized value equal' do
       expect(SecID::ISIN.new('us5949181045')).to eq(SecID::ISIN.new('US5949181045'))

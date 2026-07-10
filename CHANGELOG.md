@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- `SecID::Base#deconstruct_keys` — every identifier now destructures in `case/in` patterns, exposing the same parsed fields `#to_h` reports under `:components`. The `keys` argument is ignored, no new keys are introduced, and validity is not part of the protocol: `SecID.parse` returning `nil` remains the validity guard, and an instance built from unparseable input binds `nil` for each component. No `deconstruct` (array-pattern) method is defined
 - `SecID::Base.type_key` — the memoized class-level registry symbol for an identifier type, joining the existing `short_name` / `full_name` / `id_length` metadata surface. It round-trips through the registry: `SecID[SecID::ISIN.type_key] == SecID::ISIN`. It is now the single authority for that symbol; the registry, `#to_h`, `SecID.explain`, the ActiveModel validator, the detector, and the scanner all read it instead of each deriving it from the class name
 
 ## [6.0.0] - 2026-07-08

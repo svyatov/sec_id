@@ -11,6 +11,7 @@
   - [Text Scanning](#text-scanning) - find identifiers in freeform text
   - [Debugging Detection](#debugging-detection) - understand why strings match or don't
   - [Structured Validation](#structured-validation) - detailed error codes and messages
+  - [Pattern Matching](#pattern-matching) - destructure identifiers with `case/in`
   - [Generating Test Fixtures](#generating-test-fixtures) - produce valid identifiers for tests
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
@@ -75,6 +76,7 @@ All identifier classes provide `valid?`, `errors`, `validate`, `validate!` metho
 **All identifiers** support hash serialization:
 - `#to_h` - returns a hash with `:type`, `:full_id`, `:normalized`, `:valid`, and `:components` keys
 - `#as_json` - same as `#to_h`, for JSON serialization compatibility (Rails, `JSON.generate`, etc.)
+- `#deconstruct_keys` - exposes `:components` for [pattern matching](#pattern-matching) with `case/in`
 
 ```ruby
 SecID::ISIN.new('US5949181045').to_h
@@ -261,6 +263,48 @@ SecID::FIGI.new('BSG000BLNNH6').validate!
 # Class-level convenience method (returns the instance)
 isin = SecID::ISIN.validate!('US5949181045')  # => #<SecID::ISIN>
 ```
+
+### Pattern Matching
+
+Every identifier destructures in `case/in` via its parsed components. Since `SecID.parse` returns `nil` for
+anything invalid, an `in nil` branch is a complete validity guard:
+
+```ruby
+case SecID.parse(input)
+in SecID::ISIN[country_code: 'US', nsin:]  then "US security #{nsin}"
+in SecID::ISIN[country_code:]              then "foreign security from #{country_code}"
+in SecID::OCC[underlying:, type:, strike_mills:] then "#{type} option on #{underlying}"
+in nil                                     then 'not a valid identifier'
+end
+```
+
+`SecID::Match` is a `Data`, so scan results destructure one layer up and nest into the identifier they wrap:
+
+```ruby
+SecID.extract('AAPL ISIN US0378331005').each do |match|
+  case match
+  in { type: :isin, identifier: SecID::ISIN[country_code: 'US'] } then puts 'US ISIN found'
+  else next
+  end
+end
+```
+
+The keys are exactly the `:components` of `#to_h`, and destructuring never consults
+`valid?`. An instance built directly from unparseable input therefore binds `nil` for every component, the same shape
+`to_h` reports:
+
+```ruby
+SecID::ISIN.new('GARBAGE') => { country_code:, nsin: }
+country_code # => nil
+nsin         # => nil
+```
+
+CIK, WKN, and Valoren have no sub-fields: they match a bare `in SecID::CIK` but no keyed pattern. Array patterns
+(`deconstruct`) are not supported.
+
+Watch the `:type` key: on a `SecID::Match` it is the registry symbol (`:occ`), while on an `OCC` instance it is the
+OSI option type (`'C'` or `'P'`), so `in SecID::OCC[type: :occ]` never matches. Other types have no `:type` component
+at all — `#to_h`'s envelope keys (`:type`, `:full_id`, `:normalized`, `:valid`) are not part of the pattern surface.
 
 ### Generating Test Fixtures
 

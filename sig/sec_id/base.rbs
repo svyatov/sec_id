@@ -52,6 +52,7 @@ module SecID
     def hash: () -> Integer
     def to_h: () -> Hash[Symbol, untyped]
     def as_json: (*untyped) -> Hash[Symbol, untyped]
+    def deconstruct_keys: (::Array[Symbol]? _keys) -> Hash[Symbol, untyped]
 
     # Check-digit surface. Only the types that `include Checkable` implement these
     # (they raise/NoMethodError otherwise); declared on Base so `Generatable#generate`

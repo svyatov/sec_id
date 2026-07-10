@@ -145,6 +145,20 @@ module SecID
       to_h
     end
 
+    # Exposes the parsed components for `case/in` destructuring. Validity is not part of
+    # the protocol: components of unparseable input are `nil`, and `SecID.parse` returning
+    # `nil` is the validity guard.
+    #
+    # @param _keys [Array<Symbol>, nil] the keys the pattern requests; ignored
+    # @return [Hash] the parsed components
+    #
+    # @example
+    #   case SecID.parse('US5949181045')
+    #   in SecID::ISIN[country_code:, nsin:] then [country_code, nsin]
+    #   in nil then :invalid
+    #   end #=> ['US', '594918104']
+    def deconstruct_keys(_keys) = components
+
     protected
 
     # @return [String]
