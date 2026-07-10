@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Shared examples for #to_h hash serialization across all identifier types.
+# Shared examples for #to_h serialization and #deconstruct_keys destructuring
+# across all identifier types. Both read the same components hash.
 #
 # @param valid_id [String] a valid identifier
 # @param invalid_id [String] an invalid identifier
@@ -61,6 +62,34 @@ RSpec.shared_examples 'a hashable identifier' do |params|
 
       it 'has type' do
         expect(hash[:type]).to eq(expected_type)
+      end
+    end
+  end
+
+  describe '#deconstruct_keys' do
+    subject(:identifier) { identifier_class.new(valid_id) }
+
+    # Both public readers of `components` are pinned to the same independent literal, which is
+    # what proves they cannot drift. Comparing the two readers to each other would be x == x --
+    # `deconstruct_keys` and `to_h` both call `components`, so it would pass however badly it broke.
+    it 'returns the components hash, equal to to_h[:components]' do
+      expect(identifier.deconstruct_keys(nil)).to eq(expected_components)
+      expect(identifier.to_h[:components]).to eq(expected_components)
+    end
+
+    it 'matches a bare constant pattern' do
+      expect((identifier in ^(identifier_class))).to be(true)
+    end
+
+    it 'matches a hash pattern binding its components' do
+      identifier => { **bound }
+      expect(bound).to eq(expected_components)
+    end
+
+    # AE5: CIK, WKN and Valoren have no sub-fields, so no keyed pattern can match them.
+    if params[:expected_components].empty?
+      it 'matches no keyed pattern' do
+        expect((identifier in { identifier: _ })).to be(false)
       end
     end
   end

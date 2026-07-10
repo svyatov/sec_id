@@ -54,6 +54,7 @@ Base itself keeps:
 - `initialize` (abstract, raises `NotImplementedError`)
 - `to_h` (returns `{ type:, full_id:, normalized:, valid:, components: }`)
 - `as_json(*)` — delegates to `to_h` for JSON serialization compatibility
+- `deconstruct_keys(_keys)` — returns `components` so every type destructures in `case/in`; the `keys` argument is ignored, validity is not consulted (unparseable input binds `nil` per key), and no `deconstruct` exists
 - `==`, `eql?`, `hash` — value equality based on `comparison_id` (type + normalized form); instances usable as Hash keys and in Sets
 - `components` (private, returns `{}` — subclasses override with type-specific attributes)
 - `parse` (private, regex matching + `@full_id` assignment)
@@ -176,7 +177,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - `ID_REGEX` constant with named capture groups for parsing
 - `initialize` that calls `parse` and extracts components
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
-- Private `components` method returning a hash of parsed attributes (for `#to_h` serialization); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
+- Private `components` method returning a hash of parsed attributes (read by both `#to_h` and `#deconstruct_keys`); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
 
 **Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI):
 - Include `Checkable` concern
