@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-07-10
+
 ### Added
 
 - `SecID::Base#deconstruct_keys` — every identifier now destructures in `case/in` patterns, exposing the same parsed fields `#to_h` reports under `:components`. The `keys` argument is ignored, no new keys are introduced, and validity is not part of the protocol: `SecID.parse` returning `nil` remains the validity guard, and an instance built from unparseable input binds `nil` for each component. No `deconstruct` (array-pattern) method is defined
