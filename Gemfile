@@ -33,5 +33,5 @@ gem 'steep', '~> 2.0', require: false
 # API documentation (rake yard) and the 100%-coverage gate (rake yard:stats) — dev/test only.
 gem 'yard', '~> 0.9', require: false
 
-gem 'simplecov', '~> 0.22', require: false
+gem 'simplecov', '~> 1.0', require: false
 gem 'simplecov-cobertura', require: false
