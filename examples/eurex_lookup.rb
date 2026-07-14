@@ -105,7 +105,7 @@ if __FILE__ == $PROGRAM_NAME
   puts "Formatted:    #{isin.to_pretty_s}"
   puts "Country:      #{isin.country_code}"
   puts "NSIN type:    #{isin.nsin_type}"
-  puts "Check digit:  #{isin.check_digit}"
+  puts "Checksum:  #{isin.checksum}"
   puts
 
   begin

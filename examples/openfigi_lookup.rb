@@ -93,7 +93,7 @@ if __FILE__ == $PROGRAM_NAME
   figi = SecID::FIGI.validate!(SecID::FIGI::EXAMPLE)
   puts "FIGI:        #{figi}"
   puts "Formatted:   #{figi.to_pretty_s}"
-  puts "Check digit: #{figi.check_digit}"
+  puts "Checksum: #{figi.checksum}"
   puts
 
   begin

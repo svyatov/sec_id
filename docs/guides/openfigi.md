@@ -100,7 +100,7 @@ adapter = OpenFigiAdapter.new(api_key: ENV['OPENFIGI_API_KEY'])
 # validate! raises SecID::Error on invalid input, returns the instance on success
 figi = SecID::FIGI.validate!('BBG000BLNNH6')
 figi.to_pretty_s  # => "BBG 000BLNNH 6"
-figi.check_digit  # => 6
+figi.checksum  # => 6
 
 result = adapter.lookup(figi.to_s)
 result[:instruments].each do |inst|

@@ -106,7 +106,7 @@ if __FILE__ == $PROGRAM_NAME
   puts "LEI:         #{lei}"
   puts "Formatted:   #{lei.to_pretty_s}"
   puts "LOU ID:      #{lei.lou_id}"
-  puts "Check digit: #{lei.check_digit}"
+  puts "Checksum: #{lei.checksum}"
   puts
 
   begin

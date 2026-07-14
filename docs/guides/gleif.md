@@ -107,7 +107,7 @@ adapter = GleifAdapter.new
 lei = SecID::LEI.validate!('7LTWFZYICNSX8D621K86')
 lei.to_pretty_s  # => "7LTW FZYI CNSX 8D62 1K86"
 lei.lou_id       # => "7LTW"
-lei.check_digit  # => 86
+lei.checksum  # => 86
 
 result = adapter.lookup(lei.to_s)
 puts "#{result[:name]} (#{result[:jurisdiction]})"
