@@ -8,15 +8,15 @@ RSpec.describe SecID do
   end
 
   describe '.identifiers' do
-    it 'returns all 15 identifier classes' do
-      expect(described_class.identifiers.size).to eq(15)
+    it 'returns all 16 identifier classes' do
+      expect(described_class.identifiers.size).to eq(16)
     end
 
     it 'includes all expected classes' do
       expected = [
         SecID::ISIN, SecID::CUSIP, SecID::SEDOL, SecID::FIGI, SecID::LEI,
         SecID::IBAN, SecID::CIK, SecID::OCC, SecID::WKN, SecID::Valoren,
-        SecID::CEI, SecID::CFI, SecID::FISN, SecID::BIC, SecID::DTI,
+        SecID::CEI, SecID::CFI, SecID::FISN, SecID::BIC, SecID::DTI, SecID::UPI,
       ]
       expect(described_class.identifiers).to match_array(expected)
     end
@@ -24,7 +24,7 @@ RSpec.describe SecID do
     it 'returns a copy that does not affect the internal list' do
       list = described_class.identifiers
       list.clear
-      expect(described_class.identifiers.size).to eq(15)
+      expect(described_class.identifiers.size).to eq(16)
     end
   end
 
@@ -480,6 +480,68 @@ RSpec.describe SecID do
     it 'generates a valid DTI via the central entry point' do
       result = described_class.generate(:dti)
       expect(result).to be_a(SecID::DTI)
+      expect(result).to be_valid
+    end
+  end
+
+  describe 'UPI integration' do # covers R6, KTD3
+    it 'detects a UPI whose check character fails ISIN\'s Luhn as :upi alone' do
+      expect(described_class.detect('QZRBG6ZTKS42')).to eq([:upi])
+    end
+
+    # QZXKR05S3DL1 is a DSB-issued (OCR-corrected) UPI that is simultaneously a valid
+    # ISIN (its digit check character satisfies ISIN's Luhn); its third char 'X' keeps it
+    # out of FIGI's 12-char bucket. UPI registers after ISIN, so ISIN ranks first.
+    it 'accepts an ISIN/UPI collision, ranking ISIN first' do
+      expect(described_class.detect('QZXKR05S3DL1')).to eq(%i[isin upi])
+      expect(described_class.parse('QZXKR05S3DL1')).to be_a(SecID::ISIN)
+    end
+
+    # QZGMQN4SDLD3 is a valid UPI whose 'G' at position 3 also satisfies FIGI's structural
+    # rule and whose digit check character also satisfies ISIN's Luhn -- a genuine 3-way match.
+    # All three tie on check-digit rank and length, so registration order ranks them:
+    # ISIN (1st) -> FIGI (4th) -> UPI (16th).
+    it 'ranks a 3-way ISIN/FIGI/UPI collision by registration order' do
+      expect(described_class.detect('QZGMQN4SDLD3')).to eq(%i[isin figi upi])
+      expect(described_class.parse('QZGMQN4SDLD3')).to be_a(SecID::ISIN)
+    end
+
+    it 'detects a plain non-QZ ISIN as :isin alone despite UPI sharing the 12-char bucket' do
+      expect(described_class.detect('US0378331005')).to eq([:isin])
+    end
+
+    it 'raises AmbiguousMatchError for the collision with on_ambiguous: :raise' do
+      expect { described_class.parse('QZXKR05S3DL1', on_ambiguous: :raise) }
+        .to raise_error(SecID::AmbiguousMatchError)
+    end
+
+    it 'validates a UPI restricted to :upi' do
+      expect(described_class.valid?('QZRBG6ZTKS42', types: [:upi])).to be(true)
+    end
+
+    it 'parses a UPI into a SecID::UPI instance' do
+      expect(described_class.parse('QZRBG6ZTKS42')).to be_a(SecID::UPI)
+    end
+
+    it 'extracts a UPI embedded in freeform text' do
+      matches = described_class.extract('Reporting UPI QZRBG6ZTKS42 under EMIR')
+      expect(matches.map(&:type)).to include(:upi)
+    end
+
+    it 'restricts scanning to UPI with types:' do
+      matches = described_class.scan('QZRBG6ZTKS42', types: [:upi]).to_a
+      expect(matches.map(&:type)).to eq([:upi])
+    end
+
+    it 'explains per-type results for a UPI string' do
+      result = described_class.explain('QZRBG6ZTKS42', types: %i[upi isin])
+      upi_candidate = result[:candidates].find { |c| c[:type] == :upi }
+      expect(upi_candidate[:valid]).to be(true)
+    end
+
+    it 'generates a valid UPI via the central entry point' do
+      result = described_class.generate(:upi)
+      expect(result).to be_a(SecID::UPI)
       expect(result).to be_valid
     end
   end

@@ -358,5 +358,17 @@ RSpec.describe SecID::Checkable do
         expect(instance.__send__(:mod97, '370400440532013000131400')).to eq(89)
       end
     end
+
+    describe '#mod31_30_check_char' do
+      # ISO 7064 hybrid MOD 31,30 over the shared 30-symbol alphabet (digits + consonants).
+      # 'QZRBG6ZTKS4' is a DSB-issued UPI base whose registered check character is '2'.
+      let(:alphabet) { '0123456789BCDFGHJKLMNPQRSTVWXZ'.chars }
+      let(:alphabet_value) { alphabet.each_with_index.to_h }
+
+      it 'computes the MOD 31,30 check character for a known base' do
+        result = instance.__send__(:mod31_30_check_char, 'QZRBG6ZTKS4', alphabet, alphabet_value)
+        expect(result).to eq('2')
+      end
+    end
   end
 end

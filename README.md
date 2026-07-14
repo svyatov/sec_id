@@ -28,6 +28,7 @@
   - [FISN](#fisn) - Financial Instrument Short Name
   - [BIC](#bic) - Business Identifier Code / SWIFT code
   - [DTI](#dti) - Digital Token Identifier
+  - [UPI](#upi) - Unique Product Identifier
 - [ActiveModel / Rails Validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
 - [Lookup Service Integration](#lookup-service-integration)
 - [Type Signatures (RBS)](#type-signatures-rbs)
@@ -102,7 +103,7 @@ a.eql?(b) # => true
 Set.new([a, b]).size         # => 1
 ```
 
-**Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI) also provide:
+**Check-digit-based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI, UPI) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
 - `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
@@ -130,7 +131,7 @@ SecID::ISIN.has_check_digit?              # => true
 
 # Filter with standard Ruby
 SecID.identifiers.select(&:has_check_digit?).map(&:short_name)
-# => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI", "DTI"]
+# => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI", "DTI", "UPI"]
 
 # Detect identifier type from an unknown string
 # Results are sorted by specificity: check-digit types first, then by length precision
@@ -233,7 +234,7 @@ SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 - `:invalid_format` - correct length and characters but wrong structure
 
 **Type-specific error codes:**
-- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI)
+- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI)
 - `:invalid_prefix` - restricted FIGI prefix (FIGI)
 - `:invalid_category` - unknown CFI category code (CFI)
 - `:invalid_group` - unknown CFI group code for category (CFI)
@@ -744,7 +745,7 @@ dti.restore!                # => #<SecID::DTI> (mutates instance)
 dti.calculate_check_digit  # => 'S'
 ```
 
-DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike every other check-digit type in this gem, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
+DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike most check-digit types in this gem, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer` (as does UPI). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
 
 > **Grandfathered code:** Bitcoin's registered code (`4H95J0R2X`) predates the algorithm and fails the MOD 31,30 computation (which yields `4H95J0R2T`). A frozen exception map honors the registry's assignment across `valid?`, `restore`, and `check_digit` alike:
 >
@@ -752,6 +753,32 @@ DTI accepts exactly 9 characters: an 8-character base (first character never `0`
 > SecID::DTI.valid?('4H95J0R2X')  # => true  (registered code, via the exception map)
 > SecID::DTI.valid?('4H95J0R2T')  # => false (algorithmic form is not the registered one)
 > ```
+
+### UPI
+
+> [Unique Product Identifier](https://www.anna-dsb.com) - a 12-character code identifying OTC derivative products per ISO 4914, issued by the ANNA Derivatives Service Bureau and reported under CFTC, EMIR, and other global OTC-derivatives mandates.
+
+```ruby
+# class level
+SecID::UPI.valid?('QZRBG6ZTKS42')      # => true
+SecID::UPI.restore('QZRBG6ZTKS4')      # => 'QZRBG6ZTKS42'
+SecID::UPI.restore!('QZRBG6ZTKS4')     # => #<SecID::UPI>
+SecID::UPI.check_digit('QZRBG6ZTKS4')  # => '2'
+
+# instance level
+upi = SecID::UPI.new('QZRBG6ZTKS42')
+upi.full_id                # => 'QZRBG6ZTKS42'
+upi.identifier             # => 'QZRBG6ZTKS4'
+upi.check_digit            # => '2'
+upi.valid?                 # => true
+upi.restore                # => 'QZRBG6ZTKS42'
+upi.restore!               # => #<SecID::UPI> (mutates instance)
+upi.calculate_check_digit  # => '2'
+```
+
+UPI accepts exactly 12 characters: a fixed `QZ` prefix, a 9-character body, and 1 check character, all drawn from the same 30-symbol alphabet as DTI — digits `0`-`9` and consonants (vowels and `Y` never appear). Like DTI, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the 11 preceding characters — no DSB registry lookup or paywalled ISO 4914 spec required.
+
+> **Coexistence with ISIN:** a UPI shares the 12-character length bucket with ISIN. A UPI whose digit check character also satisfies ISIN's Luhn detects as both (`SecID.detect('QZXKR05S3DL1') # => [:isin, :upi]`), with ISIN ranked first; `SecID.parse(..., on_ambiguous: :raise)` surfaces the collision. UPI validation itself is fully offline and existence is **not** verified — that requires the licensed DSB registry.
 
 ## ActiveModel / Rails Validator
 
