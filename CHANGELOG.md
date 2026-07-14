@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-07-14
+
 ### Added
 
 - UPI (ISO 4914, Unique Product Identifier) support via `SecID::UPI` — the gem's 16th identifier type, and the first offline UPI validator in any language. Validates the 12-character code (fixed `QZ` prefix, 9-character body, 1 check character) issued by the ANNA Derivatives Service Bureau for OTC-derivatives reporting (CFTC, EMIR, and other global mandates). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the same 30-symbol alphabet as DTI (digits plus consonants; vowels and `Y` never appear), pinned empirically against DSB-issued vectors — no DSB registry lookup or paywalled ISO 4914 spec required. Like DTI, `checksum`/`calculate_checksum` return a `String` rather than an `Integer`, since UPI check characters can be letters. A UPI shares the 12-character length bucket with ISIN and can double-detect (ISIN ranked first) when its digit check character also satisfies ISIN's Luhn checksum.
