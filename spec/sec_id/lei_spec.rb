@@ -10,7 +10,7 @@ RSpec.describe SecID::LEI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Legal Entity Identifier',
                   id_length: 20,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,46 +35,46 @@ RSpec.describe SecID::LEI do
                   invalid_length_id: '5493',
                   invalid_chars_id: '5493006MHB84DD0ZWV!!'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: '5493006MHB84DD0ZWV18',
-                  invalid_check_digit_id: '5493006MHB84DD0ZWV99'
+                  invalid_checksum_id: '5493006MHB84DD0ZWV99'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: '5493006MHB84DD0ZWV99'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: '5493006MHB84DD0ZWV99'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: '529900T8BM49AURSDO55',
                   invalid_id: 'INVALID',
                   expected_type: :lei,
-                  expected_components: { lou_id: '5299', reserved: '00', entity_id: 'T8BM49AURSDO', check_digit: 55 }
+                  expected_components: { lou_id: '5299', reserved: '00', entity_id: 'T8BM49AURSDO', checksum: 55 }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: '5493006MHB84DD0ZWV18',
                   valid_id_without_check: '5493006MHB84DD0ZWV',
                   restored_id: '5493006MHB84DD0ZWV18',
                   invalid_format_id: 'INVALID',
-                  invalid_check_digit_id: '5493006MHB84DD0ZWV99',
-                  expected_check_digit: 18
+                  invalid_checksum_id: '5493006MHB84DD0ZWV99',
+                  expected_checksum: 18
 
-  describe '#check_digit_width' do
+  describe '#checksum_width' do
     it 'returns 2' do
       lei = described_class.new('5493006MHB84DD0ZWV18')
-      expect(lei.__send__(:check_digit_width)).to eq(2)
+      expect(lei.__send__(:checksum_width)).to eq(2)
     end
   end
 
   describe '#restore' do
     it 'always produces a 20-character string' do
-      # Test with a LEI where check digit is < 10 (single digit)
+      # Test with a LEI where checksum is < 10 (single digit)
       lei = described_class.new('7ZW8QJWVPR4P1J1KQY')
       restored = lei.restore
       expect(restored.length).to eq(20)
     end
 
-    it 'pads single-digit check digit' do
-      # 549300TRUWO2CD2G56 has check digit 92
+    it 'pads single-digit checksum' do
+      # 549300TRUWO2CD2G56 has checksum 92
       lei = described_class.new('549300TRUWO2CD2G56')
       expect(lei.restore).to eq('549300TRUWO2CD2G5692')
       expect(lei.restore.length).to eq(20)
@@ -96,7 +96,7 @@ RSpec.describe SecID::LEI do
       expect(lei.lou_id).to eq('5493')
       expect(lei.reserved).to eq('00')
       expect(lei.entity_id).to eq('6MHB84DD0ZWV')
-      expect(lei.check_digit).to eq(18)
+      expect(lei.checksum).to eq(18)
     end
 
     describe '#to_s' do
@@ -106,7 +106,7 @@ RSpec.describe SecID::LEI do
     end
   end
 
-  context 'when LEI is missing check-digit' do
+  context 'when LEI is missing checksum' do
     let(:lei_number) { '5493006MHB84DD0ZWV' }
 
     it 'parses LEI correctly' do
@@ -114,7 +114,7 @@ RSpec.describe SecID::LEI do
       expect(lei.lou_id).to eq('5493')
       expect(lei.reserved).to eq('00')
       expect(lei.entity_id).to eq('6MHB84DD0ZWV')
-      expect(lei.check_digit).to be_nil
+      expect(lei.checksum).to be_nil
     end
   end
 
@@ -126,7 +126,7 @@ RSpec.describe SecID::LEI do
       expect(lei.lou_id).to eq('HWUP')
       expect(lei.reserved).to eq('KR')
       expect(lei.entity_id).to eq('0MPOU8FGXBT3')
-      expect(lei.check_digit).to eq(94)
+      expect(lei.checksum).to eq(94)
     end
 
     describe '#valid?' do
@@ -150,7 +150,7 @@ RSpec.describe SecID::LEI do
       expect(lei.lou_id).to be_nil
       expect(lei.reserved).to be_nil
       expect(lei.entity_id).to be_nil
-      expect(lei.check_digit).to be_nil
+      expect(lei.checksum).to be_nil
     end
   end
 
@@ -177,7 +177,7 @@ RSpec.describe SecID::LEI do
 
   describe '.restore!' do
     context 'when LEI format is valid' do
-      it 'restores check-digit for various LEIs' do
+      it 'restores checksum for various LEIs' do
         expect(described_class.restore!('5493006MHB84DD0ZWV').to_s).to eq('5493006MHB84DD0ZWV18')
         expect(described_class.restore!('5493006MHB84DD0ZWV99').to_s).to eq('5493006MHB84DD0ZWV18')
         expect(described_class.restore!('529900T8BM49AURSDO').to_s).to eq('529900T8BM49AURSDO55')
@@ -186,14 +186,14 @@ RSpec.describe SecID::LEI do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when LEI format is valid' do
-      it 'calculates check-digit for various LEIs' do
-        expect(described_class.check_digit('5493006MHB84DD0ZWV')).to eq(18)
-        expect(described_class.check_digit('5493006MHB84DD0ZWV18')).to eq(18)
-        expect(described_class.check_digit('529900T8BM49AURSDO')).to eq(55)
-        expect(described_class.check_digit('HWUPKR0MPOU8FGXBT3')).to eq(94)
-        expect(described_class.check_digit('7ZW8QJWVPR4P1J1KQY')).to eq(45)
+      it 'calculates checksum for various LEIs' do
+        expect(described_class.checksum('5493006MHB84DD0ZWV')).to eq(18)
+        expect(described_class.checksum('5493006MHB84DD0ZWV18')).to eq(18)
+        expect(described_class.checksum('529900T8BM49AURSDO')).to eq(55)
+        expect(described_class.checksum('HWUPKR0MPOU8FGXBT3')).to eq(94)
+        expect(described_class.checksum('7ZW8QJWVPR4P1J1KQY')).to eq(45)
       end
     end
   end

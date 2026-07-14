@@ -88,7 +88,7 @@ RSpec.describe SecID::Detector do
     end
 
     context 'with specificity ordering' do
-      it 'sorts check-digit types before non-check-digit types' do
+      it 'sorts checksum types before non-checksum types' do
         result = detector.call('037833100')
         cusip_idx = result.index(:cusip)
         valoren_idx = result.index(:valoren)
@@ -155,22 +155,22 @@ RSpec.describe SecID::Detector do
       end
     end
 
-    context 'with wrong check digits' do
-      it 'rejects ISIN with wrong check digit' do
+    context 'with wrong checksum' do
+      it 'rejects ISIN with wrong checksum' do
         expect(detector.call('US5949181040')).to eq([])
       end
 
-      it 'rejects SEDOL with wrong check digit' do
+      it 'rejects SEDOL with wrong checksum' do
         expect(detector.call('B0YBKJ0')).to eq([])
       end
 
-      it 'excludes CUSIP but keeps overlapping types for wrong CUSIP check digit' do
+      it 'excludes CUSIP but keeps overlapping types for wrong CUSIP checksum' do
         result = detector.call('037833105')
         expect(result).not_to include(:cusip)
         expect(result).to include(:valoren, :cik)
       end
 
-      it 'rejects LEI with wrong check digit' do
+      it 'rejects LEI with wrong checksum' do
         expect(detector.call('5493006MHB84DD0ZWV99')).to eq([])
       end
     end
@@ -180,7 +180,7 @@ RSpec.describe SecID::Detector do
         expect(detector.call('BSG000BLNNH6')).to eq([])
       end
 
-      it 'rejects 12 all-Z characters (ISIN check digit fails, FIGI structure fails)' do
+      it 'rejects 12 all-Z characters (ISIN checksum fails, FIGI structure fails)' do
         expect(detector.call('ZZZZZZZZZZZZ')).to eq([])
       end
 

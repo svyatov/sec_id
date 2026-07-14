@@ -10,7 +10,7 @@ module SecID
     # The class-object surface Generatable's methods call once extended.
     interface _GeneratableClass
       def new: (SecID::input) -> Base
-      def has_check_digit?: () -> bool
+      def has_checksum?: () -> bool
     end
 
     # Class methods added when Generatable is included.

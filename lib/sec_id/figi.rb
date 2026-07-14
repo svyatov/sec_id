@@ -4,7 +4,7 @@ module SecID
   # Financial Instrument Global Identifier (FIGI) - a 12-character alphanumeric code
   # that uniquely identifies financial instruments.
   #
-  # Format: 2-character prefix + 'G' + 8-character random part + 1-digit check digit
+  # Format: 2-character prefix + 'G' + 8-character random part + 1-digit checksum
   # Note: FIGI excludes vowels (A, E, I, O, U) from valid characters.
   #
   # @see https://en.wikipedia.org/wiki/Financial_Instrument_Global_Identifier
@@ -12,7 +12,7 @@ module SecID
   # @example Validate a FIGI
   #   SecID::FIGI.valid?('BBG000BLNQ16')  #=> true
   #
-  # @example Restore check digit
+  # @example Restore checksum
   #   SecID::FIGI.restore!('BBG000BLNQ1')  #=> #<SecID::FIGI>
   class FIGI < Base
     include Checkable
@@ -33,7 +33,7 @@ module SecID
         (?<prefix>[B-DF-HJ-NP-TV-Z0-9]{2})
         G
         (?<random_part>[B-DF-HJ-NP-TV-Z0-9]{8}))
-      (?<check_digit>\d)?
+      (?<checksum>\d)?
     \z/x
 
     # Country-code prefixes that are restricted from use in FIGI.
@@ -54,19 +54,19 @@ module SecID
       @identifier = figi_parts[:identifier]
       @prefix = figi_parts[:prefix]
       @random_part = figi_parts[:random_part]
-      @check_digit = figi_parts[:check_digit]&.to_i
+      @checksum = figi_parts[:checksum]&.to_i
     end
 
     # @return [String, nil]
     def to_pretty_s
       return nil unless valid?
 
-      "#{prefix}G #{random_part} #{check_digit}"
+      "#{prefix}G #{random_part} #{checksum}"
     end
 
-    # @return [Integer] the calculated check digit (0-9)
+    # @return [Integer] the calculated checksum (0-9)
     # @raise [InvalidFormatError] if the FIGI format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod10(luhn_sum_indexed(reversed_digits_single(identifier)))
     end
@@ -74,7 +74,7 @@ module SecID
     # Generates a random FIGI body: non-reserved 2-char prefix + 'G' + 8-char random part.
     #
     # @param random [Random] source of randomness
-    # @return [String] an 11-character FIGI body without check digit
+    # @return [String] an 11-character FIGI body without checksum
     def self.generate_body(random)
       prefix = random_string(GENERATE_CHARSET, 2, random: random)
       prefix = random_string(GENERATE_CHARSET, 2, random: random) while RESTRICTED_PREFIXES.include?(prefix)
@@ -85,7 +85,7 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { prefix:, random_part:, check_digit: }
+    def components = { prefix:, random_part:, checksum: }
 
     # @return [Boolean]
     def valid_format?

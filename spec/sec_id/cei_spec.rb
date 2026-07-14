@@ -9,7 +9,7 @@ RSpec.describe SecID::CEI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'CUSIP Entity Identifier',
                   id_length: 10,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -34,27 +34,27 @@ RSpec.describe SecID::CEI do
                   invalid_length_id: 'A0',
                   invalid_chars_id: 'A0BCDEFG!1'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'A0BCDEFGH1',
-                  invalid_check_digit_id: 'A0BCDEFGH0'
+                  invalid_checksum_id: 'A0BCDEFGH0'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'A0BCDEFGH0'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'A0BCDEFGH0'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: 'A0BCDEFGH1',
                   invalid_id: 'INVALID',
                   expected_type: :cei,
-                  expected_components: { prefix: 'A', numeric: '0', entity_id: 'BCDEFGH', check_digit: 1 }
+                  expected_components: { prefix: 'A', numeric: '0', entity_id: 'BCDEFGH', checksum: 1 }
 
-  it_behaves_like 'a check-digit identifier',
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'A0BCDEFGH1',
                   valid_id_without_check: 'A0BCDEFGH',
                   restored_id: 'A0BCDEFGH1',
                   invalid_format_id: 'INVALID',
-                  invalid_check_digit_id: 'A0BCDEFGH0',
-                  expected_check_digit: 1
+                  invalid_checksum_id: 'A0BCDEFGH0',
+                  expected_checksum: 1
 
   context 'when CEI is valid' do
     let(:cei_number) { 'A0BCDEFGH1' }
@@ -64,11 +64,11 @@ RSpec.describe SecID::CEI do
       expect(cei.prefix).to eq('A')
       expect(cei.numeric).to eq('0')
       expect(cei.entity_id).to eq('BCDEFGH')
-      expect(cei.check_digit).to eq(1)
+      expect(cei.checksum).to eq(1)
     end
   end
 
-  context 'when CEI number is missing check-digit' do
+  context 'when CEI number is missing checksum' do
     let(:cei_number) { 'A0BCDEFGH' }
 
     it 'parses CEI number correctly' do
@@ -76,7 +76,7 @@ RSpec.describe SecID::CEI do
       expect(cei.prefix).to eq('A')
       expect(cei.numeric).to eq('0')
       expect(cei.entity_id).to eq('BCDEFGH')
-      expect(cei.check_digit).to be_nil
+      expect(cei.checksum).to be_nil
     end
   end
 
@@ -89,18 +89,18 @@ RSpec.describe SecID::CEI do
   end
 
   describe '.restore!' do
-    it 'restores check-digit for various CEIs' do
+    it 'restores checksum for various CEIs' do
       expect(described_class.restore!('A0BCDEFGH').to_s).to eq('A0BCDEFGH1')
       expect(described_class.restore!('A0A0A0A0A').to_s).to eq('A0A0A0A0A0')
       expect(described_class.restore!('Z9ZZZZZZZ').to_s).to eq('Z9ZZZZZZZ2')
     end
   end
 
-  describe '.check_digit' do
-    it 'calculates check-digit for various CEIs' do
-      expect(described_class.check_digit('A0BCDEFGH')).to eq(1)
-      expect(described_class.check_digit('A0A0A0A0A')).to eq(0)
-      expect(described_class.check_digit('Z9ZZZZZZZ')).to eq(2)
+  describe '.checksum' do
+    it 'calculates checksum for various CEIs' do
+      expect(described_class.checksum('A0BCDEFGH')).to eq(1)
+      expect(described_class.checksum('A0A0A0A0A')).to eq(0)
+      expect(described_class.checksum('Z9ZZZZZZZ')).to eq(2)
     end
   end
 end

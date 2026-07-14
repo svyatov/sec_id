@@ -10,7 +10,7 @@ RSpec.describe SecID::IBAN do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'International Bank Account Number',
                   id_length: 15..34,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,12 +35,12 @@ RSpec.describe SecID::IBAN do
                   invalid_length_id: 'DE89',
                   invalid_chars_id: 'DE89370400440532013!!!'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'DE89370400440532013000',
-                  invalid_check_digit_id: 'DE99370400440532013000'
+                  invalid_checksum_id: 'DE99370400440532013000'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'DE99370400440532013000'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'DE99370400440532013000'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
@@ -48,23 +48,23 @@ RSpec.describe SecID::IBAN do
                   invalid_id: 'INVALID',
                   expected_type: :iban,
                   expected_components: {
-                    country_code: 'DE', bban: '370400440532013000', check_digit: 89,
+                    country_code: 'DE', bban: '370400440532013000', checksum: 89,
                     bank_code: '37040044', account_number: '0532013000'
                   }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'DE89370400440532013000',
                   valid_id_without_check: 'DE370400440532013000',
                   restored_id: 'DE89370400440532013000',
                   invalid_format_id: 'INVALID',
-                  invalid_check_digit_id: 'DE99370400440532013000',
-                  expected_check_digit: 89
+                  invalid_checksum_id: 'DE99370400440532013000',
+                  expected_checksum: 89
 
-  describe '#check_digit_width' do
+  describe '#checksum_width' do
     it 'returns 2' do
       iban = described_class.new('DE89370400440532013000')
-      expect(iban.__send__(:check_digit_width)).to eq(2)
+      expect(iban.__send__(:checksum_width)).to eq(2)
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('DE')
-      expect(iban.check_digit).to eq(89)
+      expect(iban.checksum).to eq(89)
       expect(iban.bban).to eq('370400440532013000')
       expect(iban.identifier).to eq('DE370400440532013000')
     end
@@ -103,7 +103,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('FR')
-      expect(iban.check_digit).to eq(14)
+      expect(iban.checksum).to eq(14)
       expect(iban.bban).to eq('20041010050500013M02606')
     end
 
@@ -126,7 +126,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('GB')
-      expect(iban.check_digit).to eq(29)
+      expect(iban.checksum).to eq(29)
       expect(iban.bban).to eq('NWBK60161331926819')
     end
 
@@ -148,7 +148,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('ES')
-      expect(iban.check_digit).to eq(91)
+      expect(iban.checksum).to eq(91)
       expect(iban.bban).to eq('21000418450200051332')
     end
 
@@ -171,7 +171,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('NL')
-      expect(iban.check_digit).to eq(91)
+      expect(iban.checksum).to eq(91)
       expect(iban.bban).to eq('ABNA0417164300')
     end
 
@@ -192,7 +192,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('BE')
-      expect(iban.check_digit).to eq(68)
+      expect(iban.checksum).to eq(68)
       expect(iban.bban).to eq('539007547034')
     end
 
@@ -214,7 +214,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('IT')
-      expect(iban.check_digit).to eq(60)
+      expect(iban.checksum).to eq(60)
       expect(iban.bban).to eq('X0542811101000000123456')
     end
 
@@ -237,7 +237,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('CH')
-      expect(iban.check_digit).to eq(93)
+      expect(iban.checksum).to eq(93)
       expect(iban.bban).to eq('00762011623852957')
     end
 
@@ -258,7 +258,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('AT')
-      expect(iban.check_digit).to eq(61)
+      expect(iban.checksum).to eq(61)
       expect(iban.bban).to eq('1904300234573201')
     end
 
@@ -274,13 +274,13 @@ RSpec.describe SecID::IBAN do
     end
   end
 
-  context 'when IBAN is missing check-digit' do
+  context 'when IBAN is missing checksum' do
     let(:iban_number) { 'DE370400440532013000' }
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('DE')
       expect(iban.bban).to eq('370400440532013000')
-      expect(iban.check_digit).to be_nil
+      expect(iban.checksum).to be_nil
     end
   end
 
@@ -290,7 +290,7 @@ RSpec.describe SecID::IBAN do
     it 'parses IBAN as nil' do
       expect(iban.country_code).to be_nil
       expect(iban.bban).to be_nil
-      expect(iban.check_digit).to be_nil
+      expect(iban.checksum).to be_nil
       expect(iban.identifier).to be_nil
     end
   end
@@ -330,7 +330,7 @@ RSpec.describe SecID::IBAN do
 
     it 'normalizes to uppercase and parses correctly' do
       expect(iban.country_code).to eq('DE')
-      expect(iban.check_digit).to eq(89)
+      expect(iban.checksum).to eq(89)
       expect(iban.bban).to eq('370400440532013000')
       expect(iban.valid?).to be(true)
     end
@@ -341,7 +341,7 @@ RSpec.describe SecID::IBAN do
 
     it 'parses IBAN correctly' do
       expect(iban.country_code).to eq('SA')
-      expect(iban.check_digit).to eq(3)
+      expect(iban.checksum).to eq(3)
       expect(iban.bban).to eq('80000000608010167519')
     end
 
@@ -432,7 +432,7 @@ RSpec.describe SecID::IBAN do
 
   describe '.restore!' do
     context 'when IBAN format is valid' do
-      it 'restores check-digit for various IBANs' do
+      it 'restores checksum for various IBANs' do
         expect(described_class.restore!('DE370400440532013000').to_s).to eq('DE89370400440532013000')
         expect(described_class.restore!('DE99370400440532013000').to_s).to eq('DE89370400440532013000')
         expect(described_class.restore!('NLABNA0417164300').to_s).to eq('NL91ABNA0417164300')
@@ -441,14 +441,14 @@ RSpec.describe SecID::IBAN do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when IBAN format is valid' do
-      it 'calculates check-digit for various IBANs' do
-        expect(described_class.check_digit('DE370400440532013000')).to eq(89)
-        expect(described_class.check_digit('DE89370400440532013000')).to eq(89)
-        expect(described_class.check_digit('GBNWBK60161331926819')).to eq(29)
-        expect(described_class.check_digit('ES21000418450200051332')).to eq(91)
-        expect(described_class.check_digit('NL91ABNA0417164300')).to eq(91)
+      it 'calculates checksum for various IBANs' do
+        expect(described_class.checksum('DE370400440532013000')).to eq(89)
+        expect(described_class.checksum('DE89370400440532013000')).to eq(89)
+        expect(described_class.checksum('GBNWBK60161331926819')).to eq(29)
+        expect(described_class.checksum('ES21000418450200051332')).to eq(91)
+        expect(described_class.checksum('NL91ABNA0417164300')).to eq(91)
       end
     end
   end

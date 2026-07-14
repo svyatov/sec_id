@@ -10,7 +10,7 @@ RSpec.describe SecID::DTI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Digital Token Identifier',
                   id_length: 9,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,12 +35,12 @@ RSpec.describe SecID::DTI do
                   invalid_length_id: 'X9J9K87',
                   invalid_chars_id: 'X9J9K872Y'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'X9J9K872S',
-                  invalid_check_digit_id: 'X9J9K8721'
+                  invalid_checksum_id: 'X9J9K8721'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'X9J9K8721'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'X9J9K8721'
 
   it_behaves_like 'detects invalid format',
                   invalid_format_id: '012345678'
@@ -50,24 +50,24 @@ RSpec.describe SecID::DTI do
                   valid_id: 'X9J9K872S',
                   invalid_id: 'X9J9K872Y',
                   expected_type: :dti,
-                  expected_components: { check_digit: 'S' }
+                  expected_components: { checksum: 'S' }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'X9J9K872S',
                   valid_id_without_check: 'X9J9K872',
                   restored_id: 'X9J9K872S',
                   invalid_format_id: '012345678',
-                  invalid_check_digit_id: 'X9J9K8721',
-                  expected_check_digit: 'S',
-                  expected_check_digit_class: String
+                  invalid_checksum_id: 'X9J9K8721',
+                  expected_checksum: 'S',
+                  expected_checksum_class: String
 
   context 'when DTI is valid' do
     let(:dti_number) { 'X9J9K872S' }
 
     it 'parses DTI correctly' do
       expect(dti.identifier).to eq('X9J9K872')
-      expect(dti.check_digit).to eq('S')
+      expect(dti.checksum).to eq('S')
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe SecID::DTI do
 
     it 'parses DTI correctly' do
       expect(dti.identifier).to eq(dti_number)
-      expect(dti.check_digit).to be_nil
+      expect(dti.checksum).to be_nil
     end
   end
 
@@ -160,14 +160,14 @@ RSpec.describe SecID::DTI do
 
     it 'rejects the algorithmic form as invalid' do
       expect(described_class.valid?('4H95J0R2T')).to be(false)
-      expect(described_class.new('4H95J0R2T').errors.details.map { |d| d[:error] }).to eq([:invalid_check_digit])
+      expect(described_class.new('4H95J0R2T').errors.details.map { |d| d[:error] }).to eq([:invalid_checksum])
     end
 
-    it 'agrees across #check_digit and #restore!' do
+    it 'agrees across #checksum and #restore!' do
       instance = described_class.new('4H95J0R2')
-      expect(instance.calculate_check_digit).to eq('X')
+      expect(instance.calculate_checksum).to eq('X')
       expect(instance.restore!.to_s).to eq('4H95J0R2X')
-      expect(instance.check_digit).to eq('X')
+      expect(instance.checksum).to eq('X')
     end
   end
 

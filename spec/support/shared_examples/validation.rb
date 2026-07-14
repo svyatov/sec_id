@@ -90,24 +90,24 @@ RSpec.shared_examples 'a validatable identifier' do |params|
   end
 end
 
-# Shared examples for check-digit identifiers that also detect :invalid_check_digit.
+# Shared examples for checksum identifiers that also detect :invalid_checksum.
 #
-# @param valid_id [String] a valid identifier with correct check digit
-# @param invalid_check_digit_id [String] an identifier with wrong check digit
-RSpec.shared_examples 'detects invalid check digit' do |params|
+# @param valid_id [String] a valid identifier with correct checksum
+# @param invalid_checksum_id [String] an identifier with wrong checksum
+RSpec.shared_examples 'detects invalid checksum' do |params|
   let(:identifier_class) { described_class }
 
   describe '#errors' do
-    context 'when check digit is wrong' do
-      it 'returns result with :invalid_check_digit and descriptive message' do
-        result = identifier_class.new(params[:invalid_check_digit_id]).errors
+    context 'when checksum is wrong' do
+      it 'returns result with :invalid_checksum and descriptive message' do
+        result = identifier_class.new(params[:invalid_checksum_id]).errors
         expect(result.none?).to be(false)
-        expect(result.details.map { |d| d[:error] }).to eq([:invalid_check_digit])
+        expect(result.details.map { |d| d[:error] }).to eq([:invalid_checksum])
         expect(result.details.first[:message]).to include('invalid, expected')
       end
     end
 
-    context 'when check digit is correct' do
+    context 'when checksum is correct' do
       it 'returns no errors' do
         result = identifier_class.new(params[:valid_id]).errors
         expect(result.none?).to be(true)
@@ -161,15 +161,15 @@ RSpec.shared_examples 'a validate! identifier' do |params|
   end
 end
 
-# Shared examples for check-digit identifiers that raise InvalidCheckDigitError via validate!.
+# Shared examples for checksum identifiers that raise InvalidChecksumError via validate!.
 #
-# @param invalid_check_digit_id [String] an identifier with wrong check digit
-RSpec.shared_examples 'validate! detects invalid check digit' do |params|
+# @param invalid_checksum_id [String] an identifier with wrong checksum
+RSpec.shared_examples 'validate! detects invalid checksum' do |params|
   describe '#validate!' do
-    context 'when check digit is wrong' do
-      it 'raises InvalidCheckDigitError with message' do
-        instance = described_class.new(params[:invalid_check_digit_id])
-        expect { instance.validate! }.to raise_error(SecID::InvalidCheckDigitError, /invalid, expected/)
+    context 'when checksum is wrong' do
+      it 'raises InvalidChecksumError with message' do
+        instance = described_class.new(params[:invalid_checksum_id])
+        expect { instance.validate! }.to raise_error(SecID::InvalidChecksumError, /invalid, expected/)
       end
     end
   end

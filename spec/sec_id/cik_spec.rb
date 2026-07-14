@@ -10,7 +10,7 @@ RSpec.describe SecID::CIK do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Central Index Key',
                   id_length: 1..10,
-                  has_check_digit: false
+                  has_checksum: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',

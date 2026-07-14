@@ -1,24 +1,24 @@
 module SecID
-  # Provides check-digit validation and calculation for identifiers with a check digit.
+  # Provides checksum validation and calculation for identifiers with a checksum.
   module Checkable : SecID::Base
     CHAR_TO_DIGITS: Hash[String, Integer | Array[Integer]]
     CHAR_TO_DIGIT: Hash[String, Integer]
 
     def self.included: (Module base) -> void
 
-    attr_reader check_digit: (Integer | String)?
+    attr_reader checksum: (Integer | String)?
 
     # Class methods added when Checkable is included.
     module ClassMethods : SecID::_IdentifierClass
-      def restore: (SecID::input id_without_check_digit) -> String
-      def restore!: (SecID::input id_without_check_digit) -> Base
-      def check_digit: (SecID::input id) -> (Integer | String)
+      def restore: (SecID::input id_without_checksum) -> String
+      def restore!: (SecID::input id_without_checksum) -> Base
+      def checksum: (SecID::input id) -> (Integer | String)
     end
 
     def valid?: () -> bool
     def restore: () -> String
     def restore!: () -> self
-    def calculate_check_digit: () -> (Integer | String)
+    def calculate_checksum: () -> (Integer | String)
     def to_s: () -> String
 
     private
@@ -29,7 +29,7 @@ module SecID
     def reversed_digits_single: (untyped id) -> Array[Integer]
     def reversed_digits_multi: (untyped id) -> Array[Integer]
     def error_codes: () -> Array[Symbol]
-    def check_digit_width: () -> Integer
+    def checksum_width: () -> Integer
     def validation_message: (Symbol code) -> String?
     def validate_format_for_calculation!: () -> void
     def mod10: (Integer sum) -> Integer
@@ -37,6 +37,6 @@ module SecID
     def mod97: (String numeric_string) -> Integer
     def mod31_30_check_char: (untyped base, Array[String] alphabet, Hash[String, Integer] alphabet_value) -> String
 
-    @check_digit: (Integer | String)?
+    @checksum: (Integer | String)?
   end
 end

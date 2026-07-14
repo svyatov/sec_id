@@ -154,10 +154,10 @@ RSpec.describe SecIdValidator do
   end
 
   describe 'details: true — AE5, R12' do
-    it 'names the check-digit reason for a bad-check-digit ISIN' do
+    it 'names the checksum reason for a bad-checksum ISIN' do
       record = record_for({ type: :isin, details: true }, 'US0378331004')
 
-      expect(record.errors[:isin].first).to match(/check digit/i)
+      expect(record.errors[:isin].first).to match(/checksum/i)
     end
 
     it 'names the length reason for a wrong-length value' do
@@ -169,7 +169,7 @@ RSpec.describe SecIdValidator do
     it 'surfaces the reason in normalize mode too' do
       record = record_for({ type: :isin, details: true, normalize: true }, 'us-0378331004')
 
-      expect(record.errors[:isin].first).to match(/check digit/i)
+      expect(record.errors[:isin].first).to match(/checksum/i)
     end
 
     it 'falls back to the generic message for an allowlist' do

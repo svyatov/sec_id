@@ -10,7 +10,7 @@ RSpec.describe SecID::CFI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Classification of Financial Instruments',
                   id_length: 6,
-                  has_check_digit: false
+                  has_checksum: false
 
   it_behaves_like 'a generatable identifier'
 

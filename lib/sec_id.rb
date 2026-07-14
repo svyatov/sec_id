@@ -14,8 +14,8 @@ module SecID
   # Raised for invalid format, length, or characters.
   class InvalidFormatError < Error; end
 
-  # Raised when the check digit does not match the calculated value.
-  class InvalidCheckDigitError < Error; end
+  # Raised when the checksum does not match the calculated value.
+  class InvalidChecksumError < Error; end
 
   # Raised for type-specific structural errors (invalid prefix, category, group, BBAN, or date).
   class InvalidStructureError < Error; end

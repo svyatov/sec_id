@@ -5,37 +5,37 @@ module CheckableSpecHelper
   class TestClass < SecID::Base
     include SecID::Checkable
 
-    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d)?\z/
+    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<checksum>\d)?\z/
 
     def initialize(id) # rubocop:disable Lint/MissingSuper
       parts = parse(id)
       @identifier = parts[:identifier]
-      @check_digit = parts[:check_digit]&.to_i
+      @checksum = parts[:checksum]&.to_i
     end
 
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       # Simple algorithm: sum of char positions mod 10
       mod10(identifier.chars.sum { |c| c.ord - 'A'.ord })
     end
   end
 
-  # Test class with 2-digit check digit (like LEI)
+  # Test class with 2-digit checksum (like LEI)
   class TwoDigitCheckClass < SecID::Base
     include SecID::Checkable
 
     FULL_NAME = 'Two Digit Check Test'
     ID_LENGTH = 5
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
-    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d{2})?\z/
+    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<checksum>\d{2})?\z/
 
     def initialize(id) # rubocop:disable Lint/MissingSuper
       parts = parse(id)
       @identifier = parts[:identifier]
-      @check_digit = parts[:check_digit]&.to_i
+      @checksum = parts[:checksum]&.to_i
     end
 
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       # Returns a value that can be single-digit (e.g. 5) to test padding
       sum = identifier.chars.sum { |c| c.ord - 'A'.ord }
@@ -44,21 +44,21 @@ module CheckableSpecHelper
 
     private
 
-    def check_digit_width
+    def checksum_width
       2
     end
   end
 
-  # Test class that doesn't implement calculate_check_digit
+  # Test class that doesn't implement calculate_checksum
   class IncompleteClass < SecID::Base
     include SecID::Checkable
 
-    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<check_digit>\d)?\z/
+    ID_REGEX = /\A(?<identifier>[A-Z]{3})(?<checksum>\d)?\z/
 
     def initialize(id) # rubocop:disable Lint/MissingSuper
       parts = parse(id)
       @identifier = parts[:identifier]
-      @check_digit = parts[:check_digit]&.to_i
+      @checksum = parts[:checksum]&.to_i
     end
   end
 end
@@ -67,20 +67,20 @@ RSpec.describe SecID::Checkable do
   let(:test_class) { CheckableSpecHelper::TestClass }
 
   describe 'when included in a class' do
-    it 'adds check_digit attr_reader' do
+    it 'adds checksum attr_reader' do
       instance = test_class.new('ABC')
-      expect(instance).to respond_to(:check_digit)
+      expect(instance).to respond_to(:checksum)
     end
 
     it 'adds class methods' do
       expect(test_class).to respond_to(:restore)
       expect(test_class).to respond_to(:restore!)
-      expect(test_class).to respond_to(:check_digit)
+      expect(test_class).to respond_to(:checksum)
     end
   end
 
   describe '#valid?' do
-    context 'when check digit is correct' do
+    context 'when checksum is correct' do
       it 'returns true' do
         # A=0, B=1, C=2, sum=3, mod10(10-3)=7
         instance = test_class.new('ABC7')
@@ -88,14 +88,14 @@ RSpec.describe SecID::Checkable do
       end
     end
 
-    context 'when check digit is incorrect' do
+    context 'when checksum is incorrect' do
       it 'returns false' do
         instance = test_class.new('ABC0')
         expect(instance.valid?).to be(false)
       end
     end
 
-    context 'when check digit is missing' do
+    context 'when checksum is missing' do
       it 'returns false' do
         instance = test_class.new('ABC')
         expect(instance.valid?).to be(false)
@@ -111,15 +111,15 @@ RSpec.describe SecID::Checkable do
   end
 
   describe '#restore' do
-    it 'returns the full identifier string with correct check digit' do
+    it 'returns the full identifier string with correct checksum' do
       instance = test_class.new('ABC')
       expect(instance.restore).to eq('ABC7')
     end
 
-    it 'does not mutate check_digit' do
+    it 'does not mutate checksum' do
       instance = test_class.new('ABC')
       instance.restore
-      expect(instance.check_digit).to be_nil
+      expect(instance.checksum).to be_nil
     end
 
     it 'does not mutate full_id' do
@@ -142,14 +142,14 @@ RSpec.describe SecID::Checkable do
       expect(instance.restore!).to be(instance)
     end
 
-    it 'calculates and sets the check digit' do
+    it 'calculates and sets the checksum' do
       instance = test_class.new('ABC')
       instance.restore!
-      expect(instance.check_digit).to eq(7)
+      expect(instance.checksum).to eq(7)
       expect(instance.full_id).to eq('ABC7')
     end
 
-    it 'corrects an incorrect check digit' do
+    it 'corrects an incorrect checksum' do
       instance = test_class.new('ABC0')
       instance.restore!
       expect(instance.full_id).to eq('ABC7')
@@ -163,41 +163,41 @@ RSpec.describe SecID::Checkable do
     end
   end
 
-  describe '#calculate_check_digit' do
-    it 'calculates the check digit' do
+  describe '#calculate_checksum' do
+    it 'calculates the checksum' do
       instance = test_class.new('ABC')
-      expect(instance.calculate_check_digit).to eq(7)
+      expect(instance.calculate_checksum).to eq(7)
     end
 
     context 'when format is invalid' do
       it 'raises InvalidFormatError' do
         instance = test_class.new('INVALID')
-        expect { instance.calculate_check_digit }.to raise_error(SecID::InvalidFormatError)
+        expect { instance.calculate_checksum }.to raise_error(SecID::InvalidFormatError)
       end
     end
 
-    context 'when subclass does not implement calculate_check_digit' do
+    context 'when subclass does not implement calculate_checksum' do
       it 'raises NotImplementedError' do
         instance = CheckableSpecHelper::IncompleteClass.new('ABC')
-        expect { instance.calculate_check_digit }.to raise_error(NotImplementedError)
+        expect { instance.calculate_checksum }.to raise_error(NotImplementedError)
       end
     end
   end
 
   describe '#to_s' do
-    it 'returns identifier with check digit' do
+    it 'returns identifier with checksum' do
       instance = test_class.new('ABC7')
       expect(instance.to_s).to eq('ABC7')
     end
 
-    it 'returns identifier with nil check digit as empty string' do
+    it 'returns identifier with nil checksum as empty string' do
       instance = test_class.new('ABC')
       expect(instance.to_s).to eq('ABC')
     end
   end
 
   describe '.restore' do
-    it 'returns the full identifier string with correct check digit' do
+    it 'returns the full identifier string with correct checksum' do
       expect(test_class.restore('ABC')).to eq('ABC7')
     end
   end
@@ -210,30 +210,30 @@ RSpec.describe SecID::Checkable do
     end
   end
 
-  describe '.check_digit' do
-    it 'creates instance and returns calculated check digit' do
-      expect(test_class.check_digit('ABC')).to eq(7)
+  describe '.checksum' do
+    it 'creates instance and returns calculated checksum' do
+      expect(test_class.checksum('ABC')).to eq(7)
     end
   end
 
-  describe 'two-digit check digit padding' do
+  describe 'two-digit checksum padding' do
     let(:two_digit_class) { CheckableSpecHelper::TwoDigitCheckClass }
 
     # ABC: A=0, B=1, C=2, sum=3, 3%98+1=4 → single digit, must pad to "04"
     describe '#to_s' do
-      it 'pads single-digit check digit to width 2' do
+      it 'pads single-digit checksum to width 2' do
         instance = two_digit_class.new('ABC04')
         expect(instance.to_s).to eq('ABC04')
       end
 
-      it 'returns identifier only when check digit is nil' do
+      it 'returns identifier only when checksum is nil' do
         instance = two_digit_class.new('ABC')
         expect(instance.to_s).to eq('ABC')
       end
     end
 
     describe '#restore' do
-      it 'pads single-digit check digit to width 2' do
+      it 'pads single-digit checksum to width 2' do
         instance = two_digit_class.new('ABC')
         expect(instance.restore).to eq('ABC04')
         expect(instance.restore.length).to eq(5)
@@ -241,7 +241,7 @@ RSpec.describe SecID::Checkable do
     end
 
     describe '#restore!' do
-      it 'pads single-digit check digit to width 2' do
+      it 'pads single-digit checksum to width 2' do
         instance = two_digit_class.new('ABC')
         instance.restore!
         expect(instance.full_id).to eq('ABC04')
@@ -249,7 +249,7 @@ RSpec.describe SecID::Checkable do
     end
 
     describe 'validation_message' do
-      it 'shows padded check digit values' do
+      it 'shows padded checksum values' do
         instance = two_digit_class.new('ABC99')
         result = instance.errors
         expect(result.messages.first).to include("'99'", "'04'")
@@ -315,7 +315,7 @@ RSpec.describe SecID::Checkable do
     end
   end
 
-  describe 'check digit helpers (private)' do
+  describe 'checksum helpers (private)' do
     let(:instance) { test_class.new('ABC') }
 
     describe '#mod10' do
@@ -354,7 +354,7 @@ RSpec.describe SecID::Checkable do
 
     describe '#mod97' do
       it 'calculates known value' do
-        # 98 - (3704004405320130001314 00 % 97) = 89 (DE IBAN check digit)
+        # 98 - (3704004405320130001314 00 % 97) = 89 (DE IBAN checksum)
         expect(instance.__send__(:mod97, '370400440532013000131400')).to eq(89)
       end
     end

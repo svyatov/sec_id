@@ -42,7 +42,7 @@ module SecID
     def self.length_values: () -> (::Array[Integer] | ::Range[Integer])
     def self.length_specificity: () -> (Integer | Float | nil)
     def self.example: () -> String
-    def self.has_check_digit?: () -> bool
+    def self.has_checksum?: () -> bool
     def self.inherited: (singleton(Base) subclass) -> void
 
     def initialize: (SecID::input _sec_id_number) -> void
@@ -54,12 +54,12 @@ module SecID
     def as_json: (*untyped) -> Hash[Symbol, untyped]
     def deconstruct_keys: (::Array[Symbol]? _keys) -> Hash[Symbol, untyped]
 
-    # Check-digit surface. Only the types that `include Checkable` implement these
+    # Checksum surface. Only the types that `include Checkable` implement these
     # (they raise/NoMethodError otherwise); declared on Base so `Generatable#generate`
-    # and `Checkable::ClassMethods` type-check without narrowing on `has_check_digit?`.
+    # and `Checkable::ClassMethods` type-check without narrowing on `has_checksum?`.
     def restore: () -> String
     def restore!: () -> self
-    def calculate_check_digit: () -> (Integer | String)
+    def calculate_checksum: () -> (Integer | String)
 
     def comparison_id: () -> String
 
@@ -71,7 +71,7 @@ module SecID
     @full_id: String
     @identifier: untyped
     self.@short_name: String
-    self.@has_check_digit: bool
+    self.@has_checksum: bool
     self.@type_key: Symbol
     self.@detection_priority: Array[Integer | Float | nil]
   end

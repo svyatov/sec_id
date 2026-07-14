@@ -38,7 +38,7 @@ module SecID
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'DE')
-    # @return [ISIN] a new ISIN instance with calculated check digit
+    # @return [ISIN] a new ISIN instance with calculated checksum
     # @raise [InvalidFormatError] if the country code is not DE
     # @raise [InvalidFormatError] if the WKN format is invalid
     def to_isin(country_code = 'DE')

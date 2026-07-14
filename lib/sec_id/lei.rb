@@ -4,7 +4,7 @@ module SecID
   # Legal Entity Identifier (LEI) - a 20-character alphanumeric code that
   # uniquely identifies legal entities participating in financial transactions.
   #
-  # Format: 4-character LOU ID + 2-character reserved + 12-character entity ID + 2-digit check digit
+  # Format: 4-character LOU ID + 2-character reserved + 12-character entity ID + 2-digit checksum
   #
   # @see https://en.wikipedia.org/wiki/Legal_Entity_Identifier
   # @see https://www.gleif.org/en/about-lei/iso-17442-the-lei-code-structure
@@ -12,8 +12,8 @@ module SecID
   # @example Validate a LEI
   #   SecID::LEI.valid?('529900T8BM49AURSDO55')  #=> true
   #
-  # @example Calculate check digit
-  #   SecID::LEI.check_digit('529900T8BM49AURSDO')  #=> 55
+  # @example Calculate checksum
+  #   SecID::LEI.checksum('529900T8BM49AURSDO')  #=> 55
   class LEI < Base
     include Checkable
 
@@ -32,7 +32,7 @@ module SecID
         (?<lou_id>[0-9A-Z]{4})
         (?<reserved>[0-9A-Z]{2})
         (?<entity_id>[0-9A-Z]{12}))
-      (?<check_digit>\d{2})?
+      (?<checksum>\d{2})?
     \z/x
 
     # @return [String, nil] the 4-character Local Operating Unit (LOU) identifier
@@ -51,7 +51,7 @@ module SecID
       @lou_id = lei_parts[:lou_id]
       @reserved = lei_parts[:reserved]
       @entity_id = lei_parts[:entity_id]
-      @check_digit = lei_parts[:check_digit]&.to_i
+      @checksum = lei_parts[:checksum]&.to_i
     end
 
     # @return [String, nil]
@@ -61,9 +61,9 @@ module SecID
       to_s.scan(/.{1,4}/).join(' ')
     end
 
-    # @return [Integer] the calculated 2-digit check digit (1-98)
+    # @return [Integer] the calculated 2-digit checksum (1-98)
     # @raise [InvalidFormatError] if the LEI format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod97("#{numeric_identifier}00")
     end
@@ -71,7 +71,7 @@ module SecID
     # Generates a random LEI body: 18 alphanumeric characters.
     #
     # @param random [Random] source of randomness
-    # @return [String] an 18-character LEI body without check digits
+    # @return [String] an 18-character LEI body without checksum
     def self.generate_body(random)
       random_string(ALPHANUMERIC, 18, random: random)
     end
@@ -80,10 +80,10 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { lou_id:, reserved:, entity_id:, check_digit: }
+    def components = { lou_id:, reserved:, entity_id:, checksum: }
 
     # @return [Integer]
-    def check_digit_width
+    def checksum_width
       2
     end
 

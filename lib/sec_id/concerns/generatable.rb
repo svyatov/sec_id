@@ -4,9 +4,9 @@ module SecID
   # Provides generation of new, format-valid identifiers for use as test fixtures.
   #
   # Including classes define a class-level `generate_body(random)` returning a valid
-  # body (the identifier without its check digit). The default {ClassMethods#generate}
-  # builds an instance from that body and restores the check digit for check-digit types.
-  # Types whose shape is not "body (+ check digit)" compose the full identifier in
+  # body (the identifier without its checksum). The default {ClassMethods#generate}
+  # builds an instance from that body and restores the checksum for checksum types.
+  # Types whose shape is not "body (+ checksum)" compose the full identifier in
   # `generate_body` (CFI, FISN) or override `generate` entirely (OCC).
   #
   # @note Generated identifiers are valid in format only — they are not real,
@@ -44,12 +44,12 @@ module SecID
       # @return [self] a generated instance of the identifier type (e.g. {SecID::ISIN}) for which `valid?` is true
       def generate(random: Random.new)
         instance = new(generate_body(random))
-        has_check_digit? ? instance.restore! : instance
+        has_checksum? ? instance.restore! : instance
       end
 
       private
 
-      # Subclasses must implement this to return a valid body (identifier without check digit),
+      # Subclasses must implement this to return a valid body (identifier without checksum),
       # unless they override {#generate} entirely (as OCC does).
       #
       # @param _random [Random] source of randomness

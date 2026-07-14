@@ -6,8 +6,8 @@ module SecID
   # International Bank Account Number (IBAN) - an international standard for identifying
   # bank accounts across national borders (ISO 13616).
   #
-  # Format: 2-letter country code + 2-digit check digits + BBAN (Basic Bank Account Number, 11-30 chars)
-  # Note: Unlike other SecID identifiers, the check digits are in positions 3-4, not at the end.
+  # Format: 2-letter country code + 2-digit checksum + BBAN (Basic Bank Account Number, 11-30 chars)
+  # Note: Unlike other SecID identifiers, the checksum are in positions 3-4, not at the end.
   #
   # @see https://en.wikipedia.org/wiki/International_Bank_Account_Number
   # @see https://www.iban.com/structure
@@ -15,7 +15,7 @@ module SecID
   # @example Validate an IBAN
   #   SecID::IBAN.valid?('DE89370400440532013000')  #=> true
   #
-  # @example Restore check digits
+  # @example Restore checksum
   #   SecID::IBAN.restore!('DE00370400440532013000')  #=> #<SecID::IBAN>
   class IBAN < Base
     include Checkable
@@ -30,7 +30,7 @@ module SecID
     VALID_CHARS_REGEX = /\A[A-Z0-9]+\z/
 
     # Regular expression for parsing IBAN components.
-    # Note: Check digit positioning is handled in initialize, not in the regex.
+    # Note: Checksum positioning is handled in initialize, not in the regex.
     ID_REGEX = /\A
       (?<country_code>[A-Z]{2})
       (?<rest>[A-Z0-9]{13,32})
@@ -62,7 +62,7 @@ module SecID
     # @return [String, nil] the account number (extracted from BBAN if country rules define it)
     attr_reader :account_number
 
-    # @return [String, nil] the national check digit (extracted from BBAN if country rules define it)
+    # @return [String, nil] the national checksum (extracted from BBAN if country rules define it)
     attr_reader :national_check
 
     # @param iban [String] the IBAN string to parse
@@ -72,7 +72,7 @@ module SecID
       rest = iban_parts[:rest]
 
       if @country_code && rest
-        extract_check_digit_and_bban(rest)
+        extract_checksum_and_bban(rest)
         @identifier = "#{@country_code}#{@bban}" if @bban
       end
 
@@ -82,19 +82,19 @@ module SecID
     # @return [String]
     # @raise [InvalidFormatError] if the IBAN format is invalid
     def restore
-      cd = calculate_check_digit
+      cd = calculate_checksum
       "#{country_code}#{cd.to_s.rjust(2, '0')}#{bban}"
     end
 
     # @return [Integer] the calculated 2-digit check value (1-98)
     # @raise [InvalidFormatError] if the IBAN format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod97(numeric_string_for_check)
     end
 
-    # Generates a random IBAN body for a numeric-BBAN country with placeholder check digits.
-    # The default {Generatable::ClassMethods#generate} restores the real check digits via `restore!`.
+    # Generates a random IBAN body for a numeric-BBAN country with placeholder checksum.
+    # The default {Generatable::ClassMethods#generate} restores the real checksum via `restore!`.
     #
     # @param random [Random] source of randomness
     # @return [String] a country code + "00" + numeric BBAN
@@ -126,9 +126,9 @@ module SecID
 
     # @return [String]
     def to_s
-      return full_id unless check_digit
+      return full_id unless checksum
 
-      "#{country_code}#{check_digit.to_s.rjust(2, '0')}#{bban}"
+      "#{country_code}#{checksum.to_s.rjust(2, '0')}#{bban}"
     end
 
     # @return [String, nil]
@@ -140,7 +140,7 @@ module SecID
 
     # @return [Hash]
     def components
-      hash = { country_code:, bban:, check_digit: }
+      hash = { country_code:, bban:, checksum: }
       hash[:bank_code] = bank_code if bank_code
       hash[:branch_code] = branch_code if branch_code
       hash[:account_number] = account_number if account_number
@@ -149,7 +149,7 @@ module SecID
     end
 
     # @return [Integer]
-    def check_digit_width
+    def checksum_width
       2
     end
 
@@ -177,14 +177,14 @@ module SecID
 
     # @param rest [String] the IBAN string after country code
     # @return [void]
-    def extract_check_digit_and_bban(rest)
+    def extract_checksum_and_bban(rest)
       expected = expected_bban_length_for_country
 
-      if check_digits?(rest, expected)
-        @check_digit = rest[0, 2].to_i
+      if checksum?(rest, expected)
+        @checksum = rest[0, 2].to_i
         @bban = rest[2..]
       else
-        @check_digit = nil
+        @checksum = nil
         @bban = rest
       end
     end
@@ -197,11 +197,11 @@ module SecID
     # @param rest [String] the IBAN string after country code
     # @param expected_bban_length [Integer, nil] the expected BBAN length for the country
     # @return [Boolean]
-    def check_digits?(rest, expected_bban_length)
+    def checksum?(rest, expected_bban_length)
       return false unless rest[0, 2].match?(/\A\d{2}\z/)
       return true unless expected_bban_length
 
-      # If we know expected BBAN length, check if rest matches with or without check digits
+      # If we know expected BBAN length, check if rest matches with or without checksum
       rest.length == expected_bban_length + 2 || rest.length != expected_bban_length
     end
 

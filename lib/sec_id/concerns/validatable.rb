@@ -8,7 +8,7 @@ module SecID
   module Validatable
     # Maps error-code symbols to their exception classes; unmapped codes default to InvalidFormatError.
     ERROR_MAP = {
-      invalid_check_digit: InvalidCheckDigitError,
+      invalid_checksum: InvalidChecksumError,
       invalid_prefix: InvalidStructureError,
       invalid_category: InvalidStructureError,
       invalid_group: InvalidStructureError,
@@ -43,7 +43,7 @@ module SecID
       #
       # @param id [String] the identifier to validate
       # @return [Base] the identifier instance
-      # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+      # @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
       def validate!(id)
         new(id).validate!
       end
@@ -82,7 +82,7 @@ module SecID
     # Validates and returns self if valid, raises an exception otherwise.
     #
     # @return [self]
-    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    # @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
     def validate!
       return self if valid?
 
@@ -119,7 +119,7 @@ module SecID
     end
 
     # Checks length against ID_LENGTH's three shapes: Range (bounds), Array
-    # (discrete valid lengths), or Integer (allows an optional check digit).
+    # (discrete valid lengths), or Integer (allows an optional checksum).
     #
     # @return [Boolean]
     def valid_length?
@@ -130,7 +130,7 @@ module SecID
       case id_length
       when Range then id_length.cover?(len)
       when Array then id_length.include?(len)
-      else            ((id_length - check_digit_width)..id_length).cover?(len)
+      else            ((id_length - checksum_width)..id_length).cover?(len)
       end
     end
 
@@ -139,8 +139,8 @@ module SecID
       full_id.match?(self.class::VALID_CHARS_REGEX)
     end
 
-    # @return [Integer] width of the check digit (0 for non-checkable, overridden in Checkable)
-    def check_digit_width
+    # @return [Integer] width of the checksum (0 for non-checkable, overridden in Checkable)
+    def checksum_width
       0
     end
 

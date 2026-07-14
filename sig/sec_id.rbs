@@ -7,8 +7,8 @@ module SecID
   class InvalidFormatError < Error
   end
 
-  # Raised when the check digit does not match the calculated value.
-  class InvalidCheckDigitError < Error
+  # Raised when the checksum does not match the calculated value.
+  class InvalidChecksumError < Error
   end
 
   # Raised for type-specific structural errors.

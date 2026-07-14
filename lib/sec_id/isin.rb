@@ -4,14 +4,14 @@ module SecID
   # International Securities Identification Number (ISIN) - a 12-character alphanumeric code
   # that uniquely identifies a security globally.
   #
-  # Format: 2-letter country code + 9-character NSIN + 1-digit check digit
+  # Format: 2-letter country code + 9-character NSIN + 1-digit checksum
   #
   # @see https://en.wikipedia.org/wiki/International_Securities_Identification_Number
   #
   # @example Validate an ISIN
   #   SecID::ISIN.valid?('US5949181045')  #=> true
   #
-  # @example Restore check digit
+  # @example Restore checksum
   #   SecID::ISIN.restore!('US594918104')  #=> #<SecID::ISIN>
   class ISIN < Base
     include Checkable
@@ -30,7 +30,7 @@ module SecID
       (?<identifier>
         (?<country_code>[A-Z]{2})
         (?<nsin>[A-Z0-9]{9}))
-      (?<check_digit>\d)?
+      (?<checksum>\d)?
     \z/x
 
     # Country codes that use CUSIP Global Services (CGS) for NSIN assignment.
@@ -71,19 +71,19 @@ module SecID
       @identifier = isin_parts[:identifier]
       @country_code = isin_parts[:country_code]
       @nsin = isin_parts[:nsin]
-      @check_digit = isin_parts[:check_digit]&.to_i
+      @checksum = isin_parts[:checksum]&.to_i
     end
 
     # @return [String, nil]
     def to_pretty_s
       return nil unless valid?
 
-      "#{country_code} #{nsin} #{check_digit}"
+      "#{country_code} #{nsin} #{checksum}"
     end
 
-    # @return [Integer] the calculated check digit (0-9)
+    # @return [Integer] the calculated checksum (0-9)
     # @raise [InvalidFormatError] if the ISIN format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod10(luhn_sum_standard(reversed_digits_multi(identifier)))
     end
@@ -91,7 +91,7 @@ module SecID
     # Generates a random ISIN body: 2-letter country code + 9-character NSIN.
     #
     # @param random [Random] source of randomness
-    # @return [String] an 11-character ISIN body without check digit
+    # @return [String] an 11-character ISIN body without checksum
     def self.generate_body(random)
       "#{random_string(ALPHA, 2, random: random)}#{random_string(ALPHANUMERIC, 9, random: random)}"
     end
@@ -177,6 +177,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { country_code:, nsin:, check_digit: }
+    def components = { country_code:, nsin:, checksum: }
   end
 end

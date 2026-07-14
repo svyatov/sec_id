@@ -5,7 +5,7 @@
 #
 # @param full_name [String] expected full human-readable name
 # @param id_length [Integer, Range] expected identifier length
-# @param has_check_digit [Boolean] whether the class includes Checkable
+# @param has_checksum [Boolean] whether the class includes Checkable
 RSpec.shared_examples 'an identifier with metadata' do |params|
   describe 'metadata class methods' do
     it '.short_name returns the unqualified class name' do
@@ -38,8 +38,8 @@ RSpec.shared_examples 'an identifier with metadata' do |params|
       end
     end
 
-    it '.has_check_digit? returns the expected value' do
-      expect(described_class.has_check_digit?).to be(params[:has_check_digit])
+    it '.has_checksum? returns the expected value' do
+      expect(described_class.has_checksum?).to be(params[:has_checksum])
     end
   end
 end

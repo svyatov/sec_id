@@ -10,7 +10,7 @@ RSpec.describe SecID::OCC do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'OCC Option Symbol',
                   id_length: (16..21),
-                  has_check_digit: false
+                  has_checksum: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',

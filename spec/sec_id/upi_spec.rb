@@ -26,7 +26,7 @@ RSpec.describe SecID::UPI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Unique Product Identifier',
                   id_length: 12,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -51,12 +51,12 @@ RSpec.describe SecID::UPI do
                   invalid_length_id: 'QZRBG6ZTK4',
                   invalid_chars_id: 'QZABG6ZTKS42'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'QZRBG6ZTKS42',
-                  invalid_check_digit_id: 'QZRBG6ZTKS43'
+                  invalid_checksum_id: 'QZRBG6ZTKS43'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'QZRBG6ZTKS43'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'QZRBG6ZTKS43'
 
   it_behaves_like 'detects invalid format',
                   invalid_format_id: 'RBG6ZTKS42QZ'
@@ -66,17 +66,17 @@ RSpec.describe SecID::UPI do
                   valid_id: 'QZRBG6ZTKS42',
                   invalid_id: 'QZRBG6ZTKS43',
                   expected_type: :upi,
-                  expected_components: { check_digit: '2' }
+                  expected_components: { checksum: '2' }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'QZRBG6ZTKS42',
                   valid_id_without_check: 'QZRBG6ZTKS4',
                   restored_id: 'QZRBG6ZTKS42',
                   invalid_format_id: 'RBG6ZTKS42QZ',
-                  invalid_check_digit_id: 'QZRBG6ZTKS43',
-                  expected_check_digit: '2',
-                  expected_check_digit_class: String
+                  invalid_checksum_id: 'QZRBG6ZTKS43',
+                  expected_checksum: '2',
+                  expected_checksum_class: String
 
   describe '.valid?' do
     it 'returns true for every DSB-issued vector' do
@@ -88,8 +88,8 @@ RSpec.describe SecID::UPI do
     it 'computes the expected String check character for every vector' do
       vectors.each do |vector, check|
         instance = described_class.new(vector)
-        expect(instance.check_digit).to eq(check)
-        expect(instance.calculate_check_digit).to eq(check)
+        expect(instance.checksum).to eq(check)
+        expect(instance.calculate_checksum).to eq(check)
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe SecID::UPI do
       instance = described_class.new('QZRBG6ZTKS4')
       expect(instance.restore!).to equal(instance)
       expect(instance.to_s).to eq('QZRBG6ZTKS42')
-      expect(instance.check_digit).to eq('2')
+      expect(instance.checksum).to eq('2')
     end
   end
 
@@ -118,7 +118,7 @@ RSpec.describe SecID::UPI do
 
       it 'parses the identifier and check character' do
         expect(upi.identifier).to eq('QZRBG6ZTKS4')
-        expect(upi.check_digit).to eq('2')
+        expect(upi.checksum).to eq('2')
       end
     end
 
@@ -127,8 +127,8 @@ RSpec.describe SecID::UPI do
 
       it 'is format-valid (check character optional) but invalid overall' do
         expect(upi.identifier).to eq(upi_number)
-        expect(upi.check_digit).to be_nil
-        expect(upi.errors.details.map { |d| d[:error] }).to eq([:invalid_check_digit])
+        expect(upi.checksum).to be_nil
+        expect(upi.errors.details.map { |d| d[:error] }).to eq([:invalid_checksum])
       end
     end
 
@@ -136,9 +136,9 @@ RSpec.describe SecID::UPI do
       let(:upi_number) { 'QZRBG6ZTKS42' }
 
       it 'destructures via case/in' do
-        upi => { check_digit: }
-        expect(check_digit).to eq('2')
-        expect(upi.to_h[:components]).to eq({ check_digit: '2' })
+        upi => { checksum: }
+        expect(checksum).to eq('2')
+        expect(upi.to_h[:components]).to eq({ checksum: '2' })
       end
     end
   end

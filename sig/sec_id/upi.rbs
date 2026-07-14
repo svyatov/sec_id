@@ -14,8 +14,8 @@ module SecID
     GENERATE_CHARSET: Array[String]
 
     def initialize: (SecID::input upi) -> void
-    def calculate_check_digit: () -> String
-    def self.check_digit: (SecID::input id) -> String
+    def calculate_checksum: () -> String
+    def self.checksum: (SecID::input id) -> String
     private def self.generate_body: (Random random) -> String
 
     private

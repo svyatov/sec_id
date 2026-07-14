@@ -10,7 +10,7 @@ RSpec.describe SecID::ISIN do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'International Securities Identification Number',
                   id_length: 12,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,28 +35,28 @@ RSpec.describe SecID::ISIN do
                   invalid_length_id: 'US',
                   invalid_chars_id: 'US59491810-5'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'US5949181045',
-                  invalid_check_digit_id: 'IE00B296YR70'
+                  invalid_checksum_id: 'IE00B296YR70'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'IE00B296YR70'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'IE00B296YR70'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: 'US5949181045',
                   invalid_id: 'INVALID',
                   expected_type: :isin,
-                  expected_components: { country_code: 'US', nsin: '594918104', check_digit: 5 }
+                  expected_components: { country_code: 'US', nsin: '594918104', checksum: 5 }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'IE00B296YR77',
                   valid_id_without_check: 'IE00B296YR7',
                   restored_id: 'IE00B296YR77',
                   invalid_format_id: '00B296YR77',
-                  invalid_check_digit_id: 'IE00B296YR70',
-                  expected_check_digit: 7
+                  invalid_checksum_id: 'IE00B296YR70',
+                  expected_checksum: 7
 
   context 'when ISIN is valid' do
     let(:isin_number) { 'IE00B296YR77' }
@@ -65,7 +65,7 @@ RSpec.describe SecID::ISIN do
       expect(isin.identifier).to eq('IE00B296YR7')
       expect(isin.country_code).to eq('IE')
       expect(isin.nsin).to eq('00B296YR7')
-      expect(isin.check_digit).to eq(7)
+      expect(isin.checksum).to eq(7)
     end
   end
 
@@ -76,18 +76,18 @@ RSpec.describe SecID::ISIN do
       expect(isin.identifier).to be_nil
       expect(isin.country_code).to be_nil
       expect(isin.nsin).to be_nil
-      expect(isin.check_digit).to be_nil
+      expect(isin.checksum).to be_nil
     end
   end
 
-  context 'when ISIN number is missing check-digit' do
+  context 'when ISIN number is missing checksum' do
     let(:isin_number) { 'IE00B296YR7' }
 
     it 'parses ISIN number correctly' do
       expect(isin.identifier).to eq(isin_number)
       expect(isin.country_code).to eq('IE')
       expect(isin.nsin).to eq('00B296YR7')
-      expect(isin.check_digit).to be_nil
+      expect(isin.checksum).to be_nil
     end
   end
 
@@ -457,14 +457,14 @@ RSpec.describe SecID::ISIN do
         end
 
         expect(described_class.valid?('AU0000XVGZA3')).to be(true)
-        expect(described_class.valid?('AU0000VXGZA3')).to be(true) # it's not a typo, it's a check-digit flaw in ISIN
+        expect(described_class.valid?('AU0000VXGZA3')).to be(true) # it's not a typo, it's a checksum flaw in ISIN
       end
     end
   end
 
   describe '.restore!' do
     context 'when ISIN is valid' do
-      it 'restores check-digit and returns instance' do
+      it 'restores checksum and returns instance' do
         expect(described_class.restore!('AU0000XVGZA').to_s).to eq('AU0000XVGZA3')
         expect(described_class.restore!('AU0000VXGZA7').to_s).to eq('AU0000VXGZA3')
         expect(described_class.restore!('GB000263494').to_s).to eq('GB0002634946')
@@ -474,20 +474,20 @@ RSpec.describe SecID::ISIN do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when ISIN is valid' do
-      it 'calculates and returns the check-digit' do
-        expect(described_class.check_digit('AU0000XVGZA')).to eq(3)
-        expect(described_class.check_digit('AU0000VXGZA7')).to eq(3)
-        expect(described_class.check_digit('GB000263494')).to eq(6)
-        expect(described_class.check_digit('US037833104')).to eq(7)
-        expect(described_class.check_digit('US0378331004')).to eq(5)
+      it 'calculates and returns the checksum' do
+        expect(described_class.checksum('AU0000XVGZA')).to eq(3)
+        expect(described_class.checksum('AU0000VXGZA7')).to eq(3)
+        expect(described_class.checksum('GB000263494')).to eq(6)
+        expect(described_class.checksum('US037833104')).to eq(7)
+        expect(described_class.checksum('US0378331004')).to eq(5)
       end
     end
   end
 
   describe '#to_pretty_s' do
-    it 'formats as country_code + nsin + check_digit' do
+    it 'formats as country_code + nsin + checksum' do
       expect(described_class.new('US5949181045').to_pretty_s).to eq('US 594918104 5')
     end
 

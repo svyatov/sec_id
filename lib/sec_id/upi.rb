@@ -32,7 +32,7 @@ module SecID
     # optional check character.
     ID_REGEX = /\A
       (?<identifier>QZ[0-9B-DF-HJ-NP-TV-XZ]{9})
-      (?<check_digit>[0-9B-DF-HJ-NP-TV-XZ])?
+      (?<checksum>[0-9B-DF-HJ-NP-TV-XZ])?
     \z/x
 
     # The 30-symbol UPI alphabet, ordered by check-character value (0-29).
@@ -48,12 +48,12 @@ module SecID
     def initialize(upi)
       upi_parts = parse upi
       @identifier = upi_parts[:identifier]
-      @check_digit = upi_parts[:check_digit]
+      @checksum = upi_parts[:checksum]
     end
 
     # @return [String] the calculated check character
     # @raise [InvalidFormatError] if the UPI format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod31_30_check_char(identifier, ALPHABET, ALPHABET_VALUE)
     end
@@ -71,6 +71,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { check_digit: }
+    def components = { checksum: }
   end
 end

@@ -6,7 +6,7 @@ module SecID
   # OCC Option Symbol - standardized option symbol format used by Option Clearing Corporation.
   # Format: 6-char underlying (padded) + 6-char date (YYMMDD) + type (C/P) + 8-digit strike (in mills).
   #
-  # @note OCC identifiers have no check digit and validation includes both format
+  # @note OCC identifiers have no checksum and validation includes both format
   #   and date parseability checks.
   #
   # @see https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol

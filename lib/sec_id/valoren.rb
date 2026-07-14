@@ -6,7 +6,7 @@ module SecID
   #
   # Format: 5-9 numeric digits
   #
-  # @note Valoren identifiers have no check digit and validation is based solely on format.
+  # @note Valoren identifiers have no checksum and validation is based solely on format.
   #
   # @see https://en.wikipedia.org/wiki/Valoren_number
   #
@@ -52,7 +52,7 @@ module SecID
     end
 
     # @param country_code [String] the ISO 3166-1 alpha-2 country code (default: 'CH')
-    # @return [ISIN] a new ISIN instance with calculated check digit
+    # @return [ISIN] a new ISIN instance with calculated checksum
     # @raise [InvalidFormatError] if the country code is not CH or LI
     def to_isin(country_code = 'CH')
       unless ISIN_COUNTRY_CODES.include?(country_code)

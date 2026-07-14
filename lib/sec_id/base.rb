@@ -8,28 +8,28 @@ module SecID
   # - ID_REGEX constant with named capture groups for parsing
   # - initialize method that calls parse and extracts components
   #
-  # Subclasses with check digits should also include the Checkable concern,
-  # which provides check-digit validation, calculation, and restoration.
+  # Subclasses with checksum should also include the Checkable concern,
+  # which provides checksum validation, calculation, and restoration.
   #
-  # @example Implementing a check-digit identifier
+  # @example Implementing a checksum identifier
   #   class MyIdentifier < Base
   #     include Checkable
   #
-  #     ID_REGEX = /\A(?<identifier>[A-Z]{6})(?<check_digit>\d)?\z/x
+  #     ID_REGEX = /\A(?<identifier>[A-Z]{6})(?<checksum>\d)?\z/x
   #
   #     def initialize(id)
   #       parts = parse(id)
   #       @identifier = parts[:identifier]
-  #       @check_digit = parts[:check_digit]&.to_i
+  #       @checksum = parts[:checksum]&.to_i
   #     end
   #
-  #     def calculate_check_digit
+  #     def calculate_checksum
   #       validate_format_for_calculation!
   #       mod10(some_algorithm)
   #     end
   #   end
   #
-  # @example Implementing a non-check-digit identifier
+  # @example Implementing a non-checksum identifier
   #   class SimpleId < Base
   #     ID_REGEX = /\A(?<identifier>[A-Z]{6})\z/x
   #
@@ -46,7 +46,7 @@ module SecID
     # @return [String] the original input after normalization (stripped and uppercased)
     attr_reader :full_id
 
-    # @return [String, nil] the main identifier portion (without check digit)
+    # @return [String, nil] the main identifier portion (without checksum)
     attr_reader :identifier
 
     class << self
@@ -55,15 +55,15 @@ module SecID
       # @return [Symbol] the registry key (e.g. :isin, :cusip)
       def type_key = @type_key ||= short_name.downcase.to_sym
 
-      # Composite sort key ranking detection specificity: check-digit types first,
+      # Composite sort key ranking detection specificity: checksum types first,
       # then narrower length range, then registration order. A class the registry
       # never saw sorts last.
       #
       # @api private
-      # @return [Array] frozen [check-digit rank, length specificity, registration order]
+      # @return [Array] frozen [checksum rank, length specificity, registration order]
       def detection_priority
         @detection_priority ||=
-          [has_check_digit? ? 0 : 1, length_specificity, SecID.identifiers.index(self) || Float::INFINITY].freeze
+          [has_checksum? ? 0 : 1, length_specificity, SecID.identifiers.index(self) || Float::INFINITY].freeze
       end
 
       # @return [String] the unqualified class name (e.g. "ISIN", "CUSIP")
@@ -89,11 +89,11 @@ module SecID
       # @return [String] a representative valid identifier string
       def example = self::EXAMPLE
 
-      # @return [Boolean] true if this identifier type uses a check digit
-      def has_check_digit?
-        return @has_check_digit if defined?(@has_check_digit)
+      # @return [Boolean] true if this identifier type uses a checksum
+      def has_checksum?
+        return @has_checksum if defined?(@has_checksum)
 
-        @has_check_digit = ancestors.include?(SecID::Checkable)
+        @has_checksum = ancestors.include?(SecID::Checkable)
       end
     end
 

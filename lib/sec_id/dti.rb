@@ -13,7 +13,7 @@ module SecID
   # @example Validate a DTI
   #   SecID::DTI.valid?('X9J9K872S')  #=> true
   #
-  # @example Restore check digit
+  # @example Restore checksum
   #   SecID::DTI.restore('X9J9K872')  #=> 'X9J9K872S'
   class DTI < Base
     include Checkable
@@ -33,7 +33,7 @@ module SecID
       (?<identifier>
         [1-9B-DF-HJ-NP-TV-XZ]
         [0-9B-DF-HJ-NP-TV-XZ]{7})
-      (?<check_digit>[0-9B-DF-HJ-NP-TV-XZ])?
+      (?<checksum>[0-9B-DF-HJ-NP-TV-XZ])?
     \z/x
 
     # The 30-symbol DTI alphabet, ordered by check-character value (0-29).
@@ -55,14 +55,14 @@ module SecID
     def initialize(dti)
       dti_parts = parse dti
       @identifier = dti_parts[:identifier]
-      @check_digit = dti_parts[:check_digit]
+      @checksum = dti_parts[:checksum]
     end
 
     # @return [String] the calculated or grandfathered check character
     # @raise [InvalidFormatError] if the DTI format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
-      grandfathered_check_digit(identifier) || iso7064_mod31_30_check_char(identifier)
+      grandfathered_checksum(identifier) || iso7064_mod31_30_check_char(identifier)
     end
 
     # Generates a random DTI body: first character non-zero, 8 characters total,
@@ -79,11 +79,11 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { check_digit: }
+    def components = { checksum: }
 
     # @param base [String] the 8-character DTI base
     # @return [String, nil] the registered check character, or nil if not grandfathered
-    def grandfathered_check_digit(base)
+    def grandfathered_checksum(base)
       GRANDFATHERED_CODES[base]&.delete_prefix(base)
     end
 
