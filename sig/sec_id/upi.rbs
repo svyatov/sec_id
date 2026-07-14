@@ -1,6 +1,6 @@
 module SecID
-  # Digital Token Identifier (DTI, ISO 24165).
-  class DTI < Base
+  # Unique Product Identifier (UPI, ISO 4914).
+  class UPI < Base
     include Checkable
     extend Checkable::ClassMethods
 
@@ -12,9 +12,8 @@ module SecID
     ALPHABET: Array[String]
     ALPHABET_VALUE: Hash[String, Integer]
     GENERATE_CHARSET: Array[String]
-    GRANDFATHERED_CODES: Hash[String, String]
 
-    def initialize: (SecID::input dti) -> void
+    def initialize: (SecID::input upi) -> void
     def calculate_check_digit: () -> String
     def self.check_digit: (SecID::input id) -> String
     private def self.generate_body: (Random random) -> String
@@ -22,7 +21,5 @@ module SecID
     private
 
     def components: () -> Hash[Symbol, untyped]
-    def grandfathered_check_digit: (untyped base) -> String?
-    def iso7064_mod31_30_check_char: (untyped base) -> String
   end
 end

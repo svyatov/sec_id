@@ -35,6 +35,7 @@ module SecID
     def mod10: (Integer sum) -> Integer
     def div10mod10: (Integer number) -> Integer
     def mod97: (String numeric_string) -> Integer
+    def mod31_30_check_char: (untyped base, Array[String] alphabet, Hash[String, Integer] alphabet_value) -> String
 
     @check_digit: (Integer | String)?
   end

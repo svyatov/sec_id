@@ -112,7 +112,7 @@ RSpec.describe SecID::Base do
     # Expected symbols are hardcoded, not derived from type_key: comparing to_h[:type]
     # against klass.type_key would be x == x, since to_h returns self.class.type_key.
     it 'emits the registry symbol as the :type value for every registered type' do
-      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic dti]
+      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic dti upi]
       emitted = SecID.identifiers.map { |klass| klass.new(klass.example).to_h[:type] }
       expect(emitted).to eq(expected)
     end
@@ -263,8 +263,8 @@ RSpec.describe SecID::Base do
   end
 
   describe '.inherited auto-registration' do
-    it 'registers all 15 identifier types' do
-      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic dti]
+    it 'registers all 16 identifier types' do
+      expected = %i[isin cusip sedol figi lei iban cik occ wkn valoren cei cfi fisn bic dti upi]
       registered = SecID.identifiers.map { |k| k.short_name.downcase.to_sym }
       expect(registered).to eq(expected)
     end

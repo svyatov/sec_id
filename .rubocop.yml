@@ -43,6 +43,10 @@ Metrics/ClassLength:
     - 'lib/sec_id/cfi.rb'
     - 'lib/sec_id/iban.rb'
 
+Metrics/ModuleLength:
+  Exclude:
+    - 'lib/sec_id/concerns/checkable.rb'
+
 Lint/MissingSuper:
   AllowedParentClasses:
     - Base

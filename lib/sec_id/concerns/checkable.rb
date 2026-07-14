@@ -239,5 +239,22 @@ module SecID
     def mod97(numeric_string)
       98 - (numeric_string.to_i % 97)
     end
+
+    # ISO 7064 hybrid MOD 31,30 check character over a base string, parameterized
+    # by the type's 30-symbol alphabet. Shared by DTI and UPI.
+    #
+    # @param base [String] the base string (identifier without check character)
+    # @param alphabet [Array<String>] the 30-symbol alphabet ordered by check value (0-29)
+    # @param alphabet_value [Hash{String => Integer}] maps each alphabet character to its value
+    # @return [String] the single computed check character
+    def mod31_30_check_char(base, alphabet, alphabet_value)
+      perm = 30
+      base.each_char do |c|
+        s = (perm + alphabet_value.fetch(c)) % 30
+        s = 30 if s.zero?
+        perm = (s * 2) % 31
+      end
+      alphabet.fetch((31 - perm) % 30)
+    end
   end
 end

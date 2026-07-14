@@ -92,13 +92,7 @@ module SecID
     # @param base [String] the 8-character DTI base
     # @return [String] the single computed check character
     def iso7064_mod31_30_check_char(base)
-      perm = 30
-      base.each_char do |c|
-        s = (perm + ALPHABET_VALUE.fetch(c)) % 30
-        s = 30 if s.zero?
-        perm = (s * 2) % 31
-      end
-      ALPHABET.fetch((31 - perm) % 30)
+      mod31_30_check_char(base, ALPHABET, ALPHABET_VALUE)
     end
   end
 end
