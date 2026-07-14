@@ -103,7 +103,7 @@ a.eql?(b) # => true
 Set.new([a, b]).size         # => 1
 ```
 
-**Check-digit based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI, UPI) also provide:
+**Check-digit-based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI, UPI) also provide:
 - `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
 - `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance
 - `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
