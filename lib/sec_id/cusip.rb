@@ -91,6 +91,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { cusip6:, issue:, checksum:, check_digit: checksum }
+    def components = { cusip6:, issue:, checksum: }
   end
 end

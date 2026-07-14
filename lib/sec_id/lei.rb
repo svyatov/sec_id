@@ -80,7 +80,7 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { lou_id:, reserved:, entity_id:, checksum:, check_digit: checksum }
+    def components = { lou_id:, reserved:, entity_id:, checksum: }
 
     # @return [Integer]
     def checksum_width

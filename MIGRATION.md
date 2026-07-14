@@ -72,6 +72,13 @@ rescue SecID::InvalidChecksumError => e
 through v7 (it is the *same class object*, so `rescue` under either name catches the same error),
 and is removed in v8.
 
+The constant alias emits **no** deprecation warning at runtime (it is a plain constant, not a
+warned method), so `-W` output won't reveal your rescue sites — find them statically:
+
+```bash
+grep -rEn 'InvalidCheckDigitError' app/ lib/ spec/
+```
+
 ### 4. Update error-code matchers (hard flip — no bridge)
 
 The `:invalid_check_digit` code in `errors.details` and `explain` output is replaced by
@@ -106,6 +113,13 @@ isin => { checksum: }      # canonical
 
 isin.to_h[:components]
 #   => { country_code: 'US', nsin: '594918104', checksum: 5, check_digit: 5 }
+```
+
+Reading the `:check_digit` key also emits **no** warning (the value mirrors `:checksum`), so grep
+for the call sites rather than relying on stderr:
+
+```bash
+grep -rEn ':check_digit\b|check_digit:' app/ lib/ spec/
 ```
 
 ### 6. Silencing the deprecation warnings

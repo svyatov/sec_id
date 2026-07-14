@@ -44,6 +44,14 @@ RSpec.describe 'v7 deprecation bridge' do # rubocop:disable RSpec/DescribeClass
     it 'warns on every call (no dedup)' do
       expect { 2.times { isin.check_digit } }.to output(/deprecated.*deprecated/m).to_stderr
     end
+
+    # RBS::Test wraps the aliased method with an instrumentation frame, which shifts the
+    # `uplevel: 2` attribution off the external caller — skip under `rake rbs:test`; the
+    # assertion holds under a plain spec run.
+    it 'attributes the warning to the calling site, not gem internals (uplevel)', :rbs_test_incompatible do
+      expect { isin.check_digit }.to output(/#{Regexp.escape(File.basename(__FILE__))}:\d+/).to_stderr
+      expect { isin.check_digit }.not_to output(%r{sec_id/(deprecation|concerns/checkable)\.rb}).to_stderr
+    end
   end
 
   describe 'error class alias (R2, R5 / AE2)' do
@@ -79,6 +87,24 @@ RSpec.describe 'v7 deprecation bridge' do # rubocop:disable RSpec/DescribeClass
       iban = SecID::IBAN.new('GB82WEST12345698765432')
       expect(lei.to_h[:components].values_at(:checksum, :check_digit)).to eq([55, 55])
       expect(iban.to_h[:components].values_at(:checksum, :check_digit)).to eq([82, 82])
+    end
+
+    it 'mirrors :check_digit onto :checksum for every checksum type' do
+      checksum_types = SecID.identifiers.select(&:has_checksum?)
+      expect(checksum_types.length).to eq(9)
+      checksum_types.each do |klass|
+        components = SecID.generate(klass.type_key).to_h[:components]
+        expect(components[:check_digit]).to eq(components[:checksum]), "#{klass.short_name} mirror"
+        expect(components[:checksum]).not_to be_nil, "#{klass.short_name} checksum"
+      end
+    end
+
+    it 'reads the dual key with no deprecation warning for every checksum type' do
+      SecID.identifiers.select(&:has_checksum?).each do |klass|
+        instance = SecID.generate(klass.type_key)
+        expect { instance.to_h }.not_to output.to_stderr, "#{klass.short_name} to_h"
+        expect { instance.deconstruct_keys(nil) }.not_to output.to_stderr, "#{klass.short_name} deconstruct"
+      end
     end
   end
 end

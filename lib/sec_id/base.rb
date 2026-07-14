@@ -142,7 +142,7 @@ module SecID
         full_id: full_id,
         normalized: valid? ? normalized : nil,
         valid: valid?,
-        components: components
+        components: components_with_deprecation_bridge
       }
     end
 
@@ -165,7 +165,7 @@ module SecID
     #   in SecID::ISIN[country_code:, nsin:] then [country_code, nsin]
     #   in nil then :invalid
     #   end #=> ['US', '594918104']
-    def deconstruct_keys(_keys) = components
+    def deconstruct_keys(_keys) = components_with_deprecation_bridge
 
     protected
 
@@ -175,6 +175,17 @@ module SecID
     end
 
     private
+
+    # Mirrors the canonical `:checksum` components key onto the deprecated `:check_digit`
+    # key for the v7 bridge, when a checksum is present. The mirror reads `:checksum`, so the
+    # deprecated `check_digit` reader never fires internally. Removed in v8 (revert `to_h` and
+    # `deconstruct_keys` to call `components` directly).
+    #
+    # @return [Hash] the parsed components, with `:check_digit` added when `:checksum` is present
+    def components_with_deprecation_bridge
+      parsed = components
+      parsed.key?(:checksum) ? parsed.merge(check_digit: parsed[:checksum]) : parsed
+    end
 
     # @return [Hash]
     def components

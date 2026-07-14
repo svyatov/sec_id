@@ -69,6 +69,7 @@ module SecID
 
     private
 
+    def components_with_deprecation_bridge: () -> Hash[Symbol, untyped]
     def components: () -> Hash[Symbol, untyped]
     def parse: (SecID::input sec_id_number) -> (::MatchData | ::Hash[Symbol, untyped])
 

@@ -140,9 +140,7 @@ module SecID
 
     # @return [Hash]
     def components
-      # v7 bridge: :check_digit mirrors the canonical :checksum; removed in v8.
-      checksum_value = checksum
-      hash = { country_code:, bban:, checksum: checksum_value, check_digit: checksum_value }
+      hash = { country_code:, bban:, checksum: }
       hash[:bank_code] = bank_code if bank_code
       hash[:branch_code] = branch_code if branch_code
       hash[:account_number] = account_number if account_number

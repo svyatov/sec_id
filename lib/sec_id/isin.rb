@@ -177,6 +177,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { country_code:, nsin:, checksum:, check_digit: checksum }
+    def components = { country_code:, nsin:, checksum: }
   end
 end
