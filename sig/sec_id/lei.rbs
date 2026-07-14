@@ -20,14 +20,18 @@ module SecID
 
     def initialize: (SecID::input lei) -> void
     def to_pretty_s: () -> String?
+    def calculate_checksum: () -> Integer
+    def self.checksum: (SecID::input id) -> Integer
+    # @deprecated v7 bridge alias for `calculate_checksum`; removed in v8.
     def calculate_check_digit: () -> Integer
+    # @deprecated v7 bridge alias for `checksum`; removed in v8.
     def self.check_digit: (SecID::input id) -> Integer
     private def self.generate_body: (Random random) -> String
 
     private
 
     def components: () -> Hash[Symbol, untyped]
-    def check_digit_width: () -> Integer
+    def checksum_width: () -> Integer
     def numeric_identifier: () -> String
   end
 end

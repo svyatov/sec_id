@@ -8,8 +8,8 @@ RSpec.describe SecID::Base do
   end
 
   describe '.error_class_for' do
-    it 'maps :invalid_check_digit to InvalidCheckDigitError' do
-      expect(described_class.error_class_for(:invalid_check_digit)).to eq(SecID::InvalidCheckDigitError)
+    it 'maps :invalid_checksum to InvalidChecksumError' do
+      expect(described_class.error_class_for(:invalid_checksum)).to eq(SecID::InvalidChecksumError)
     end
 
     it 'maps :invalid_prefix to InvalidStructureError' do
@@ -54,12 +54,12 @@ RSpec.describe SecID::Base do
       expect(SecID::ISIN.example).to eq('US5949181045')
     end
 
-    it '.has_check_digit? returns true for Checkable types' do
-      expect(SecID::ISIN.has_check_digit?).to be(true)
+    it '.has_checksum? returns true for Checkable types' do
+      expect(SecID::ISIN.has_checksum?).to be(true)
     end
 
-    it '.has_check_digit? returns false for non-Checkable types' do
-      expect(SecID::CIK.has_check_digit?).to be(false)
+    it '.has_checksum? returns false for non-Checkable types' do
+      expect(SecID::CIK.has_checksum?).to be(false)
     end
 
     it '.type_key returns the registry symbol' do
@@ -74,7 +74,7 @@ RSpec.describe SecID::Base do
   end
 
   describe '.detection_priority' do
-    # Mirrors ISIN's check-digit rank and ID_LENGTH so a comparison against ISIN ties on the
+    # Mirrors ISIN's checksum rank and ID_LENGTH so a comparison against ISIN ties on the
     # first two elements and is decided by the third — the only slot that can hold Infinity.
     let(:unregistered) do
       klass = Class.new(described_class) { include SecID::Checkable }
@@ -82,7 +82,7 @@ RSpec.describe SecID::Base do
       klass
     end
 
-    it 'ranks check-digit types ahead of non-check-digit types' do
+    it 'ranks checksum types ahead of non-checksum types' do
       expect(SecID::ISIN.detection_priority[0]).to eq(0)
       expect(SecID::CIK.detection_priority[0]).to eq(1)
     end
@@ -127,7 +127,7 @@ RSpec.describe SecID::Base do
       end
     end
 
-    # AE2: SecID.parse is the validity channel; an invalid check digit yields nil.
+    # AE2: SecID.parse is the validity channel; an invalid checksum yields nil.
     it 'falls to the nil branch for an identifier SecID.parse rejects' do
       matched =
         case SecID.parse('US6949181045')
@@ -139,10 +139,10 @@ RSpec.describe SecID::Base do
     end
 
     # AE3: the protocol does not gate on valid?.
-    it 'destructures an instance with an invalid check digit' do
+    it 'destructures an instance with an invalid checksum' do
       isin = SecID::ISIN.new('US6949181045')
       expect(isin).not_to be_valid
-      expect(isin.deconstruct_keys(nil)).to eq(country_code: 'US', nsin: '694918104', check_digit: 5)
+      expect(isin.deconstruct_keys(nil)).to eq(country_code: 'US', nsin: '694918104', checksum: 5, check_digit: 5)
     end
 
     # AE4: unparseable input binds nil, mirroring MatchData#deconstruct_keys.

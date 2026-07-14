@@ -1,26 +1,26 @@
 # frozen_string_literal: true
 
 module SecID
-  # Provides check-digit validation and calculation for securities identifiers.
-  # Include this module in classes that have a check digit as part of their format.
+  # Provides checksum validation and calculation for securities identifiers.
+  # Include this module in classes that have a checksum as part of their format.
   #
   # Including classes must implement:
-  # - `calculate_check_digit` method that returns the calculated check digit value
+  # - `calculate_checksum` method that returns the calculated checksum value
   #
   # This module provides:
   # - Character-to-digit mapping constants
-  # - Luhn algorithm variants for check-digit calculation
-  # - `valid?` override that validates format and check digit
+  # - Luhn algorithm variants for checksum calculation
+  # - `valid?` override that validates format and checksum
   # - `restore` method returning full identifier string without mutation
-  # - `restore!` method to calculate and set the check digit, returning `self`
-  # - `check_digit` attribute
-  # - Class-level convenience methods: `restore`, `restore!`, `check_digit`
+  # - `restore!` method to calculate and set the checksum, returning `self`
+  # - `checksum` attribute
+  # - Class-level convenience methods: `restore`, `restore!`, `checksum`
   #
   # @example Including in an identifier class
   #   class MyIdentifier < Base
   #     include Checkable
   #
-  #     def calculate_check_digit
+  #     def calculate_checksum
   #       validate_format_for_calculation!
   #       mod10(luhn_sum_standard(reversed_digits_multi(identifier)))
   #     end
@@ -30,7 +30,7 @@ module SecID
   module Checkable
     # Character-to-digit mapping for Luhn algorithm variants.
     # Maps alphanumeric characters to digit arrays for multi-digit expansion.
-    # Used by ISIN for check-digit calculation.
+    # Used by ISIN for checksum calculation.
     CHAR_TO_DIGITS = {
       '0' => 0,      '1' => 1,      '2' => 2,      '3' => 3,      '4' => 4,
       '5' => 5,      '6' => 6,      '7' => 7,      '8' => 8,      '9' => 9,
@@ -44,7 +44,7 @@ module SecID
 
     # Character-to-digit mapping for single-digit conversion.
     # Maps alphanumeric characters to values 0-38 (A=10, B=11, ..., Z=35, *=36, @=37, #=38).
-    # Used by CUSIP, FIGI, SEDOL, LEI, and IBAN for check-digit calculations.
+    # Used by CUSIP, FIGI, SEDOL, LEI, and IBAN for checksum calculations.
     CHAR_TO_DIGIT = {
       '0' => 0,  '1' => 1,  '2' => 2,  '3' => 3,  '4' =>  4,
       '5' => 5,  '6' => 6,  '7' => 7,  '8' => 8,  '9' =>  9,
@@ -58,75 +58,102 @@ module SecID
 
     # @api private
     def self.included(base)
-      base.attr_reader :check_digit
+      base.attr_reader :checksum
       base.extend(ClassMethods)
     end
 
     # Class methods added when Checkable is included.
     module ClassMethods
-      # Returns the full identifier string with correct check digit.
+      # Returns the full identifier string with correct checksum.
       #
-      # @param id_without_check_digit [String] identifier without or with incorrect check digit
-      # @return [String] the full identifier with correct check digit
+      # @param id_without_checksum [String] identifier without or with incorrect checksum
+      # @return [String] the full identifier with correct checksum
       # @raise [InvalidFormatError] if the identifier format is invalid
-      def restore(id_without_check_digit)
-        new(id_without_check_digit).restore
+      def restore(id_without_checksum)
+        new(id_without_checksum).restore
       end
 
-      # Restores (calculates) the check digit and returns the instance.
+      # Restores (calculates) the checksum and returns the instance.
       #
-      # @param id_without_check_digit [String] identifier without or with incorrect check digit
-      # @return [self] the restored instance with correct check digit
+      # @param id_without_checksum [String] identifier without or with incorrect checksum
+      # @return [self] the restored instance with correct checksum
       # @raise [InvalidFormatError] if the identifier format is invalid
-      def restore!(id_without_check_digit)
-        new(id_without_check_digit).restore!
+      def restore!(id_without_checksum)
+        new(id_without_checksum).restore!
       end
 
-      # @param id [String] the identifier to calculate check digit for
-      # @return [Integer, String] the calculated check digit
+      # @param id [String] the identifier to calculate checksum for
+      # @return [Integer, String] the calculated checksum
+      # @raise [InvalidFormatError] if the identifier format is invalid
+      def checksum(id)
+        new(id).calculate_checksum
+      end
+
+      # @deprecated Use {.checksum}. Kept as a v7 bridge; removed in v8.
+      #
+      # @param id [String] the identifier to calculate the checksum for
+      # @return [Integer, String] the calculated checksum
       # @raise [InvalidFormatError] if the identifier format is invalid
       def check_digit(id)
-        new(id).calculate_check_digit
+        SecID::Deprecation.warn(old: 'check_digit', new: 'checksum')
+        checksum(id)
       end
     end
 
-    # Validates format and check digit.
+    # Validates format and checksum.
     #
     # @return [Boolean]
     def valid?
-      super && check_digit == calculate_check_digit
+      super && checksum == calculate_checksum
     end
 
-    # Returns the full identifier string with correct check digit without mutation.
+    # Returns the full identifier string with correct checksum without mutation.
     #
-    # @return [String] the full identifier with correct check digit
+    # @return [String] the full identifier with correct checksum
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore
-      "#{identifier}#{calculate_check_digit.to_s.rjust(check_digit_width, '0')}"
+      "#{identifier}#{calculate_checksum.to_s.rjust(checksum_width, '0')}"
     end
 
-    # Calculates and sets the check digit, updating full_id.
+    # Calculates and sets the checksum, updating full_id.
     #
     # @return [self]
     # @raise [InvalidFormatError] if the identifier format is invalid
     def restore!
-      @check_digit = calculate_check_digit
+      @checksum = calculate_checksum
       @full_id = to_s
       self
     end
 
-    # Subclasses must override this method to implement their check-digit algorithm.
+    # Subclasses must override this method to implement their checksum algorithm.
     #
-    # @return [Integer, String] the calculated check digit
+    # @return [Integer, String] the calculated checksum
     # @raise [NotImplementedError] if subclass doesn't implement
     # @raise [InvalidFormatError] if the identifier format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       raise NotImplementedError
     end
 
     # @return [String]
     def to_s
-      "#{identifier}#{check_digit&.to_s&.rjust(check_digit_width, '0')}"
+      "#{identifier}#{checksum&.to_s&.rjust(checksum_width, '0')}"
+    end
+
+    # @deprecated Use {#checksum}. Kept as a v7 bridge; removed in v8.
+    #
+    # @return [Integer, String]
+    def check_digit
+      SecID::Deprecation.warn(old: 'check_digit', new: 'checksum')
+      checksum
+    end
+
+    # @deprecated Use {#calculate_checksum}. Kept as a v7 bridge; removed in v8.
+    #
+    # @return [Integer, String]
+    # @raise [InvalidFormatError] if the identifier format is invalid
+    def calculate_check_digit
+      SecID::Deprecation.warn(old: 'calculate_check_digit', new: 'calculate_checksum')
+      calculate_checksum
     end
 
     private
@@ -188,27 +215,27 @@ module SecID
       id.each_char.flat_map { |c| CHAR_TO_DIGITS.fetch(c) }.reverse!
     end
 
-    # Returns error codes including check digit validation.
+    # Returns error codes including checksum validation.
     #
     # @return [Array<Symbol>]
     def error_codes
       return detect_errors unless valid_format?
-      return [:invalid_check_digit] unless check_digit == calculate_check_digit
+      return [:invalid_checksum] unless checksum == calculate_checksum
 
       []
     end
 
     # @return [Integer]
-    def check_digit_width
+    def checksum_width
       1
     end
 
     # @param code [Symbol]
     # @return [String]
     def validation_message(code)
-      if code == :invalid_check_digit
-        fmt = ->(cd) { cd.to_s.rjust(check_digit_width, '0') }
-        return "Check digit '#{fmt[check_digit]}' is invalid, expected '#{fmt[calculate_check_digit]}'"
+      if code == :invalid_checksum
+        fmt = ->(cd) { cd.to_s.rjust(checksum_width, '0') }
+        return "Checksum '#{fmt[checksum]}' is invalid, expected '#{fmt[calculate_checksum]}'"
       end
 
       super
@@ -219,11 +246,11 @@ module SecID
     def validate_format_for_calculation!
       return if valid_format?
 
-      raise InvalidFormatError, "#{self.class.name} '#{full_id}' is invalid and check-digit cannot be calculated!"
+      raise InvalidFormatError, "#{self.class.name} '#{full_id}' is invalid and checksum cannot be calculated!"
     end
 
-    # @param sum [Integer] the sum to calculate check digit from
-    # @return [Integer] check digit (0-9)
+    # @param sum [Integer] the sum to calculate checksum from
+    # @return [Integer] checksum (0-9)
     def mod10(sum)
       (10 - (sum % 10)) % 10
     end
@@ -235,7 +262,7 @@ module SecID
     end
 
     # @param numeric_string [String] numeric string representation
-    # @return [Integer] check digit value (1-98)
+    # @return [Integer] checksum value (1-98)
     def mod97(numeric_string)
       98 - (numeric_string.to_i % 97)
     end

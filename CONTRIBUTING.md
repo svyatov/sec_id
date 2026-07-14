@@ -53,7 +53,7 @@ Examples:
 
 ```
 feat: add WKN support
-fix: correct CUSIP check-digit for alphanumeric input
+fix: correct CUSIP checksum for alphanumeric input
 docs: update README with LEI usage examples
 ```
 

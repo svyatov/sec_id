@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC, DTI, UPI) — validate, normalize, parse, detect, convert, generate, classify, and calculate check digits. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC, DTI, UPI) — validate, normalize, parse, detect, convert, generate, classify, and calculate checksums. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
 
 ### Directory Layout
 
@@ -48,7 +48,7 @@ All identifier classes inherit from `SecID::Base` (`lib/sec_id/base.rb`), a thin
 - `Generatable` — generation: `.generate(random:)`, `random_string(charset, length, random:)` helper, `ALPHA`/`DIGITS`/`ALPHANUMERIC` charset constants
 
 Base itself keeps:
-- Class-level metadata methods: `type_key` (the registry symbol — single authority, read by the registry, `to_h`, `explain`, the validator, `Detector`, and `Scanner`), `short_name`, `full_name`, `id_length`, `example`, `has_check_digit?`, and the `@api private` `detection_priority` (composite specificity sort key: check-digit rank, `length_specificity`, registration order — `Float::INFINITY` for an unregistered class)
+- Class-level metadata methods: `type_key` (the registry symbol — single authority, read by the registry, `to_h`, `explain`, the validator, `Detector`, and `Scanner`), `short_name`, `full_name`, `id_length`, `example`, `has_checksum?`, and the `@api private` `detection_priority` (composite specificity sort key: checksum rank, `length_specificity`, registration order — `Float::INFINITY` for an unregistered class)
 - `attr_reader :full_id, :identifier`
 - `inherited` hook (auto-registration)
 - `initialize` (abstract, raises `NotImplementedError`)
@@ -65,11 +65,11 @@ Each identifier class defines these metadata constants:
 - `EXAMPLE` — representative valid identifier string
 - `VALID_CHARS_REGEX` — regex for valid character set (used by `detect_errors` fallback)
 
-Classes with check digits include the `Checkable` concern, which adds:
-- `valid?` override that validates format and check digit
-- `restore` (returns full identifier string without mutation), `restore!` (mutates and returns `self`), `check_digit`, `calculate_check_digit` methods
+Classes with checksums include the `Checkable` concern, which adds:
+- `valid?` override that validates format and checksum
+- `restore` (returns full identifier string without mutation), `restore!` (mutates and returns `self`), `checksum`, `calculate_checksum` methods
 - Character-to-digit conversion maps and Luhn algorithm variants
-- Class-level `restore`, `restore!`, and `check_digit` methods
+- Class-level `restore`, `restore!`, and `checksum` methods
 
 ### Registry (`lib/sec_id.rb`)
 
@@ -92,7 +92,7 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 2. **Length lookup** — pre-computed `Hash{Integer => Array<Class>}` from `ID_LENGTH` constants
 3. **Charset pre-filter** — survivors filtered by `VALID_CHARS_REGEX` before calling `valid?`
 
-Specificity sort: reads each class's `Base.detection_priority` (check-digit types first, then smaller length range, then load order).
+Specificity sort: reads each class's `Base.detection_priority` (checksum types first, then smaller length range, then load order).
 
 Fast paths bypass the full sort: `#matches?` (used by `SecID.valid?`) short-circuits on the first valid candidate; `#first_match` (used by `SecID.parse`) builds the winning instance once and selects it via `min_by`, avoiding a second instantiation.
 
@@ -126,11 +126,11 @@ Provides normalization and display formatting methods. Defines `SEPARATORS` cons
 Provides validation methods. Defines `ERROR_MAP` constant (maps error code symbols to exception classes).
 - Class methods: `valid?(id)`, `validate(id)` (returns instance), `validate!(id)`, `error_class_for(code)`
 - Instance methods: `valid?`, `validate` (eagerly triggers errors, returns self), `errors` (memoized, returns `Errors`), `validate!`
-- Private methods: `valid_format?`, `error_codes`, `detect_errors`, `valid_length?`, `valid_characters?`, `check_digit_width`, `validation_message`, `build_error`
+- Private methods: `valid_format?`, `error_codes`, `detect_errors`, `valid_length?`, `valid_characters?`, `checksum_width`, `validation_message`, `build_error`
 
 #### Checkable (`checkable.rb`)
 
-Provides check-digit validation and calculation for identifiers with check digits. Include this in classes that have a check digit (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI).
+Provides checksum validation and calculation for identifiers with checksums. Include this in classes that have a checksum (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI).
 
 Constants:
 - `CHAR_TO_DIGITS` - Multi-digit mapping for ISIN (letters expand to two digits)
@@ -144,15 +144,24 @@ Luhn algorithm variants (private):
 - `reversed_digits_multi(id)` - Converts identifier to reversed digit array (multi-digit mapping for ISIN)
 
 Validation overrides (private):
-- `error_codes` - Returns `[:invalid_check_digit]` when format is valid but check digit doesn't match
-- `check_digit_width` - Returns `1` (used by `Validatable#valid_length?` to allow optional check digit in length check; LEI and IBAN override → `2`)
+- `error_codes` - Returns `[:invalid_checksum]` when format is valid but checksum doesn't match
+- `checksum_width` - Returns `1` (used by `Validatable#valid_length?` to allow optional checksum in length check; LEI and IBAN override → `2`)
 
-`restore` and `to_s` use `check_digit_width` to right-justify the check digit string (e.g. `5` → `"05"` for width 2). IBAN overrides `restore`/`to_s` because its check digit is mid-string.
+`restore` and `to_s` use `checksum_width` to right-justify the checksum string (e.g. `5` → `"05"` for width 2). IBAN overrides `restore`/`to_s` because its checksum is mid-string.
 
 Helper methods (private):
-- `mod10`, `div10mod10`, `mod97` - Check digit calculation helpers
+- `mod10`, `div10mod10`, `mod97` - Checksum calculation helpers
 - `mod31_30_check_char(base, alphabet, alphabet_value)` - Shared ISO 7064 hybrid MOD 31,30 walker, parameterized by alphabet (explicit args, not `self.class::ALPHABET`, to avoid RBS's `UnknownConstant`); used by DTI and UPI
 - `validate_format_for_calculation!` - Raises error if format invalid
+
+#### v7 Deprecation Bridge (`deprecation.rb`)
+
+The v7 rename of the check-digit concept to `checksum` ships a bridge that keeps the pre-v7 names working through v7 (all removed in v8; the `Checkable` concern name itself is unchanged):
+- `SecID::Deprecation.warn(old:, new:, removed_in: 'v8')` (`lib/sec_id/deprecation.rb`) emits one `Kernel#warn` per call — no dedup, visible at Ruby's default verbosity (silenced by `-W0` / `$VERBOSE = nil`). No `category:` is passed, because `Warning[:deprecated]` defaults off and would hide the migration signal.
+- Deprecated method aliases warn then delegate: instance/class `check_digit` → `checksum`, `calculate_check_digit` → `calculate_checksum`, class-level `has_check_digit?` → `has_checksum?`. Written as explicit typed methods (not metaprogrammed) so Steep sees both name sets and `STEEP_UNTYPED_BASELINE` holds. The per-type sigs narrow the deprecated `calculate_check_digit`/`self.check_digit` to the same concrete return type as their canonical counterparts (`Integer`, or `String` for DTI/UPI), so callers still on the old names during v7 keep full type precision; the `check_digit` reader stays the unified `(Integer | String)?` (an `attr_reader` can't be narrowed per subclass).
+- `SecID::InvalidCheckDigitError` is a constant alias of `InvalidChecksumError` (same class object, so `rescue` under either name keeps working).
+- `to_h`/`deconstruct_keys` carry both `:checksum` and a mirrored `:check_digit` key through v7 via the single `Base#components_with_deprecation_bridge` wrapper — each type's own `components` returns only `:checksum`, and the wrapper mirrors the canonical value (so the deprecated reader never fires internally). v8 removal is a one-file revert: drop the wrapper and point `to_h`/`deconstruct_keys` back at `components`.
+- The `:invalid_check_digit` error code flips hard to `:invalid_checksum` with **no** dual emission (dual would duplicate `errors.details` entries). See `MIGRATION.md` for the matcher change.
 
 #### Generatable (`generatable.rb`)
 
@@ -161,13 +170,13 @@ Provides generation of new, format-valid identifiers for use as test fixtures. I
 Constants (charset building blocks): `ALPHA`, `DIGITS`, `ALPHANUMERIC`.
 
 Class methods (added via `included`/`extend(ClassMethods)`):
-- `generate(random: Random.new)` - Builds `new(generate_body(random))`, then calls `restore!` when `has_check_digit?` is true, else returns the instance
+- `generate(random: Random.new)` - Builds `new(generate_body(random))`, then calls `restore!` when `has_checksum?` is true, else returns the instance
 - `random_string(charset, length, random:)` (private) - Draws `length` characters from `charset` using `Array#sample(random:)`
 
 Per-type hooks:
-- Each type defines a private class-level `generate_body(random)` returning a valid body (identifier without check digit); check-digit types' bodies are restored by the default `generate`
-- Check-digit-less types (CFI, FISN, BIC) compose the complete identifier in `generate_body`; no `restore!` is called
-- IBAN composes a full-length body with placeholder `"00"` check digits in `generate_body`; the default `generate` then calls `restore!` to replace them with the real two-digit check value
+- Each type defines a private class-level `generate_body(random)` returning a valid body (identifier without checksum); checksum types' bodies are restored by the default `generate`
+- Checksum-less types (CFI, FISN, BIC) compose the complete identifier in `generate_body`; no `restore!` is called
+- IBAN composes a full-length body with a placeholder `"00"` checksum in `generate_body`; the default `generate` then calls `restore!` to replace them with the real two-digit check value
 - OCC overrides `generate` entirely (via `OCC.build`)
 - FIGI resamples its prefix until it is not in `RESTRICTED_PREFIXES`; IBAN generates only numeric-BBAN countries (`NUMERIC_COUNTRY_RULES`); CIK/Valoren use a random integer (not a digit char-fill) to avoid leading-zero bodies
 - CFI samples each attribute position only from the letters `SecID::CFI::Tables` permits for that group (plus `X`; pure-N/A positions yield only `X`, so `K`'s `XXXX` falls out), then applies the `ED` cross-position rule — so every generated code passes strict `valid?`
@@ -180,13 +189,13 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - Type-specific attributes (e.g., `country_code`, `nsin` for ISIN; `cusip6`, `issue` for CUSIP)
 - Private `components` method returning a hash of parsed attributes (read by both `#to_h` and `#deconstruct_keys`); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
 
-**Classes with check digits** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI):
+**Classes with checksums** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI):
 - Include `Checkable` concern
-- Implement `calculate_check_digit` with standard-specific algorithm
-- LEI and IBAN override `check_digit_width` → `2` (two-character check digit)
-- DTI's and UPI's check "digit" is a `String` (can be a letter), not an `Integer` — the only types where this differs; `Checkable`'s `check_digit`/`calculate_check_digit` contracts are typed `Integer | String` to admit it
+- Implement `calculate_checksum` with standard-specific algorithm
+- LEI and IBAN override `checksum_width` → `2` (two-character checksum)
+- DTI's and UPI's check "digit" is a `String` (can be a letter), not an `Integer` — the only types where this differs; `Checkable`'s `checksum`/`calculate_checksum` contracts are typed `Integer | String` to admit it
 
-**Classes without check digits** (CIK, OCC, WKN, Valoren, CFI, FISN, BIC):
+**Classes without checksums** (CIK, OCC, WKN, Valoren, CFI, FISN, BIC):
 - Do not include `Checkable`
 - Validation based solely on format (CFI additionally validates its category/group/attribute tables strictly — see below)
 
@@ -202,8 +211,8 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - IBAN: `detect_errors` returns `:invalid_bban` when BBAN format doesn't match country rules; `.supported_countries` returns sorted array of all supported country codes
 - OCC: `error_codes` returns `:invalid_date` when date string can't be parsed
 - BIC: `detect_errors` returns `:invalid_country` when positions 5-6 are not in the recognized set (`lib/sec_id/bic/country_codes.rb`); `.countries` returns the sorted frozen set of recognized ISO 3166 / SWIFT country codes
-- DTI: `calculate_check_digit` consults `GRANDFATHERED_CODES` (a frozen `Hash[String, String]`, base → registered code) before running the ISO 7064 hybrid MOD 31,30 algorithm; a hit means the registry's hand-assigned code (currently only Bitcoin, `4H95J0R2` → `4H95J0R2X`) wins over the algorithmic result, and this is honored API-wide (`valid?`, `restore`, `restore!`, `check_digit`) since they all route through `calculate_check_digit`
-- UPI (ISO 4914): 12 characters — fixed `QZ` prefix + 9-character body + 1 check character, all drawn from DTI's 30-symbol alphabet; `calculate_check_digit` runs the shared `Checkable#mod31_30_check_char` over the 11 preceding characters (no grandfathered codes, no first-char restriction). A non-`QZ` string fails as `:invalid_format` via the regex (the prefix is structural, not a restricted-prefix list). Shares the 12-char length bucket with ISIN/FIGI: a digit-checked UPI that also satisfies ISIN's Luhn double-detects `[:isin, :upi]` (ISIN first, since UPI registers after it); a letter-checked UPI detects as `[:upi]` alone (KTD3)
+- DTI: `calculate_checksum` consults `GRANDFATHERED_CODES` (a frozen `Hash[String, String]`, base → registered code) before running the ISO 7064 hybrid MOD 31,30 algorithm; a hit means the registry's hand-assigned code (currently only Bitcoin, `4H95J0R2` → `4H95J0R2X`) wins over the algorithmic result, and this is honored API-wide (`valid?`, `restore`, `restore!`, `checksum`) since they all route through `calculate_checksum`
+- UPI (ISO 4914): 12 characters — fixed `QZ` prefix + 9-character body + 1 check character, all drawn from DTI's 30-symbol alphabet; `calculate_checksum` runs the shared `Checkable#mod31_30_check_char` over the 11 preceding characters (no grandfathered codes, no first-char restriction). A non-`QZ` string fails as `:invalid_format` via the regex (the prefix is structural, not a restricted-prefix list). Shares the 12-char length bucket with ISIN/FIGI: a digit-checked UPI that also satisfies ISIN's Luhn double-detects `[:isin, :upi]` (ISIN first, since UPI registers after it); a letter-checked UPI detects as `[:upi]` alone (KTD3)
 
 ### Conversion Methods
 
@@ -230,13 +239,13 @@ Frozen, immutable value object returned by `#errors`. Contains:
 ### Error Handling
 
 - `SecID::Error` - Base error class
-- `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_check_digit` on invalid format
-- `SecID::InvalidCheckDigitError` - Raised by `validate!` for `:invalid_check_digit`
+- `SecID::InvalidFormatError` - Raised by `validate!` for format errors (`:invalid_length`, `:invalid_characters`, `:invalid_format`) and by `calculate_checksum` on invalid format
+- `SecID::InvalidChecksumError` - Raised by `validate!` for `:invalid_checksum` (aliased as the deprecated `SecID::InvalidCheckDigitError` through v7 — see the v7 Deprecation Bridge)
 - `SecID::InvalidStructureError` - Raised by `validate!` for type-specific structural errors (`:invalid_prefix`, `:invalid_category`, `:invalid_group`, `:invalid_attribute`, `:invalid_bban`, `:invalid_date`, `:invalid_country`)
 - `SecID::AmbiguousMatchError` - Raised by `parse`/`parse!` when `on_ambiguous: :raise` and multiple types match
 - `Validatable::ERROR_MAP` maps error code symbols to exception classes; unmapped codes default to `InvalidFormatError`
 - `#validate!` returns `self` on success, raises on first error; `.validate!` returns the instance
-- **Important:** Classes that include `Checkable` must implement `calculate_check_digit`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
+- **Important:** Classes that include `Checkable` must implement `calculate_checksum`. If `NotImplementedError` is raised from a concrete identifier class, it indicates a missing implementation.
 
 ### RBS Type Signatures (`sig/`)
 
@@ -244,15 +253,15 @@ Hand-written RBS signatures mirror the core `lib/` scope (everything except `lib
 
 Key facts for working in `sig/`:
 
-- **`lib/**/*.rb` is byte-identical to the pre-types source — a deliberate property, not a limitation**: types were added with zero edits to the securities logic, so no check-digit or classification behavior could be altered. The pragmatic choices below are driven by *inherent* runtime nilability and RBS/stdlib limits — they would remain even if `lib/` were editable, since the only alternative is dead "can't-happen" guards in check-digit math (verified redundant by RBS::Test). All are documented inline in the sigs:
+- **`lib/**/*.rb` is byte-identical to the pre-types source — a deliberate property, not a limitation**: types were added with zero edits to the securities logic, so no checksum or classification behavior could be altered. The pragmatic choices below are driven by *inherent* runtime nilability and RBS/stdlib limits — they would remain even if `lib/` were editable, since the only alternative is dead "can't-happen" guards in checksum math (verified redundant by RBS::Test). All are documented inline in the sigs:
   - **Concern mixins**: `Base` includes the four concerns and `extend`s their `ClassMethods` (RBS doesn't run `self.included` hooks). Instance concerns use host-interface self-types (`_NormalizableHost`, `_ValidatableHost` with a refined `def class: () -> singleton(Base)`); `Checkable`'s self-type is `SecID::Base` (Base doesn't include it, so no ancestor cycle). Class-method modules use the `_IdentifierClass`/`_GeneratableClass` interfaces (whose `new` returns `Base`).
   - **`untyped` where a value is legitimately nilable but used as non-nil after runtime validation** (e.g. component readers, `identifier` overrides in SEDOL/LEI/Valoren, `@identifier` on Base). `untyped` — not a non-nil "happy-path" lie — because RBS::Test sees the real `nil` for invalid input; a non-nil type would fail the runtime gate.
-  - **`restore`/`restore!`/`calculate_check_digit` are declared on `Base`** (only check-digit types implement them) so `Generatable#generate` and `Checkable::ClassMethods` type-check without narrowing on `has_check_digit?`.
+  - **`restore`/`restore!`/`calculate_checksum` are declared on `Base`** (only checksum types implement them) so `Generatable#generate` and `Checkable::ClassMethods` type-check without narrowing on `has_checksum?`.
   - **Input type**: `SecID::input = String | Integer | nil` (numeric input is accepted by Valoren/CIK/CUSIP).
   - Two Steep diagnostics are relaxed in the `Steepfile` for idioms RBS simply can't express: `UnannotatedEmptyCollection` (base.rb's `regexp.match(...) || {}`) and `UnknownConstant` (`Normalizable::ClassMethods`' polymorphic `self::SEPARATORS`). Neither affects the untyped-call gate.
-- **Coverage gate is a pinned baseline**, not literal zero: `Rakefile`'s `STEEP_UNTYPED_BASELINE` caps the residual untyped calls that are intrinsic, not a gap to close — receivers that are genuinely nilable at runtime (the `valid?`/`errors` design) plus idioms RBS/stdlib can't express (nilable stdlib `MatchData` in the scanner, `Array#map!`'s type-invariance, `freeze`-after-`case` in `DeepFreeze`, widening CFI table literals). Forcing them to zero would only add dead guards to check-digit/classification math; `rake rbs:test` verifies them at runtime instead. `rake steep:coverage` fails if the count exceeds the baseline — lower it whenever it drops.
+- **Coverage gate is a pinned baseline**, not literal zero: `Rakefile`'s `STEEP_UNTYPED_BASELINE` caps the residual untyped calls that are intrinsic, not a gap to close — receivers that are genuinely nilable at runtime (the `valid?`/`errors` design) plus idioms RBS/stdlib can't express (nilable stdlib `MatchData` in the scanner, `Array#map!`'s type-invariance, `freeze`-after-`case` in `DeepFreeze`, widening CFI table literals). Forcing them to zero would only add dead guards to checksum/classification math; `rake rbs:test` verifies them at runtime instead. `rake steep:coverage` fails if the count exceeds the baseline — lower it whenever it drops.
 - **CFI dynamic methods are generated**: `Field`'s `<symbol>?` predicates and `AttributeSet`'s `<meaning>` readers are per-instance singleton methods RBS can't express per-instance, so `rake sig:cfi` emits the union of all names from `SecID::CFI::Tables` into `sig/sec_id/cfi/{field,attribute_set}.rbs` (marked generated; don't hand-edit). `tasks/cfi_signature_generator.rb` holds the walk; `spec/sig/cfi_signatures_spec.rb` regenerates in memory and fails if the committed files drift from the tables. Because these predicates/readers are defined per-instance via `define_singleton_method`, RBS::Test cannot hook them — `rake rbs:test` does **not** runtime-verify the generated CFI sigs; their guardrail is the drift spec (name-set equality against `SecID::CFI::Tables`) plus Steep's static call-site checks.
-- **RBS::Test exclusions**: four specs are tagged `:rbs_test_incompatible` and skipped under `rake rbs:test` (performance/timing budgets, an alias-identity check via `#method`, and a missing-keyword `ArgumentError` assertion) — the instrumentation changes their runtime behavior; they aren't signature-conformance tests.
+- **RBS::Test exclusions**: five specs are tagged `:rbs_test_incompatible` and skipped under `rake rbs:test` (performance/timing budgets, an alias-identity check via `#method`, a missing-keyword `ArgumentError` assertion, and the deprecation-warning `uplevel` attribution check whose stack depth the instrumentation frame shifts) — the instrumentation changes their runtime behavior; they aren't signature-conformance tests.
 
 When editing `lib/` in the typed scope, update the corresponding `sig/` file and keep `bundle exec rake steep` / `rake steep:coverage` / `rake rbs:test` green.
 
@@ -331,7 +340,7 @@ Use `!` after type or add `BREAKING CHANGE:` footer. Breaking changes trigger a 
 
 ```
 feat: add WKN support
-fix: correct CUSIP check-digit for alphanumeric input
+fix: correct CUSIP checksum for alphanumeric input
 docs: update README with LEI usage examples
 refactor: extract shared Normalizable module
 feat!: rename full_id to identifier across all classes
@@ -370,18 +379,18 @@ All classes and methods must have YARD documentation. Follow these conventions:
 
 ```ruby
 # Good - blank line before @param
-# Calculates the check digit for this identifier.
+# Calculates the checksum for this identifier.
 #
 # @param value [String] the value to calculate
-# @return [Integer] the calculated check digit
-def calculate_check_digit(value)
+# @return [Integer] the calculated checksum
+def calculate_checksum(value)
 end
 
 # Bad - no blank line
-# Calculates the check digit for this identifier.
+# Calculates the checksum for this identifier.
 # @param value [String] the value to calculate
-# @return [Integer] the calculated check digit
-def calculate_check_digit(value)
+# @return [Integer] the calculated checksum
+def calculate_checksum(value)
 end
 ```
 

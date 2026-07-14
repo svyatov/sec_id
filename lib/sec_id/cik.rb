@@ -4,7 +4,7 @@ module SecID
   # Central Index Key (CIK) - SEC identifier for entities filing with the SEC.
   # A 1-10 digit number that uniquely identifies entities in SEC systems.
   #
-  # @note CIK identifiers have no check digit and validation is based solely on format.
+  # @note CIK identifiers have no checksum and validation is based solely on format.
   #
   # @see https://en.wikipedia.org/wiki/Central_Index_Key
   #

@@ -82,11 +82,11 @@ All identifier classes provide `valid?`, `errors`, `validate`, `validate!` metho
 ```ruby
 SecID::ISIN.new('US5949181045').to_h
 # => { type: :isin, full_id: 'US5949181045', normalized: 'US5949181045',
-#      valid: true, components: { country_code: 'US', nsin: '594918104', check_digit: 5 } }
+#      valid: true, components: { country_code: 'US', nsin: '594918104', checksum: 5 } }
 
 SecID::ISIN.new('INVALID').to_h
 # => { type: :isin, full_id: 'INVALID', normalized: nil,
-#      valid: false, components: { country_code: nil, nsin: nil, check_digit: nil } }
+#      valid: false, components: { country_code: nil, nsin: nil, checksum: nil } }
 ```
 
 **All identifiers** support value equality — two instances of the same type with the same normalized form are equal:
@@ -103,10 +103,10 @@ a.eql?(b) # => true
 Set.new([a, b]).size         # => 1
 ```
 
-**Check-digit-based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI, UPI) also provide:
-- `restore` / `.restore` - returns the full identifier string with correct check-digit (no mutation)
-- `restore!` / `.restore!` - restores check-digit in place and returns `self` / instance
-- `check_digit` / `calculate_check_digit` - calculates and returns the check-digit
+**Checksum-based identifiers** (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, DTI, UPI) also provide:
+- `restore` / `.restore` - returns the full identifier string with correct checksum (no mutation)
+- `restore!` / `.restore!` - restores checksum in place and returns `self` / instance
+- `checksum` / `calculate_checksum` - calculates and returns the checksum
 
 ### Metadata Registry
 
@@ -127,14 +127,14 @@ SecID::ISIN.short_name                    # => "ISIN"
 SecID::ISIN.full_name                     # => "International Securities Identification Number"
 SecID::ISIN.id_length                     # => 12
 SecID::ISIN.example                       # => "US5949181045"
-SecID::ISIN.has_check_digit?              # => true
+SecID::ISIN.has_checksum?                 # => true
 
 # Filter with standard Ruby
-SecID.identifiers.select(&:has_check_digit?).map(&:short_name)
+SecID.identifiers.select(&:has_checksum?).map(&:short_name)
 # => ["ISIN", "CUSIP", "SEDOL", "FIGI", "LEI", "IBAN", "CEI", "DTI", "UPI"]
 
 # Detect identifier type from an unknown string
-# Results are sorted by specificity: check-digit types first, then by length precision
+# Results are sorted by specificity: checksum types first, then by length precision
 SecID.detect('US5949181045')  # => [:isin]
 SecID.detect('037833100')     # => [:cusip, :valoren, :cik]
 SecID.detect('APPLE INC/SH')  # => [:fisn]
@@ -203,7 +203,7 @@ Understand why a string matches or doesn't match specific identifier types:
 result = SecID.explain('US5949181040')
 isin = result[:candidates].find { |c| c[:type] == :isin }
 isin[:valid]                      # => false
-isin[:errors].first[:error]       # => :invalid_check_digit
+isin[:errors].first[:error]       # => :invalid_checksum
 
 # Filter to specific types
 SecID.explain('US5949181045', types: %i[isin cusip])
@@ -216,8 +216,8 @@ All identifier classes provide a Rails-like `#errors` API for detailed error rep
 ```ruby
 isin = SecID::ISIN.new('US5949181040')
 isin.errors.none?     # => false
-isin.errors.messages  # => ["Check digit '0' is invalid, expected '5'"]
-isin.errors.details   # => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
+isin.errors.messages  # => ["Checksum '0' is invalid, expected '5'"]
+isin.errors.details   # => [{ error: :invalid_checksum, message: "Checksum '0' is invalid, expected '5'" }]
 isin.errors.any?      # => true
 isin.errors.empty?    # => false
 isin.errors.size      # => 1
@@ -234,7 +234,7 @@ SecID::ISIN.validate('US5949181040').errors   # => #<SecID::Errors>
 - `:invalid_format` - correct length and characters but wrong structure
 
 **Type-specific error codes:**
-- `:invalid_check_digit` - check digit mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI)
+- `:invalid_checksum` - checksum mismatch (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI)
 - `:invalid_prefix` - restricted FIGI prefix (FIGI)
 - `:invalid_category` - unknown CFI category code (CFI)
 - `:invalid_group` - unknown CFI group code for category (CFI)
@@ -256,7 +256,7 @@ SecID::ISIN.new('INVALID').validate!
 # => SecID::InvalidFormatError: Expected 12 characters, got 7
 
 SecID::ISIN.new('US5949181040').validate!
-# => SecID::InvalidCheckDigitError: Check digit '0' is invalid, expected '5'
+# => SecID::InvalidChecksumError: Checksum '0' is invalid, expected '5'
 
 SecID::FIGI.new('BSG000BLNNH6').validate!
 # => SecID::InvalidStructureError: Prefix 'BS' is restricted
@@ -309,7 +309,7 @@ at all — `#to_h`'s envelope keys (`:type`, `:full_id`, `:normalized`, `:valid`
 
 ### Generating Test Fixtures
 
-Generate syntactically valid identifiers — with correct check digits where applicable — for use as test fixtures. Available per class and via the central dispatcher:
+Generate syntactically valid identifiers — with correct checksum where applicable — for use as test fixtures. Available per class and via the central dispatcher:
 
 ```ruby
 SecID::ISIN.generate          # => #<SecID::ISIN ...>
@@ -337,18 +337,18 @@ SecID::LEI.generate(random: Random.new(42)) == SecID::LEI.generate(random: Rando
 SecID::ISIN.valid?('US5949181045')      # => true
 SecID::ISIN.restore('US594918104')      # => 'US5949181045'
 SecID::ISIN.restore!('US594918104')     # => #<SecID::ISIN>
-SecID::ISIN.check_digit('US594918104')  # => 5
+SecID::ISIN.checksum('US594918104')  # => 5
 
 # instance level
 isin = SecID::ISIN.new('US5949181045')
 isin.full_id               # => 'US5949181045'
 isin.country_code          # => 'US'
 isin.nsin                  # => '594918104'
-isin.check_digit           # => 5
+isin.checksum           # => 5
 isin.valid?                # => true
 isin.restore               # => 'US5949181045'
 isin.restore!              # => #<SecID::ISIN> (mutates instance)
-isin.calculate_check_digit # => 5
+isin.calculate_checksum # => 5
 isin.to_pretty_s           # => 'US 594918104 5'
 isin.to_cusip              # => #<SecID::CUSIP>
 isin.nsin_type             # => :cusip
@@ -382,18 +382,18 @@ SecID::ISIN.new('CH0012221716').to_valoren # => #<SecID::Valoren>
 SecID::CUSIP.valid?('594918104')      # => true
 SecID::CUSIP.restore('59491810')      # => '594918104'
 SecID::CUSIP.restore!('59491810')     # => #<SecID::CUSIP>
-SecID::CUSIP.check_digit('59491810')  # => 4
+SecID::CUSIP.checksum('59491810')  # => 4
 
 # instance level
 cusip = SecID::CUSIP.new('594918104')
 cusip.full_id               # => '594918104'
 cusip.cusip6                # => '594918'
 cusip.issue                 # => '10'
-cusip.check_digit           # => 4
+cusip.checksum           # => 4
 cusip.valid?                # => true
 cusip.restore               # => '594918104'
 cusip.restore!              # => #<SecID::CUSIP> (mutates instance)
-cusip.calculate_check_digit # => 4
+cusip.calculate_checksum # => 4
 cusip.to_pretty_s           # => '594918 10 4'
 cusip.to_isin('US')         # => #<SecID::ISIN>
 cusip.cins?                 # => false
@@ -408,7 +408,7 @@ cusip.cins?                 # => false
 SecID::CEI.valid?('A0BCDEFGH1')      # => true
 SecID::CEI.restore('A0BCDEFGH')      # => 'A0BCDEFGH1'
 SecID::CEI.restore!('A0BCDEFGH')     # => #<SecID::CEI>
-SecID::CEI.check_digit('A0BCDEFGH')  # => 1
+SecID::CEI.checksum('A0BCDEFGH')  # => 1
 
 # instance level
 cei = SecID::CEI.new('A0BCDEFGH1')
@@ -416,11 +416,11 @@ cei.full_id               # => 'A0BCDEFGH1'
 cei.prefix                # => 'A'
 cei.numeric               # => '0'
 cei.entity_id             # => 'BCDEFGH'
-cei.check_digit           # => 1
+cei.checksum           # => 1
 cei.valid?                # => true
 cei.restore               # => 'A0BCDEFGH1'
 cei.restore!              # => #<SecID::CEI> (mutates instance)
-cei.calculate_check_digit # => 1
+cei.calculate_checksum # => 1
 ```
 
 ### SEDOL
@@ -432,16 +432,16 @@ cei.calculate_check_digit # => 1
 SecID::SEDOL.valid?('B0Z52W5')      # => true
 SecID::SEDOL.restore('B0Z52W')      # => 'B0Z52W5'
 SecID::SEDOL.restore!('B0Z52W')     # => #<SecID::SEDOL>
-SecID::SEDOL.check_digit('B0Z52W')  # => 5
+SecID::SEDOL.checksum('B0Z52W')  # => 5
 
 # instance level
 sedol = SecID::SEDOL.new('B0Z52W5')
 sedol.full_id               # => 'B0Z52W5'
-sedol.check_digit           # => 5
+sedol.checksum           # => 5
 sedol.valid?                # => true
 sedol.restore               # => 'B0Z52W5'
 sedol.restore!              # => #<SecID::SEDOL> (mutates instance)
-sedol.calculate_check_digit # => 5
+sedol.calculate_checksum # => 5
 sedol.to_isin               # => #<SecID::ISIN> (GB ISIN by default)
 sedol.to_isin('IE')         # => #<SecID::ISIN> (IE ISIN)
 ```
@@ -455,18 +455,18 @@ sedol.to_isin('IE')         # => #<SecID::ISIN> (IE ISIN)
 SecID::FIGI.valid?('BBG000DMBXR2')     # => true
 SecID::FIGI.restore('BBG000DMBXR')     # => 'BBG000DMBXR2'
 SecID::FIGI.restore!('BBG000DMBXR')    # => #<SecID::FIGI>
-SecID::FIGI.check_digit('BBG000DMBXR') # => 2
+SecID::FIGI.checksum('BBG000DMBXR') # => 2
 
 # instance level
 figi = SecID::FIGI.new('BBG000DMBXR2')
 figi.full_id               # => 'BBG000DMBXR2'
 figi.prefix                # => 'BB'
 figi.random_part           # => '000DMBXR'
-figi.check_digit           # => 2
+figi.checksum           # => 2
 figi.valid?                # => true
 figi.restore               # => 'BBG000DMBXR2'
 figi.restore!              # => #<SecID::FIGI> (mutates instance)
-figi.calculate_check_digit # => 2
+figi.calculate_checksum # => 2
 figi.to_pretty_s           # => 'BBG 000DMBXR 2'
 ```
 
@@ -479,7 +479,7 @@ figi.to_pretty_s           # => 'BBG 000DMBXR 2'
 SecID::LEI.valid?('5493006MHB84DD0ZWV18')    # => true
 SecID::LEI.restore('5493006MHB84DD0ZWV')     # => '5493006MHB84DD0ZWV18'
 SecID::LEI.restore!('5493006MHB84DD0ZWV')    # => #<SecID::LEI>
-SecID::LEI.check_digit('5493006MHB84DD0ZWV') # => 18
+SecID::LEI.checksum('5493006MHB84DD0ZWV') # => 18
 
 # instance level
 lei = SecID::LEI.new('5493006MHB84DD0ZWV18')
@@ -487,11 +487,11 @@ lei.full_id               # => '5493006MHB84DD0ZWV18'
 lei.lou_id                # => '5493'
 lei.reserved              # => '00'
 lei.entity_id             # => '6MHB84DD0ZWV'
-lei.check_digit           # => 18
+lei.checksum           # => 18
 lei.valid?                # => true
 lei.restore               # => '5493006MHB84DD0ZWV18'
 lei.restore!              # => #<SecID::LEI> (mutates instance)
-lei.calculate_check_digit # => 18
+lei.calculate_checksum # => 18
 lei.to_pretty_s           # => '5493 006M HB84 DD0Z WV18'
 ```
 
@@ -504,7 +504,7 @@ lei.to_pretty_s           # => '5493 006M HB84 DD0Z WV18'
 SecID::IBAN.valid?('DE89370400440532013000')    # => true
 SecID::IBAN.restore('DE370400440532013000')     # => 'DE89370400440532013000'
 SecID::IBAN.restore!('DE370400440532013000')    # => #<SecID::IBAN>
-SecID::IBAN.check_digit('DE370400440532013000') # => 89
+SecID::IBAN.checksum('DE370400440532013000') # => 89
 
 # instance level
 iban = SecID::IBAN.new('DE89370400440532013000')
@@ -513,11 +513,11 @@ iban.country_code          # => 'DE'
 iban.bban                  # => '370400440532013000'
 iban.bank_code             # => '37040044'
 iban.account_number        # => '0532013000'
-iban.check_digit           # => 89
+iban.checksum           # => 89
 iban.valid?                # => true
 iban.restore               # => 'DE89370400440532013000'
 iban.restore!              # => #<SecID::IBAN> (mutates instance)
-iban.calculate_check_digit # => 89
+iban.calculate_checksum # => 89
 iban.known_country?        # => true
 iban.to_pretty_s           # => 'DE89 3704 0044 0532 0130 00'
 ```
@@ -732,22 +732,22 @@ BIC validation confirms structure and a real country code only. It does **not** 
 SecID::DTI.valid?('X9J9K872S')      # => true
 SecID::DTI.restore('X9J9K872')      # => 'X9J9K872S'
 SecID::DTI.restore!('X9J9K872')     # => #<SecID::DTI>
-SecID::DTI.check_digit('X9J9K872')  # => 'S'
+SecID::DTI.checksum('X9J9K872')  # => 'S'
 
 # instance level
 dti = SecID::DTI.new('X9J9K872S')
 dti.full_id               # => 'X9J9K872S'
 dti.identifier             # => 'X9J9K872'
-dti.check_digit            # => 'S'
+dti.checksum            # => 'S'
 dti.valid?                 # => true
 dti.restore                # => 'X9J9K872S'
 dti.restore!                # => #<SecID::DTI> (mutates instance)
-dti.calculate_check_digit  # => 'S'
+dti.calculate_checksum  # => 'S'
 ```
 
-DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike most check-digit types in this gem, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer` (as does UPI). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
+DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike most checksum types in this gem, `checksum` and `calculate_checksum` return a `String`, not an `Integer` (as does UPI). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
 
-> **Grandfathered code:** Bitcoin's registered code (`4H95J0R2X`) predates the algorithm and fails the MOD 31,30 computation (which yields `4H95J0R2T`). A frozen exception map honors the registry's assignment across `valid?`, `restore`, and `check_digit` alike:
+> **Grandfathered code:** Bitcoin's registered code (`4H95J0R2X`) predates the algorithm and fails the MOD 31,30 computation (which yields `4H95J0R2T`). A frozen exception map honors the registry's assignment across `valid?`, `restore`, and `checksum` alike:
 >
 > ```ruby
 > SecID::DTI.valid?('4H95J0R2X')  # => true  (registered code, via the exception map)
@@ -763,20 +763,20 @@ DTI accepts exactly 9 characters: an 8-character base (first character never `0`
 SecID::UPI.valid?('QZRBG6ZTKS42')      # => true
 SecID::UPI.restore('QZRBG6ZTKS4')      # => 'QZRBG6ZTKS42'
 SecID::UPI.restore!('QZRBG6ZTKS4')     # => #<SecID::UPI>
-SecID::UPI.check_digit('QZRBG6ZTKS4')  # => '2'
+SecID::UPI.checksum('QZRBG6ZTKS4')  # => '2'
 
 # instance level
 upi = SecID::UPI.new('QZRBG6ZTKS42')
 upi.full_id                # => 'QZRBG6ZTKS42'
 upi.identifier             # => 'QZRBG6ZTKS4'
-upi.check_digit            # => '2'
+upi.checksum            # => '2'
 upi.valid?                 # => true
 upi.restore                # => 'QZRBG6ZTKS42'
 upi.restore!               # => #<SecID::UPI> (mutates instance)
-upi.calculate_check_digit  # => '2'
+upi.calculate_checksum  # => '2'
 ```
 
-UPI accepts exactly 12 characters: a fixed `QZ` prefix, a 9-character body, and 1 check character, all drawn from the same 30-symbol alphabet as DTI — digits `0`-`9` and consonants (vowels and `Y` never appear). Like DTI, `check_digit` and `calculate_check_digit` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the 11 preceding characters — no DSB registry lookup or paywalled ISO 4914 spec required.
+UPI accepts exactly 12 characters: a fixed `QZ` prefix, a 9-character body, and 1 check character, all drawn from the same 30-symbol alphabet as DTI — digits `0`-`9` and consonants (vowels and `Y` never appear). Like DTI, `checksum` and `calculate_checksum` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the 11 preceding characters — no DSB registry lookup or paywalled ISO 4914 spec required.
 
 > **Coexistence with ISIN:** a UPI shares the 12-character length bucket with ISIN. A UPI whose digit check character also satisfies ISIN's Luhn detects as both (`SecID.detect('QZXKR05S3DL1') # => [:isin, :upi]`), with ISIN ranked first; `SecID.parse(..., on_ambiguous: :raise)` surfaces the collision. UPI validation itself is fully offline and existence is **not** verified — that requires the licensed DSB registry.
 
@@ -830,7 +830,7 @@ On failure the validator adds one error under the `:sec_id` key with a type-awar
 
 ```ruby
 validates :isin, sec_id: { type: :isin, details: true }
-# a bad check digit reports e.g. "Check digit '4' is invalid, expected '5'"
+# a bad checksum reports e.g. "Checksum '4' is invalid, expected '5'"
 ```
 
 Standard `EachValidator` options — `allow_nil`, `allow_blank`, `if`, `unless`, `on` — work as usual. Tested against Rails 7.2, 8.0, and 8.1.

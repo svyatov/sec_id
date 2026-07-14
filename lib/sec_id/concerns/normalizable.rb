@@ -19,7 +19,7 @@ module SecID
       #
       # @param id [String, #to_s] the identifier to normalize
       # @return [String] the normalized identifier
-      # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+      # @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
       def normalize(id)
         cleaned = id.to_s.strip.gsub(self::SEPARATORS, '')
         new(cleaned.upcase).normalized
@@ -38,7 +38,7 @@ module SecID
     # Returns the canonical normalized form of this identifier.
     #
     # @return [String]
-    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    # @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
     def normalized
       validate!
       to_s
@@ -46,13 +46,13 @@ module SecID
 
     # @!method normalize
     #   @return [String]
-    #   @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    #   @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
     alias normalize normalized
 
     # Normalizes this identifier in place, updating {#full_id}.
     #
     # @return [self]
-    # @raise [InvalidFormatError, InvalidCheckDigitError, InvalidStructureError]
+    # @raise [InvalidFormatError, InvalidChecksumError, InvalidStructureError]
     def normalize!
       @full_id = normalized
       self

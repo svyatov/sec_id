@@ -34,11 +34,11 @@ end
 # design returns nil readers for invalid input); the rest are idioms RBS/stdlib can't
 # express (nilable stdlib MatchData in the scanner, Array#map!'s type-invariance,
 # freeze-after-case in DeepFreeze, widening CFI tables). Forcing them to zero would only
-# add dead "can't-happen" guards to check-digit math, so RBS::Test verifies them at
+# add dead "can't-happen" guards to checksum math, so RBS::Test verifies them at
 # runtime instead. The gate pins that floor so coverage cannot silently regress; lower
 # BASELINE whenever it drops.
-# 119: DTI's calculate_check_digit passes the nilable `identifier` reader into
-# grandfathered_check_digit/iso7064_mod31_30_check_char, both typed `(untyped base)` per
+# 119: DTI's calculate_checksum passes the nilable `identifier` reader into
+# grandfathered_checksum/iso7064_mod31_30_check_char, both typed `(untyped base)` per
 # the same nilable-but-runtime-safe convention as Checkable#reversed_digits_single.
 STEEP_UNTYPED_BASELINE = 119
 

@@ -116,14 +116,14 @@ RSpec.describe SecID::Errors do
   describe 'when single error' do
     subject(:result) { described_class.new(errors) }
 
-    let(:errors) { [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }] }
+    let(:errors) { [{ error: :invalid_checksum, message: "Checksum '0' is invalid, expected '5'" }] }
 
     it 'is not none' do
       expect(result.none?).to be(false)
     end
 
     it 'returns single detail' do
-      expect(result.details.first[:error]).to eq(:invalid_check_digit)
+      expect(result.details.first[:error]).to eq(:invalid_checksum)
     end
 
     it 'has size 1' do

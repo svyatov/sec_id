@@ -15,14 +15,18 @@ module SecID
     GRANDFATHERED_CODES: Hash[String, String]
 
     def initialize: (SecID::input dti) -> void
+    def calculate_checksum: () -> String
+    def self.checksum: (SecID::input id) -> String
+    # @deprecated v7 bridge alias for `calculate_checksum`; removed in v8.
     def calculate_check_digit: () -> String
+    # @deprecated v7 bridge alias for `checksum`; removed in v8.
     def self.check_digit: (SecID::input id) -> String
     private def self.generate_body: (Random random) -> String
 
     private
 
     def components: () -> Hash[Symbol, untyped]
-    def grandfathered_check_digit: (untyped base) -> String?
+    def grandfathered_checksum: (untyped base) -> String?
     def iso7064_mod31_30_check_char: (untyped base) -> String
   end
 end

@@ -11,7 +11,7 @@ require 'sec_id'
 
 # Representative inputs covering each hot path.
 VALID_ISIN  = 'US5949181045'
-BAD_CD_ISIN = 'US5949181040' # valid format, wrong check digit
+BAD_CD_ISIN = 'US5949181040' # valid format, wrong checksum
 CUSIP       = '594918104'
 SEDOL       = '2046251'
 CFI         = 'ESVUFR' # exercises the per-position attribute lookups
@@ -22,7 +22,7 @@ TEXT = 'Portfolio: US5949181045, DE000BAY0017 and 2046251 plus BIC DEUTDEFF500 w
 
 CASES = {
   'ISIN.valid? (known type)' => -> { SecID::ISIN.valid?(VALID_ISIN) },
-  'ISIN.valid? (bad check digit)' => -> { SecID::ISIN.valid?(BAD_CD_ISIN) },
+  'ISIN.valid? (bad checksum)' => -> { SecID::ISIN.valid?(BAD_CD_ISIN) },
   'CUSIP.valid?' => -> { SecID::CUSIP.valid?(CUSIP) },
   'SEDOL.valid?' => -> { SecID::SEDOL.valid?(SEDOL) },
   'CFI.valid?' => -> { SecID::CFI.valid?(CFI) },

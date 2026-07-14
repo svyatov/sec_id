@@ -10,7 +10,7 @@ RSpec.describe SecID::FIGI do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Financial Instrument Global Identifier',
                   id_length: 12,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,28 +35,28 @@ RSpec.describe SecID::FIGI do
                   invalid_length_id: 'BBG',
                   invalid_chars_id: 'BBG000H!FSM0'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'BBG000H4FSM0',
-                  invalid_check_digit_id: 'BBG000H4FSM5'
+                  invalid_checksum_id: 'BBG000H4FSM5'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'BBG000H4FSM5'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'BBG000H4FSM5'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: 'BBG000BLNNH6',
                   invalid_id: 'INVALID',
                   expected_type: :figi,
-                  expected_components: { prefix: 'BB', random_part: '000BLNNH', check_digit: 6 }
+                  expected_components: { prefix: 'BB', random_part: '000BLNNH', checksum: 6, check_digit: 6 }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'BBG000H4FSM0',
                   valid_id_without_check: 'BBG000H4FSM',
                   restored_id: 'BBG000H4FSM0',
                   invalid_format_id: 'G000BLNQ16',
-                  invalid_check_digit_id: 'BBG000H4FSM5',
-                  expected_check_digit: 0
+                  invalid_checksum_id: 'BBG000H4FSM5',
+                  expected_checksum: 0
 
   context 'when FIGI is valid' do
     let(:figi_number) { 'BBG000H4FSM0' }
@@ -65,7 +65,7 @@ RSpec.describe SecID::FIGI do
       expect(figi.identifier).to eq('BBG000H4FSM')
       expect(figi.prefix).to eq('BB')
       expect(figi.random_part).to eq('000H4FSM')
-      expect(figi.check_digit).to eq(0)
+      expect(figi.checksum).to eq(0)
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe SecID::FIGI do
       expect(figi.identifier).to eq('BSGF4YQD8PV')
       expect(figi.prefix).to eq('BS')
       expect(figi.random_part).to eq('F4YQD8PV')
-      expect(figi.check_digit).to eq(0)
+      expect(figi.checksum).to eq(0)
     end
 
     describe '#valid?' do
@@ -99,18 +99,18 @@ RSpec.describe SecID::FIGI do
       expect(figi.identifier).to be_nil
       expect(figi.prefix).to be_nil
       expect(figi.random_part).to be_nil
-      expect(figi.check_digit).to be_nil
+      expect(figi.checksum).to be_nil
     end
   end
 
-  context 'when FIGI number is missing check-digit' do
+  context 'when FIGI number is missing checksum' do
     let(:figi_number) { 'BBG000BLNQ1' }
 
     it 'parses FIGI correctly' do
       expect(figi.identifier).to eq(figi_number)
       expect(figi.prefix).to eq('BB')
       expect(figi.random_part).to eq('000BLNQ1')
-      expect(figi.check_digit).to be_nil
+      expect(figi.checksum).to be_nil
     end
   end
 
@@ -126,7 +126,7 @@ RSpec.describe SecID::FIGI do
 
   describe '.restore!' do
     context 'when FIGI is valid' do
-      it 'restores check-digit for various FIGIs' do
+      it 'restores checksum for various FIGIs' do
         expect(described_class.restore!('BBG000HY4HW').to_s).to eq('BBG000HY4HW9')
         expect(described_class.restore!('BBG000HY4HW9').to_s).to eq('BBG000HY4HW9')
         expect(described_class.restore!('BBG000BCK0D').to_s).to eq('BBG000BCK0D3')
@@ -162,20 +162,20 @@ RSpec.describe SecID::FIGI do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when FIGI is valid' do
-      it 'calculates check-digit for various FIGIs' do
-        expect(described_class.check_digit('BBG000HY4HW')).to eq(9)
-        expect(described_class.check_digit('BBG000HY4HW9')).to eq(9)
-        expect(described_class.check_digit('BBG000BCK0D')).to eq(3)
-        expect(described_class.check_digit('BBG000BCK0D3')).to eq(3)
-        expect(described_class.check_digit('BBG000BKRK3')).to eq(5)
+      it 'calculates checksum for various FIGIs' do
+        expect(described_class.checksum('BBG000HY4HW')).to eq(9)
+        expect(described_class.checksum('BBG000HY4HW9')).to eq(9)
+        expect(described_class.checksum('BBG000BCK0D')).to eq(3)
+        expect(described_class.checksum('BBG000BCK0D3')).to eq(3)
+        expect(described_class.checksum('BBG000BKRK3')).to eq(5)
       end
     end
   end
 
   describe '#to_pretty_s' do
-    it 'formats as prefix+G + random_part + check_digit' do
+    it 'formats as prefix+G + random_part + checksum' do
       expect(described_class.new('BBG000BLNQ16').to_pretty_s).to eq('BBG 000BLNQ1 6')
     end
   end

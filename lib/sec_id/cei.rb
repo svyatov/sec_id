@@ -4,7 +4,7 @@ module SecID
   # CUSIP Entity Identifier (CEI) - a 10-character alphanumeric code that identifies
   # legal entities in the syndicated loan market.
   #
-  # Format: 1 alpha + 1 digit + 7 alphanumeric + 1 check digit
+  # Format: 1 alpha + 1 digit + 7 alphanumeric + 1 checksum
   #
   # @see https://www.cusip.com/identifiers.html
   #
@@ -28,7 +28,7 @@ module SecID
         (?<prefix>[A-Z])
         (?<numeric>[0-9])
         (?<entity_id>[A-Z0-9]{7}))
-      (?<check_digit>\d)?
+      (?<checksum>\d)?
     \z/x
 
     # @return [String, nil] the first character (alphabetic)
@@ -47,12 +47,12 @@ module SecID
       @prefix = cei_parts[:prefix]
       @numeric = cei_parts[:numeric]
       @entity_id = cei_parts[:entity_id]
-      @check_digit = cei_parts[:check_digit]&.to_i
+      @checksum = cei_parts[:checksum]&.to_i
     end
 
-    # @return [Integer] the calculated check digit (0-9)
+    # @return [Integer] the calculated checksum (0-9)
     # @raise [InvalidFormatError] if the CEI format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
@@ -60,7 +60,7 @@ module SecID
     # Generates a random CEI body: 1 letter + 1 digit + 7 alphanumeric characters.
     #
     # @param random [Random] source of randomness
-    # @return [String] a 9-character CEI body without check digit
+    # @return [String] a 9-character CEI body without checksum
     def self.generate_body(random)
       "#{random_string(ALPHA, 1, random: random)}#{random_string(DIGITS, 1, random: random)}" \
         "#{random_string(ALPHANUMERIC, 7, random: random)}"
@@ -70,6 +70,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { prefix:, numeric:, entity_id:, check_digit: }
+    def components = { prefix:, numeric:, entity_id:, checksum: }
   end
 end

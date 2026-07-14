@@ -10,7 +10,7 @@ RSpec.describe SecID::SEDOL do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Stock Exchange Daily Official List',
                   id_length: 7,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,44 +35,44 @@ RSpec.describe SecID::SEDOL do
                   invalid_length_id: 'B1',
                   invalid_chars_id: 'B19AKT4'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: 'B19GKT4',
-                  invalid_check_digit_id: 'B19GKT0'
+                  invalid_checksum_id: 'B19GKT0'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: 'B19GKT0'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: 'B19GKT0'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: 'B0YBKJ7',
                   invalid_id: 'INVALID',
                   expected_type: :sedol,
-                  expected_components: { check_digit: 7 }
+                  expected_components: { checksum: 7, check_digit: 7 }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: 'B19GKT4',
                   valid_id_without_check: 'B19GKT',
                   restored_id: 'B19GKT4',
                   invalid_format_id: 'A61351',
-                  invalid_check_digit_id: 'B19GKT0',
-                  expected_check_digit: 4
+                  invalid_checksum_id: 'B19GKT0',
+                  expected_checksum: 4
 
   context 'when SEDOL is valid' do
     let(:sedol_number) { 'B19GKT4' }
 
     it 'parses SEDOL correctly' do
       expect(sedol.identifier).to eq('B19GKT')
-      expect(sedol.check_digit).to eq(4)
+      expect(sedol.checksum).to eq(4)
     end
   end
 
-  context 'when SEDOL number is missing check-digit' do
+  context 'when SEDOL number is missing checksum' do
     let(:sedol_number) { '552902' }
 
     it 'parses SEDOL number correctly' do
       expect(sedol.identifier).to eq(sedol_number)
-      expect(sedol.check_digit).to be_nil
+      expect(sedol.checksum).to be_nil
     end
   end
 
@@ -90,7 +90,7 @@ RSpec.describe SecID::SEDOL do
 
   describe '.restore!' do
     context 'when SEDOL is valid' do
-      it 'restores check-digit for various SEDOLs' do
+      it 'restores checksum for various SEDOLs' do
         expect(described_class.restore!('B09CBL').to_s).to eq('B09CBL4')
         expect(described_class.restore!('219071').to_s).to eq('2190716')
         expect(described_class.restore!('B923455').to_s).to eq('B923452')
@@ -100,14 +100,14 @@ RSpec.describe SecID::SEDOL do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when SEDOL is valid' do
-      it 'calculates check-digit for various SEDOLs' do
-        expect(described_class.check_digit('554389')).to eq(0)
-        expect(described_class.check_digit('2190716')).to eq(6)
-        expect(described_class.check_digit('B0Z52W')).to eq(5)
-        expect(described_class.check_digit('B19GKT4')).to eq(4)
-        expect(described_class.check_digit('613511')).to eq(1)
+      it 'calculates checksum for various SEDOLs' do
+        expect(described_class.checksum('554389')).to eq(0)
+        expect(described_class.checksum('2190716')).to eq(6)
+        expect(described_class.checksum('B0Z52W')).to eq(5)
+        expect(described_class.checksum('B19GKT4')).to eq(4)
+        expect(described_class.checksum('613511')).to eq(1)
       end
     end
   end
@@ -181,7 +181,7 @@ RSpec.describe SecID::SEDOL do
       end
     end
 
-    context 'when SEDOL is missing check digit' do
+    context 'when SEDOL is missing checksum' do
       let(:sedol_number) { 'B02H2F' }
 
       it 'returns valid ISIN without mutating source SEDOL' do
@@ -189,14 +189,14 @@ RSpec.describe SecID::SEDOL do
         expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('GB00B02H2F76')
         expect(sedol.full_id).to eq('B02H2F')
-        expect(sedol.check_digit).to be_nil
+        expect(sedol.checksum).to be_nil
       end
     end
 
-    context 'when SEDOL has wrong check digit' do
+    context 'when SEDOL has wrong checksum' do
       let(:sedol_number) { 'B02H2F0' }
 
-      it 'produces valid ISIN with correct check digit' do
+      it 'produces valid ISIN with correct checksum' do
         result = sedol.to_isin
         expect(result).to be_a(SecID::ISIN)
         expect(result.valid?).to be(true)

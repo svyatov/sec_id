@@ -157,7 +157,7 @@ RSpec.describe SecID::Scanner do
         expect(matches.first.type).to eq(:isin)
       end
 
-      it 'skips invalid check digit' do
+      it 'skips invalid checksum' do
         expect(SecID.extract('US5949181040 is wrong')).to eq([])
       end
     end

@@ -10,7 +10,7 @@ RSpec.describe SecID::Valoren do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Valoren Number',
                   id_length: 5..9,
-                  has_check_digit: false
+                  has_checksum: false
 
   # Validation API
   it_behaves_like 'a validatable identifier',

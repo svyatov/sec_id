@@ -4,7 +4,7 @@ module SecID
   # Committee on Uniform Securities Identification Procedures (CUSIP) - a 9-character
   # alphanumeric code that identifies North American securities.
   #
-  # Format: 6-character issuer code (CUSIP-6) + 2-character issue number + 1-digit check digit
+  # Format: 6-character issuer code (CUSIP-6) + 2-character issue number + 1-digit checksum
   #
   # @see https://en.wikipedia.org/wiki/CUSIP
   #
@@ -31,7 +31,7 @@ module SecID
       (?<identifier>
         (?<cusip6>[A-Z0-9]{5}[A-Z0-9*@#])
         (?<issue>[A-Z0-9*@#]{2}))
-      (?<check_digit>\d)?
+      (?<checksum>\d)?
     \z/x
 
     # @return [String, nil] the 6-character issuer code
@@ -46,19 +46,19 @@ module SecID
       @identifier = cusip_parts[:identifier]
       @cusip6 = cusip_parts[:cusip6]
       @issue = cusip_parts[:issue]
-      @check_digit = cusip_parts[:check_digit]&.to_i
+      @checksum = cusip_parts[:checksum]&.to_i
     end
 
     # @return [String, nil]
     def to_pretty_s
       return nil unless valid?
 
-      "#{cusip6} #{issue} #{check_digit}"
+      "#{cusip6} #{issue} #{checksum}"
     end
 
-    # @return [Integer] the calculated check digit (0-9)
+    # @return [Integer] the calculated checksum (0-9)
     # @raise [InvalidFormatError] if the CUSIP format is invalid
-    def calculate_check_digit
+    def calculate_checksum
       validate_format_for_calculation!
       mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
     end
@@ -66,7 +66,7 @@ module SecID
     # Generates a random CUSIP body: 8 alphanumeric characters.
     #
     # @param random [Random] source of randomness
-    # @return [String] an 8-character CUSIP body without check digit
+    # @return [String] an 8-character CUSIP body without checksum
     def self.generate_body(random)
       random_string(ALPHANUMERIC, 8, random: random)
     end
@@ -91,6 +91,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { cusip6:, issue:, check_digit: }
+    def components = { cusip6:, issue:, checksum: }
   end
 end

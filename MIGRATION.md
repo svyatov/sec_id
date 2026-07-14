@@ -1,3 +1,150 @@
+# Upgrading to SecID 7.0
+
+This guide covers all breaking changes when upgrading from SecID 6.x to 7.0. They are all one
+mechanical rename: the **check-digit** concept became **checksum** across the public API —
+methods, the error class, the error code, the components key, and documentation vocabulary.
+The name was inaccurate on two axes: DTI's and UPI's check value is a `String` (it can be a
+letter, not a digit), and LEI and IBAN carry a two-character check value. `checksum` is
+type- and count-agnostic.
+
+Nothing about validation or checksum arithmetic changed — every previously valid identifier is
+still valid and every computed value is byte-identical. Only names, one error code, and
+deprecation warnings changed.
+
+## Quick Reference
+
+| What changed | Before (6.x) | After (7.0) |
+|---|---|---|
+| Instance/class method | `isin.check_digit`, `SecID::ISIN.check_digit(id)` | `isin.checksum`, `SecID::ISIN.checksum(id)` |
+| Calculation method | `isin.calculate_check_digit` | `isin.calculate_checksum` |
+| Capability predicate | `SecID::ISIN.has_check_digit?` | `SecID::ISIN.has_checksum?` |
+| Error class | `SecID::InvalidCheckDigitError` | `SecID::InvalidChecksumError` |
+| **Error code (hard flip)** | `:invalid_check_digit` | `:invalid_checksum` |
+| Components / `to_h` / pattern-match key | `{ check_digit: … }` | `{ checksum: … }` |
+
+`restore` / `restore!` and the `Checkable` concern name are unchanged.
+
+**Bridge:** the old method names, the `InvalidCheckDigitError` constant, and the `:check_digit`
+components key all keep working through v7 (the methods warn on use); they are removed in v8.
+**The one exception is the error code** — `:invalid_check_digit` flips hard to `:invalid_checksum`
+at v7 with no bridge, so an error-code matcher must be updated immediately.
+
+## Step-by-Step
+
+### 1. Update Gemfile
+
+```ruby
+gem 'sec_id', '~> 7.0'
+```
+
+Then run `bundle update sec_id`.
+
+### 2. Rename method calls (deprecated aliases warn through v7)
+
+```ruby
+# Before (6.x)
+isin.check_digit
+isin.calculate_check_digit
+SecID::ISIN.check_digit('US594918104')
+SecID::ISIN.has_check_digit?
+
+# After (7.0)
+isin.checksum
+isin.calculate_checksum
+SecID::ISIN.checksum('US594918104')
+SecID::ISIN.has_checksum?
+```
+
+The old names still work through v7 but emit a deprecation warning on every call and are removed
+in v8. See step 6 to silence them if you cannot migrate every call site yet.
+
+### 3. Rename the rescued error class
+
+```ruby
+# Before (6.x)
+rescue SecID::InvalidCheckDigitError => e
+
+# After (7.0)
+rescue SecID::InvalidChecksumError => e
+```
+
+`SecID::InvalidCheckDigitError` remains as a constant alias of `SecID::InvalidChecksumError`
+through v7 (it is the *same class object*, so `rescue` under either name catches the same error),
+and is removed in v8.
+
+The constant alias emits **no** deprecation warning at runtime (it is a plain constant, not a
+warned method), so `-W` output won't reveal your rescue sites — find them statically:
+
+```bash
+grep -rEn 'InvalidCheckDigitError' app/ lib/ spec/
+```
+
+### 4. Update error-code matchers (hard flip — no bridge)
+
+The `:invalid_check_digit` code in `errors.details` and `explain` output is replaced by
+`:invalid_checksum` with **no dual emission** — emitting both would duplicate `errors.details`
+entries. This is the only change with no v7 bridge, so update any matcher immediately.
+
+```ruby
+# Before (6.x)
+isin.errors.details.first[:error] == :invalid_check_digit
+SecID.explain('US5949181040', types: [:isin])[:candidates].first[:errors]
+#   => [{ error: :invalid_check_digit, message: "Check digit '0' is invalid, expected '5'" }]
+
+# After (7.0)
+isin.errors.details.first[:error] == :invalid_checksum
+SecID.explain('US5949181040', types: [:isin])[:candidates].first[:errors]
+#   => [{ error: :invalid_checksum, message: "Checksum '0' is invalid, expected '5'" }]
+```
+
+If you use the opt-in ActiveModel/Rails validator with `details: true`, the surfaced reason
+follows the same flip: an invalid checksum now reports `:invalid_checksum`.
+
+### 5. Migrate pattern matches and `to_h` readers before v8
+
+`components` (and therefore `to_h` and `deconstruct_keys`) carries **both** `:checksum` and the
+deprecated `:check_digit` key through v7, so existing pattern matches keep working. The
+`:check_digit` key is removed in v8 — migrate to `:checksum` before then.
+
+```ruby
+# Both work through v7, binding the same value:
+isin => { check_digit: }   # deprecated, removed in v8
+isin => { checksum: }      # canonical
+
+isin.to_h[:components]
+#   => { country_code: 'US', nsin: '594918104', checksum: 5, check_digit: 5 }
+```
+
+Reading the `:check_digit` key also emits **no** warning (the value mirrors `:checksum`), so grep
+for the call sites rather than relying on stderr:
+
+```bash
+grep -rEn ':check_digit\b|check_digit:' app/ lib/ spec/
+```
+
+### 6. Silencing the deprecation warnings
+
+The method aliases warn via `Kernel#warn` on every call, visible at Ruby's default verbosity.
+If you cannot migrate every call site before v7, silence them one of these ways:
+
+```ruby
+# Process-wide, at the lowest verbosity (also silences other Ruby warnings):
+$VERBOSE = nil            # equivalent to running with -W0
+
+# Or filter only SecID's deprecations with an app-level Warning override:
+module SecIDDeprecationSilencer
+  def warn(message, category: nil, **)
+    super unless message.to_s.include?('SecID: `')
+  end
+end
+Warning.extend(SecIDDeprecationSilencer)
+```
+
+The warnings are intentionally on by default (not routed through `Warning[:deprecated]`, which
+Ruby leaves off) so the migration signal is visible without opting in.
+
+---
+
 # Upgrading to SecID 6.0
 
 This guide covers all breaking changes when upgrading from SecID 5.x to 6.0. Every one is

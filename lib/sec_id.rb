@@ -14,8 +14,12 @@ module SecID
   # Raised for invalid format, length, or characters.
   class InvalidFormatError < Error; end
 
-  # Raised when the check digit does not match the calculated value.
-  class InvalidCheckDigitError < Error; end
+  # Raised when the checksum does not match the calculated value.
+  class InvalidChecksumError < Error; end
+
+  # @deprecated Use {InvalidChecksumError}. Kept as a v7 bridge (same class object,
+  #   so `rescue` under either name keeps working); removed in v8.
+  InvalidCheckDigitError = InvalidChecksumError
 
   # Raised for type-specific structural errors (invalid prefix, category, group, BBAN, or date).
   class InvalidStructureError < Error; end
@@ -195,6 +199,7 @@ module SecID
   end
 end
 
+require 'sec_id/deprecation'
 require 'sec_id/deep_freeze'
 require 'sec_id/errors'
 require 'sec_id/concerns/normalizable'

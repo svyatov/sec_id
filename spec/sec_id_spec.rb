@@ -294,11 +294,11 @@ RSpec.describe SecID do
       expect(isin_candidate[:errors]).to eq([])
     end
 
-    it 'shows invalid_check_digit for wrong check digit' do
+    it 'shows invalid_checksum for wrong checksum' do
       result = described_class.explain('US5949181040')
       isin_candidate = result[:candidates].find { |c| c[:type] == :isin }
       expect(isin_candidate[:valid]).to be(false)
-      expect(isin_candidate[:errors].first[:error]).to eq(:invalid_check_digit)
+      expect(isin_candidate[:errors].first[:error]).to eq(:invalid_checksum)
     end
 
     it 'shows invalid_length for wrong length' do
@@ -499,7 +499,7 @@ RSpec.describe SecID do
 
     # QZGMQN4SDLD3 is a valid UPI whose 'G' at position 3 also satisfies FIGI's structural
     # rule and whose digit check character also satisfies ISIN's Luhn -- a genuine 3-way match.
-    # All three tie on check-digit rank and length, so registration order ranks them:
+    # All three tie on checksum rank and length, so registration order ranks them:
     # ISIN (1st) -> FIGI (4th) -> UPI (16th).
     it 'ranks a 3-way ISIN/FIGI/UPI collision by registration order' do
       expect(described_class.detect('QZGMQN4SDLD3')).to eq(%i[isin figi upi])

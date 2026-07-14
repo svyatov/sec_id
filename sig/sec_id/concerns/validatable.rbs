@@ -33,7 +33,7 @@ module SecID
     def detect_errors: () -> Array[Symbol]
     def valid_length?: () -> bool
     def valid_characters?: () -> bool
-    def check_digit_width: () -> Integer
+    def checksum_width: () -> Integer
     def validation_message: (Symbol code) -> String?
     def build_error: (Symbol code, String? message) -> Errors::detail
 

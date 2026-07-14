@@ -10,7 +10,7 @@ RSpec.describe SecID::CUSIP do
   it_behaves_like 'an identifier with metadata',
                   full_name: 'Committee on Uniform Securities Identification Procedures',
                   id_length: 9,
-                  has_check_digit: true
+                  has_checksum: true
 
   it_behaves_like 'a generatable identifier'
 
@@ -35,28 +35,28 @@ RSpec.describe SecID::CUSIP do
                   invalid_length_id: '0378',
                   invalid_chars_id: '03783310!'
 
-  it_behaves_like 'detects invalid check digit',
+  it_behaves_like 'detects invalid checksum',
                   valid_id: '68389X105',
-                  invalid_check_digit_id: '68389X100'
+                  invalid_checksum_id: '68389X100'
 
-  it_behaves_like 'validate! detects invalid check digit',
-                  invalid_check_digit_id: '68389X100'
+  it_behaves_like 'validate! detects invalid checksum',
+                  invalid_checksum_id: '68389X100'
 
   # Serialization
   it_behaves_like 'a hashable identifier',
                   valid_id: '037833100',
                   invalid_id: 'INVALID',
                   expected_type: :cusip,
-                  expected_components: { cusip6: '037833', issue: '10', check_digit: 0 }
+                  expected_components: { cusip6: '037833', issue: '10', checksum: 0, check_digit: 0 }
 
-  # Core check-digit identifier behavior
-  it_behaves_like 'a check-digit identifier',
+  # Core checksum identifier behavior
+  it_behaves_like 'a checksum identifier',
                   valid_id: '68389X105',
                   valid_id_without_check: '68389X10',
                   restored_id: '68389X105',
                   invalid_format_id: '5949181',
-                  invalid_check_digit_id: '68389X100',
-                  expected_check_digit: 5
+                  invalid_checksum_id: '68389X100',
+                  expected_checksum: 5
 
   context 'when CUSIP is valid' do
     let(:cusip_number) { '68389X105' }
@@ -65,18 +65,18 @@ RSpec.describe SecID::CUSIP do
       expect(cusip.identifier).to eq('68389X10')
       expect(cusip.cusip6).to eq('68389X')
       expect(cusip.issue).to eq('10')
-      expect(cusip.check_digit).to eq(5)
+      expect(cusip.checksum).to eq(5)
     end
   end
 
-  context 'when CUSIP number is missing check-digit' do
+  context 'when CUSIP number is missing checksum' do
     let(:cusip_number) { '38259P50' }
 
     it 'parses CUSIP number correctly' do
       expect(cusip.identifier).to eq(cusip_number)
       expect(cusip.cusip6).to eq('38259P')
       expect(cusip.issue).to eq('50')
-      expect(cusip.check_digit).to be_nil
+      expect(cusip.checksum).to be_nil
     end
   end
 
@@ -109,7 +109,7 @@ RSpec.describe SecID::CUSIP do
       end
     end
 
-    context 'when CUSIP is missing check digit' do
+    context 'when CUSIP is missing checksum' do
       let(:cusip_number) { '59491810' }
 
       it 'returns valid ISIN without mutating source CUSIP' do
@@ -117,14 +117,14 @@ RSpec.describe SecID::CUSIP do
         expect(result).to be_a(SecID::ISIN)
         expect(result.full_id).to eq('US5949181045')
         expect(cusip.full_id).to eq('59491810')
-        expect(cusip.check_digit).to be_nil
+        expect(cusip.checksum).to be_nil
       end
     end
 
-    context 'when CUSIP has wrong check digit' do
+    context 'when CUSIP has wrong checksum' do
       let(:cusip_number) { '594918109' }
 
-      it 'produces valid ISIN with correct check digit' do
+      it 'produces valid ISIN with correct checksum' do
         result = cusip.to_isin('US')
         expect(result).to be_a(SecID::ISIN)
         expect(result.valid?).to be(true)
@@ -153,7 +153,7 @@ RSpec.describe SecID::CUSIP do
 
   describe '.restore!' do
     context 'when CUSIP is valid' do
-      it 'restores check-digit for various CUSIPs' do
+      it 'restores checksum for various CUSIPs' do
         expect(described_class.restore!('03783310').to_s).to eq('037833100')
         expect(described_class.restore!('17275R10').to_s).to eq('17275R102')
         expect(described_class.restore!('38259P50').to_s).to eq('38259P508')
@@ -163,20 +163,20 @@ RSpec.describe SecID::CUSIP do
     end
   end
 
-  describe '.check_digit' do
+  describe '.checksum' do
     context 'when CUSIP is valid' do
-      it 'calculates check-digit for various CUSIPs' do
-        expect(described_class.check_digit('03783310')).to eq(0)
-        expect(described_class.check_digit('17275R10')).to eq(2)
-        expect(described_class.check_digit('38259P50')).to eq(8)
-        expect(described_class.check_digit('59491810')).to eq(4)
-        expect(described_class.check_digit('68389X10')).to eq(5)
+      it 'calculates checksum for various CUSIPs' do
+        expect(described_class.checksum('03783310')).to eq(0)
+        expect(described_class.checksum('17275R10')).to eq(2)
+        expect(described_class.checksum('38259P50')).to eq(8)
+        expect(described_class.checksum('59491810')).to eq(4)
+        expect(described_class.checksum('68389X10')).to eq(5)
       end
     end
   end
 
   describe '#to_pretty_s' do
-    it 'formats as cusip6 + issue + check_digit' do
+    it 'formats as cusip6 + issue + checksum' do
       expect(described_class.new('037833100').to_pretty_s).to eq('037833 10 0')
     end
   end

@@ -2,28 +2,28 @@
 
 # rubocop:disable RSpec/MultipleMemoizedHelpers
 
-# Shared examples for check-digit based identifiers (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN).
-# Validates the core API: valid?, restore, restore!, check_digit.
+# Shared examples for checksum based identifiers (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN).
+# Validates the core API: valid?, restore, restore!, checksum.
 #
-# @param valid_id [String] a valid identifier with correct check-digit
-# @param valid_id_without_check [String] a valid identifier without check-digit (for restoration)
+# @param valid_id [String] a valid identifier with correct checksum
+# @param valid_id_without_check [String] a valid identifier without checksum (for restoration)
 # @param restored_id [String] the expected full identifier after restoration
 # @param invalid_format_id [String] an identifier with invalid format
-# @param invalid_check_digit_id [String] an identifier with wrong check-digit
-# @param expected_check_digit [Integer, String] the expected check-digit value
-# @param expected_check_digit_class [Class] the expected check-digit type (default: Integer)
-RSpec.shared_examples 'a check-digit identifier' do |params|
+# @param invalid_checksum_id [String] an identifier with wrong checksum
+# @param expected_checksum [Integer, String] the expected checksum value
+# @param expected_checksum_class [Class] the expected checksum type (default: Integer)
+RSpec.shared_examples 'a checksum identifier' do |params|
   let(:identifier_class) { described_class }
   let(:valid_id) { params[:valid_id] }
   let(:valid_id_without_check) { params[:valid_id_without_check] }
   let(:restored_id) { params[:restored_id] }
   let(:invalid_format_id) { params[:invalid_format_id] }
-  let(:invalid_check_digit_id) { params[:invalid_check_digit_id] }
-  let(:expected_check_digit) { params[:expected_check_digit] }
-  let(:expected_check_digit_class) { params.fetch(:expected_check_digit_class, Integer) }
+  let(:invalid_checksum_id) { params[:invalid_checksum_id] }
+  let(:expected_checksum) { params[:expected_checksum] }
+  let(:expected_checksum_class) { params.fetch(:expected_checksum_class, Integer) }
 
   describe 'instance methods' do
-    context 'when identifier is valid with correct check-digit' do
+    context 'when identifier is valid with correct checksum' do
       let(:instance) { identifier_class.new(valid_id) }
 
       it 'returns true for #valid?' do
@@ -41,14 +41,14 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.full_id).to eq(valid_id)
       end
 
-      it 'returns the expected type for #calculate_check_digit' do
-        result = instance.calculate_check_digit
-        expect(result).to be_a(expected_check_digit_class)
-        expect(result).to eq(expected_check_digit)
+      it 'returns the expected type for #calculate_checksum' do
+        result = instance.calculate_checksum
+        expect(result).to be_a(expected_checksum_class)
+        expect(result).to eq(expected_checksum)
       end
     end
 
-    context 'when identifier is missing check-digit' do
+    context 'when identifier is missing checksum' do
       let(:instance) { identifier_class.new(valid_id_without_check) }
 
       it 'returns false for #valid?' do
@@ -64,10 +64,10 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.full_id).to eq(valid_id_without_check)
       end
 
-      it 'does not mutate check_digit for #restore' do
-        original_check_digit = instance.check_digit
+      it 'does not mutate checksum for #restore' do
+        original_checksum = instance.checksum
         instance.restore
-        expect(instance.check_digit).to eq(original_check_digit)
+        expect(instance.checksum).to eq(original_checksum)
       end
 
       it 'returns self for #restore!' do
@@ -75,18 +75,18 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(instance.full_id).to eq(restored_id)
       end
 
-      it 'sets check_digit for #restore!' do
+      it 'sets checksum for #restore!' do
         instance.restore!
-        expect(instance.check_digit).to eq(expected_check_digit)
+        expect(instance.checksum).to eq(expected_checksum)
       end
 
-      it 'calculates correct check-digit' do
-        expect(instance.calculate_check_digit).to eq(expected_check_digit)
+      it 'calculates correct checksum' do
+        expect(instance.calculate_checksum).to eq(expected_checksum)
       end
     end
 
-    context 'when identifier has invalid check-digit' do
-      let(:instance) { identifier_class.new(invalid_check_digit_id) }
+    context 'when identifier has invalid checksum' do
+      let(:instance) { identifier_class.new(invalid_checksum_id) }
 
       it 'returns false for #valid?' do
         expect(instance.valid?).to be(false)
@@ -117,8 +117,8 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect { instance.restore! }.to raise_error(SecID::InvalidFormatError)
       end
 
-      it 'raises error for #calculate_check_digit' do
-        expect { instance.calculate_check_digit }.to raise_error(SecID::InvalidFormatError)
+      it 'raises error for #calculate_checksum' do
+        expect { instance.calculate_checksum }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
@@ -129,12 +129,12 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(identifier_class.valid?(valid_id)).to be(true)
       end
 
-      it 'returns false for identifier without check-digit' do
+      it 'returns false for identifier without checksum' do
         expect(identifier_class.valid?(valid_id_without_check)).to be(false)
       end
 
-      it 'returns false for identifier with invalid check-digit' do
-        expect(identifier_class.valid?(invalid_check_digit_id)).to be(false)
+      it 'returns false for identifier with invalid checksum' do
+        expect(identifier_class.valid?(invalid_checksum_id)).to be(false)
       end
 
       it 'returns false for invalid format' do
@@ -151,12 +151,12 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(identifier_class.restore(valid_id)).to eq(restored_id)
       end
 
-      it 'restores identifier without check-digit' do
+      it 'restores identifier without checksum' do
         expect(identifier_class.restore(valid_id_without_check)).to eq(restored_id)
       end
 
-      it 'restores identifier with invalid check-digit' do
-        expect(identifier_class.restore(invalid_check_digit_id)).to eq(restored_id)
+      it 'restores identifier with invalid checksum' do
+        expect(identifier_class.restore(invalid_checksum_id)).to eq(restored_id)
       end
 
       it 'raises error for invalid format' do
@@ -171,14 +171,14 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
         expect(result.to_s).to eq(restored_id)
       end
 
-      it 'returns an instance for identifier without check-digit' do
+      it 'returns an instance for identifier without checksum' do
         result = identifier_class.restore!(valid_id_without_check)
         expect(result).to be_a(identifier_class)
         expect(result.to_s).to eq(restored_id)
       end
 
-      it 'returns an instance for identifier with invalid check-digit' do
-        result = identifier_class.restore!(invalid_check_digit_id)
+      it 'returns an instance for identifier with invalid checksum' do
+        result = identifier_class.restore!(invalid_checksum_id)
         expect(result).to be_a(identifier_class)
         expect(result.to_s).to eq(restored_id)
       end
@@ -188,25 +188,25 @@ RSpec.shared_examples 'a check-digit identifier' do |params|
       end
     end
 
-    describe '.check_digit' do
+    describe '.checksum' do
       it 'returns the expected type' do
-        expect(identifier_class.check_digit(valid_id)).to be_a(expected_check_digit_class)
+        expect(identifier_class.checksum(valid_id)).to be_a(expected_checksum_class)
       end
 
-      it 'calculates check-digit for valid identifier' do
-        expect(identifier_class.check_digit(valid_id)).to eq(expected_check_digit)
+      it 'calculates checksum for valid identifier' do
+        expect(identifier_class.checksum(valid_id)).to eq(expected_checksum)
       end
 
-      it 'calculates check-digit for identifier without check-digit' do
-        expect(identifier_class.check_digit(valid_id_without_check)).to eq(expected_check_digit)
+      it 'calculates checksum for identifier without checksum' do
+        expect(identifier_class.checksum(valid_id_without_check)).to eq(expected_checksum)
       end
 
-      it 'calculates check-digit for identifier with invalid check-digit' do
-        expect(identifier_class.check_digit(invalid_check_digit_id)).to eq(expected_check_digit)
+      it 'calculates checksum for identifier with invalid checksum' do
+        expect(identifier_class.checksum(invalid_checksum_id)).to eq(expected_checksum)
       end
 
       it 'raises error for invalid format' do
-        expect { identifier_class.check_digit(invalid_format_id) }.to raise_error(SecID::InvalidFormatError)
+        expect { identifier_class.checksum(invalid_format_id) }.to raise_error(SecID::InvalidFormatError)
       end
     end
   end
