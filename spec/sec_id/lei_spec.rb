@@ -69,16 +69,16 @@ RSpec.describe SecID::LEI do
 
   describe '#restore' do
     it 'always produces a 20-character string' do
-      # Test with a LEI where checksum is < 10 (single digit)
+      # 7ZW8QJWVPR4P1J1KQY has checksum 45
       lei = described_class.new('7ZW8QJWVPR4P1J1KQY')
       restored = lei.restore
       expect(restored.length).to eq(20)
     end
 
     it 'pads single-digit checksum' do
-      # 549300TRUWO2CD2G56 has checksum 92
-      lei = described_class.new('549300TRUWO2CD2G56')
-      expect(lei.restore).to eq('549300TRUWO2CD2G5692')
+      # 549300PZZU963WJE97 has checksum 5, restored with a leading zero as "05"
+      lei = described_class.new('549300PZZU963WJE97')
+      expect(lei.restore).to eq('549300PZZU963WJE9705')
       expect(lei.restore.length).to eq(20)
     end
   end
