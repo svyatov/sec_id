@@ -10,6 +10,8 @@ module SecID
   # is passed, because `Warning[:deprecated]` defaults to `false` and would hide
   # the bridge warning the rename relies on.
   module Deprecation
+    # Emits a standardized deprecation warning for a renamed API name.
+    #
     # @param old [String] the deprecated name
     # @param new [String] the canonical replacement name
     # @param removed_in [String] the version that removes the deprecated name
