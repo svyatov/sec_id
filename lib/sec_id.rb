@@ -195,6 +195,7 @@ module SecID
   end
 end
 
+require 'sec_id/deprecation'
 require 'sec_id/deep_freeze'
 require 'sec_id/errors'
 require 'sec_id/concerns/normalizable'
