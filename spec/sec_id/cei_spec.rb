@@ -46,7 +46,7 @@ RSpec.describe SecID::CEI do
                   valid_id: 'A0BCDEFGH1',
                   invalid_id: 'INVALID',
                   expected_type: :cei,
-                  expected_components: { prefix: 'A', numeric: '0', entity_id: 'BCDEFGH', checksum: 1 }
+                  expected_components: { prefix: 'A', numeric: '0', entity_id: 'BCDEFGH', checksum: 1, check_digit: 1 }
 
   it_behaves_like 'a checksum identifier',
                   valid_id: 'A0BCDEFGH1',

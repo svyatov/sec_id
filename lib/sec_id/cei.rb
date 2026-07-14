@@ -70,6 +70,6 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { prefix:, numeric:, entity_id:, checksum: }
+    def components = { prefix:, numeric:, entity_id:, checksum:, check_digit: checksum }
   end
 end

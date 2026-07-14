@@ -43,6 +43,10 @@ module SecID
     def self.length_specificity: () -> (Integer | Float | nil)
     def self.example: () -> String
     def self.has_checksum?: () -> bool
+
+    # @deprecated v7 bridge alias for `has_checksum?`; removed in v8.
+    def self.has_check_digit?: () -> bool
+
     def self.inherited: (singleton(Base) subclass) -> void
 
     def initialize: (SecID::input _sec_id_number) -> void

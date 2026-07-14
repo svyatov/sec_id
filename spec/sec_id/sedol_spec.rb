@@ -47,7 +47,7 @@ RSpec.describe SecID::SEDOL do
                   valid_id: 'B0YBKJ7',
                   invalid_id: 'INVALID',
                   expected_type: :sedol,
-                  expected_components: { checksum: 7 }
+                  expected_components: { checksum: 7, check_digit: 7 }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

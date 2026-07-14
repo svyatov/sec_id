@@ -95,6 +95,14 @@ module SecID
 
         @has_checksum = ancestors.include?(SecID::Checkable)
       end
+
+      # @deprecated Use {.has_checksum?}. Kept as a v7 bridge; removed in v8.
+      #
+      # @return [Boolean]
+      def has_check_digit?
+        SecID::Deprecation.warn(old: 'has_check_digit?', new: 'has_checksum?')
+        has_checksum?
+      end
     end
 
     # @api private

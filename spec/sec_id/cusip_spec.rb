@@ -47,7 +47,7 @@ RSpec.describe SecID::CUSIP do
                   valid_id: '037833100',
                   invalid_id: 'INVALID',
                   expected_type: :cusip,
-                  expected_components: { cusip6: '037833', issue: '10', checksum: 0 }
+                  expected_components: { cusip6: '037833', issue: '10', checksum: 0, check_digit: 0 }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

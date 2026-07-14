@@ -47,7 +47,7 @@ RSpec.describe SecID::ISIN do
                   valid_id: 'US5949181045',
                   invalid_id: 'INVALID',
                   expected_type: :isin,
-                  expected_components: { country_code: 'US', nsin: '594918104', checksum: 5 }
+                  expected_components: { country_code: 'US', nsin: '594918104', checksum: 5, check_digit: 5 }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

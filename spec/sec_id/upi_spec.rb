@@ -66,7 +66,7 @@ RSpec.describe SecID::UPI do
                   valid_id: 'QZRBG6ZTKS42',
                   invalid_id: 'QZRBG6ZTKS43',
                   expected_type: :upi,
-                  expected_components: { checksum: '2' }
+                  expected_components: { checksum: '2', check_digit: '2' }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',
@@ -138,7 +138,7 @@ RSpec.describe SecID::UPI do
       it 'destructures via case/in' do
         upi => { checksum: }
         expect(checksum).to eq('2')
-        expect(upi.to_h[:components]).to eq({ checksum: '2' })
+        expect(upi.to_h[:components]).to eq({ checksum: '2', check_digit: '2' })
       end
     end
   end

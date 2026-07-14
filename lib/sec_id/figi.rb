@@ -85,7 +85,7 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { prefix:, random_part:, checksum: }
+    def components = { prefix:, random_part:, checksum:, check_digit: checksum }
 
     # @return [Boolean]
     def valid_format?

@@ -79,7 +79,7 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { checksum: }
+    def components = { checksum:, check_digit: checksum }
 
     # NOTE: Not idiomatic Ruby, but optimized for performance.
     #

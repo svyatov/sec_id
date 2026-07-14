@@ -88,6 +88,16 @@ module SecID
       def checksum(id)
         new(id).calculate_checksum
       end
+
+      # @deprecated Use {.checksum}. Kept as a v7 bridge; removed in v8.
+      #
+      # @param id [String] the identifier to calculate the checksum for
+      # @return [Integer, String] the calculated checksum
+      # @raise [InvalidFormatError] if the identifier format is invalid
+      def check_digit(id)
+        SecID::Deprecation.warn(old: 'check_digit', new: 'checksum')
+        checksum(id)
+      end
     end
 
     # Validates format and checksum.
@@ -127,6 +137,23 @@ module SecID
     # @return [String]
     def to_s
       "#{identifier}#{checksum&.to_s&.rjust(checksum_width, '0')}"
+    end
+
+    # @deprecated Use {#checksum}. Kept as a v7 bridge; removed in v8.
+    #
+    # @return [Integer, String]
+    def check_digit
+      SecID::Deprecation.warn(old: 'check_digit', new: 'checksum')
+      checksum
+    end
+
+    # @deprecated Use {#calculate_checksum}. Kept as a v7 bridge; removed in v8.
+    #
+    # @return [Integer, String]
+    # @raise [InvalidFormatError] if the identifier format is invalid
+    def calculate_check_digit
+      SecID::Deprecation.warn(old: 'calculate_check_digit', new: 'calculate_checksum')
+      calculate_checksum
     end
 
     private

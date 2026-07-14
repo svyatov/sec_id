@@ -11,6 +11,9 @@ module SecID
   class InvalidChecksumError < Error
   end
 
+  # @deprecated v7 bridge constant alias for `InvalidChecksumError` (same class object); removed in v8.
+  InvalidCheckDigitError: singleton(InvalidChecksumError)
+
   # Raised for type-specific structural errors.
   class InvalidStructureError < Error
   end

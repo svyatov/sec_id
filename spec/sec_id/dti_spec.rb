@@ -50,7 +50,7 @@ RSpec.describe SecID::DTI do
                   valid_id: 'X9J9K872S',
                   invalid_id: 'X9J9K872Y',
                   expected_type: :dti,
-                  expected_components: { checksum: 'S' }
+                  expected_components: { checksum: 'S', check_digit: 'S' }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

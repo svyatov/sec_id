@@ -48,7 +48,7 @@ RSpec.describe SecID::IBAN do
                   invalid_id: 'INVALID',
                   expected_type: :iban,
                   expected_components: {
-                    country_code: 'DE', bban: '370400440532013000', checksum: 89,
+                    country_code: 'DE', bban: '370400440532013000', checksum: 89, check_digit: 89,
                     bank_code: '37040044', account_number: '0532013000'
                   }
 

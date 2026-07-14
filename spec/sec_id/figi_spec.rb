@@ -47,7 +47,7 @@ RSpec.describe SecID::FIGI do
                   valid_id: 'BBG000BLNNH6',
                   invalid_id: 'INVALID',
                   expected_type: :figi,
-                  expected_components: { prefix: 'BB', random_part: '000BLNNH', checksum: 6 }
+                  expected_components: { prefix: 'BB', random_part: '000BLNNH', checksum: 6, check_digit: 6 }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

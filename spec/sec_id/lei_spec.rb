@@ -47,7 +47,9 @@ RSpec.describe SecID::LEI do
                   valid_id: '529900T8BM49AURSDO55',
                   invalid_id: 'INVALID',
                   expected_type: :lei,
-                  expected_components: { lou_id: '5299', reserved: '00', entity_id: 'T8BM49AURSDO', checksum: 55 }
+                  expected_components: {
+                    lou_id: '5299', reserved: '00', entity_id: 'T8BM49AURSDO', checksum: 55, check_digit: 55
+                  }
 
   # Core checksum identifier behavior
   it_behaves_like 'a checksum identifier',

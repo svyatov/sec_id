@@ -79,7 +79,7 @@ module SecID
     private
 
     # @return [Hash]
-    def components = { checksum: }
+    def components = { checksum:, check_digit: checksum }
 
     # @param base [String] the 8-character DTI base
     # @return [String, nil] the registered check character, or nil if not grandfathered

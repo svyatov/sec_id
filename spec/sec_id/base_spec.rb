@@ -142,7 +142,7 @@ RSpec.describe SecID::Base do
     it 'destructures an instance with an invalid checksum' do
       isin = SecID::ISIN.new('US6949181045')
       expect(isin).not_to be_valid
-      expect(isin.deconstruct_keys(nil)).to eq(country_code: 'US', nsin: '694918104', checksum: 5)
+      expect(isin.deconstruct_keys(nil)).to eq(country_code: 'US', nsin: '694918104', checksum: 5, check_digit: 5)
     end
 
     # AE4: unparseable input binds nil, mirroring MatchData#deconstruct_keys.
