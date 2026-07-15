@@ -18,6 +18,7 @@ module SecID
   #   SecID::UPI.restore('QZRBG6ZTKS4')  #=> 'QZRBG6ZTKS42'
   class UPI < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Unique Product Identifier'

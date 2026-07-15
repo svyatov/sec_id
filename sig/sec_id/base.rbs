@@ -43,6 +43,9 @@ module SecID
     def self.length_specificity: () -> (Integer | Float | nil)
     def self.example: () -> String
     def self.has_checksum?: () -> bool
+    # Only Suggestable (checksum) types implement `.suggest`; declared here so the
+    # module-level `SecID.suggest` can call it on any registered class object.
+    def self.suggest: (SecID::input str) -> Array[Suggestion]
 
     # @deprecated v7 bridge alias for `has_checksum?`; removed in v8.
     def self.has_check_digit?: () -> bool
@@ -58,12 +61,15 @@ module SecID
     def as_json: (*untyped) -> Hash[Symbol, untyped]
     def deconstruct_keys: (::Array[Symbol]? _keys) -> Hash[Symbol, untyped]
 
-    # Checksum surface. Only the types that `include Checkable` implement these
-    # (they raise/NoMethodError otherwise); declared on Base so `Generatable#generate`
-    # and `Checkable::ClassMethods` type-check without narrowing on `has_checksum?`.
+    # Checksum / repair surface. Only the types that `include Checkable` /
+    # `include Suggestable` implement these (they raise/NoMethodError otherwise);
+    # declared on Base so `Generatable#generate`, `Checkable::ClassMethods`, and the
+    # Base-self-typed `Suggestable` body type-check without narrowing on `has_checksum?`.
     def restore: () -> String
     def restore!: () -> self
     def calculate_checksum: () -> (Integer | String)
+    attr_reader checksum: (Integer | String)?
+    def suggest: () -> Array[Suggestion]
 
     def comparison_id: () -> String
 

@@ -16,6 +16,7 @@ module SecID
   #   SecID::SEDOL.checksum('B19GKT')  #=> 4
   class SEDOL < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Stock Exchange Daily Official List'

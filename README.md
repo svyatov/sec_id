@@ -1,6 +1,6 @@
 # SecID [![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://rubygems.org/gems/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg)](https://github.com/svyatov/sec_id/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/svyatov/sec_id/graph/badge.svg?token=VV49EMQIIC)](https://codecov.io/gh/svyatov/sec_id) [![Documentation](https://img.shields.io/badge/docs-rubydoc.info-blue.svg)](https://rubydoc.info/gems/sec_id) [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.2-CC342D.svg)](https://www.ruby-lang.org) [![Types: RBS](https://img.shields.io/badge/types-RBS-8A2BE2.svg)](https://github.com/svyatov/sec_id/tree/main/sig)
 
-> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, generate, and classify.
+> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, generate, classify, and repair.
 
 ## Table of Contents
 
@@ -13,6 +13,7 @@
   - [Structured Validation](#structured-validation) - detailed error codes and messages
   - [Pattern Matching](#pattern-matching) - destructure identifiers with `case/in`
   - [Generating Test Fixtures](#generating-test-fixtures) - produce valid identifiers for tests
+  - [Repairing Typos](#repairing-typos) - suggest corrections for checksum-failing identifiers
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [CEI](#cei) - CUSIP Entity Identifier
@@ -327,6 +328,41 @@ SecID::LEI.generate(random: Random.new(42)) == SecID::LEI.generate(random: Rando
 > Country codes, FIGI prefixes, OCC expiry dates, and CFI category/group/attribute choices are
 > randomly selected (from the values each standard permits) and do not map to real-world
 > instruments. Use them as test fixtures, not as references to actual securities.
+
+### Repairing Typos
+
+Turn the checksum from a gatekeeper into a repair engine. For a checksum-**failing** identifier, `suggest` enumerates the plausible single-character human errors — visual/OCR homoglyph substitutions (`O`↔`0`, `I`↔`1`, `5`↔`S`, `8`↔`B`, …) and adjacent transpositions — keeps only the edits that re-validate, and returns them as confidence-ranked `SecID::Suggestion` candidates that report *what changed*. Available for all 9 checksum types (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI) per class and via the central dispatcher:
+
+```ruby
+# A letter O typed where a 0 belongs — 'US5949181O45' should be 'US5949181045'
+top = SecID::ISIN.suggest('US5949181O45').first
+top.to_s          # => 'US5949181045'  (the corrected identifier)
+top.edit          # => :substitution
+top.position      # => 9
+top.from          # => 'O'
+top.to            # => '0'
+top.confidence    # => :high
+top.identifier    # => #<SecID::ISIN ...>  (parsed and valid — call .country_code, .to_h, etc.)
+
+# Module-level: infers every format-compatible checksum type (like parse / detect)
+SecID.suggest('US5949181O45')                   # => [#<SecID::Suggestion type=:isin ...>, ...]
+SecID.suggest('US5949181O45', types: [:isin])   # => restrict to specific types
+```
+
+Each candidate carries the corrected `identifier` (a parsed, valid instance), the `edit` kind, its `position`, the `from`/`to` characters, and a `confidence` tier. Candidates are ranked by confidence: `:high` homoglyph substitutions first, then `:medium` adjacent transpositions, then the `:checksum` recompute (body assumed correct, wrong check character) last as a fallback hypothesis. **There is no `:low` tier** — coincidental substitutions that merely satisfy the checksum are never generated, keeping the result small and high-precision.
+
+> **`suggest` returns candidates, never authoritative corrections, and never mutates its input.**
+> Every returned candidate fully re-validates (`valid?` is the oracle), so no false candidate escapes —
+> but the `confidence` tier is how *you* decide what to trust. This matters for financial identifiers.
+
+Notes and limitations:
+
+- **Never empty for structurally-valid input** — a parseable but checksum-failing identifier always yields at least the `:checksum` fallback. Only wrong-length or illegal-charset input (which fails the format gate) returns `[]`.
+- **Vowel-free reachability** — SEDOL, FIGI, DTI, and UPI exclude vowels from their charset, so an `O`-for-`0` or `I`-for-`1` typo is unparseable and therefore unrepairable (it fails the format gate before enumeration). The mistyped character must be *in* the type's charset to be reachable.
+- **Single body error only** — two or more wrong body characters, or a dropped/doubled character (insertion/deletion), are out of scope; such input returns only the `:checksum` fallback, never additional body candidates.
+- **Non-checksum types are unsupported** — CIK, OCC, WKN, Valoren, CFI, FISN, and BIC have no checksum oracle, so they have no `suggest`; `SecID.suggest` silently skips them.
+
+**Precision** (simulated over 1,000 seeded samples per checksum type — see [`benchmark/suggest_precision.rb`](benchmark/suggest_precision.rb)): every reachable, single-error homoglyph or transposition that yields a checksum-failing identifier is recovered — the correct identifier is **always** among the returned candidates (100%), and is the top-ranked body candidate ~89% of the time for homoglyph errors. In-charset homoglyph reachability averages ~96% (100% for the letter-permitting types, lower for the four vowel-free ones).
 
 ### ISIN
 

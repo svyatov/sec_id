@@ -12,6 +12,7 @@ module SecID
   #   SecID::CEI.valid?('A0BCDEFGH1')  #=> true
   class CEI < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'CUSIP Entity Identifier'

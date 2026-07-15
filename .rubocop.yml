@@ -39,12 +39,14 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Exclude:
+    - 'lib/sec_id.rb'
     - 'lib/sec_id/base.rb'
     - 'lib/sec_id/cfi.rb'
     - 'lib/sec_id/iban.rb'
 
 Metrics/ModuleLength:
   Exclude:
+    - 'lib/sec_id.rb'
     - 'lib/sec_id/concerns/checkable.rb'
 
 Lint/MissingSuper:
@@ -61,5 +63,6 @@ RSpec/SpecFilePathFormat:
   CustomTransform:
     Checkable: concerns/checkable
     Validatable: concerns/validatable
+    Suggestable: concerns/suggestable
     SecIdValidator: active_model
     CFITables: cfi/tables

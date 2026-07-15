@@ -16,6 +16,7 @@ module SecID
   #   SecID::LEI.checksum('529900T8BM49AURSDO')  #=> 55
   class LEI < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Legal Entity Identifier'

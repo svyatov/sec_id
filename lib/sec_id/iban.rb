@@ -19,6 +19,7 @@ module SecID
   #   SecID::IBAN.restore!('DE00370400440532013000')  #=> #<SecID::IBAN>
   class IBAN < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'International Bank Account Number'

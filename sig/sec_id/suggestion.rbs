@@ -1,0 +1,23 @@
+module SecID
+  # Immutable value object representing one repair candidate returned by `suggest`.
+  class Suggestion < Data
+    EDIT_KINDS: Array[Symbol]
+    CONFIDENCE_LEVELS: Array[Symbol]
+
+    attr_reader type: Symbol
+    attr_reader identifier: Base
+    attr_reader edit: Symbol
+    attr_reader position: Integer?
+    attr_reader from: String
+    attr_reader to: String
+    attr_reader confidence: Symbol?
+
+    def self.new: (type: Symbol, identifier: Base, edit: Symbol, position: Integer?, from: String, to: String, confidence: Symbol?) -> instance
+                | (Symbol type, Base identifier, Symbol edit, Integer? position, String from, String to, Symbol? confidence) -> instance
+    def self.[]: (type: Symbol, identifier: Base, edit: Symbol, position: Integer?, from: String, to: String, confidence: Symbol?) -> instance
+               | (Symbol type, Base identifier, Symbol edit, Integer? position, String from, String to, Symbol? confidence) -> instance
+
+    def as_json: (*untyped) -> Hash[Symbol, untyped]
+    def to_s: () -> String
+  end
+end

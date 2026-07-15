@@ -15,6 +15,7 @@ module SecID
   #   SecID::ISIN.restore!('US594918104')  #=> #<SecID::ISIN>
   class ISIN < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'International Securities Identification Number'

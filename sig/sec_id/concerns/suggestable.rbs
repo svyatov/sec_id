@@ -1,0 +1,32 @@
+module SecID
+  # Repair engine for checksum-failing identifiers: enumerates plausible edits and
+  # returns the re-validating ones as confidence-ranked Suggestion objects.
+  module Suggestable : SecID::Base
+    HOMOGLYPHS: Hash[String, Array[String]]
+    RANK: Hash[Symbol, Integer]
+
+    def self.included: (Module base) -> void
+
+    # Class methods added when Suggestable is included.
+    module ClassMethods : SecID::_IdentifierClass
+      def suggest: (SecID::input str) -> Array[Suggestion]
+    end
+
+    def suggest: () -> Array[Suggestion]
+
+    private
+
+    def candidate_strings: () -> Array[String]
+    def homoglyph_candidates: () -> Array[String]
+    def transposition_candidates: () -> Array[String]
+    def replace_at: (String str, Integer index, String char) -> String
+    def swap_at: (String str, Integer index) -> String
+    def classify: (Base candidate) -> Suggestion?
+    def changed_indices: (Base candidate) -> Array[Integer]
+    def substitution_suggestion: (Base candidate, Integer index) -> Suggestion
+    def transposition_suggestion: (Base candidate, Array[Integer] indices) -> Suggestion?
+    def swap?: (Base candidate, Integer left, Integer right) -> bool
+    def checksum_suggestion: (Base candidate) -> Suggestion
+    def rendered_checksum: ((Integer | String)? value) -> String
+  end
+end
