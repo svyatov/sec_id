@@ -29,7 +29,9 @@ CASES = {
   'SecID.valid? (unknown -> detector)' => -> { SecID.valid?(VALID_ISIN) },
   'SecID.detect' => -> { SecID.detect(VALID_ISIN) },
   'SecID.parse' => -> { SecID.parse(VALID_ISIN) },
-  'SecID.extract (paragraph)' => -> { SecID.extract(TEXT) }
+  'SecID.extract (paragraph)' => -> { SecID.extract(TEXT) },
+  'ISIN.suggest (repair)' => -> { SecID::ISIN.suggest(BAD_CD_ISIN) },
+  'SecID.suggest (module)' => -> { SecID.suggest(BAD_CD_ISIN) }
 }.freeze
 
 puts "Ruby #{RUBY_VERSION}\n\n== Throughput =="

@@ -545,4 +545,43 @@ RSpec.describe SecID do
       expect(result).to be_valid
     end
   end
+
+  describe '.suggest' do
+    it 'may span ISIN and UPI for a shared-bucket QZ-prefixed vowel-free input (AE5)' do
+      suggestions = described_class.suggest('QZRBG6ZTKS45')
+      expect(suggestions.map(&:type).uniq).to include(:isin, :upi)
+      expect(suggestions).to all(satisfy { |s| s.identifier.valid? })
+    end
+
+    it 'ranks ISIN before UPI on a tie (registration order)' do
+      suggestions = described_class.suggest('QZRBG6ZTKS45')
+      isin_checksum = suggestions.index { |s| s.type == :isin && s.edit == :checksum }
+      upi_checksum = suggestions.index { |s| s.type == :upi && s.edit == :checksum }
+      expect(isin_checksum).to be < upi_checksum
+    end
+
+    it 'drops UPI for a vowel-bearing 12-char input at the charset pre-filter' do
+      expect(described_class.suggest('US5949181040').map(&:type).uniq).to eq([:isin])
+    end
+
+    it 'restricts to the given checksum types' do
+      expect(described_class.suggest('QZRBG6ZTKS45', types: [:isin]).map(&:type).uniq).to eq([:isin])
+    end
+
+    it 'silently skips non-checksum types (no repair oracle)' do
+      expect(described_class.suggest('US5949181040', types: [:wkn])).to eq([])
+    end
+
+    it 'returns [] when no format-compatible checksum type matches' do
+      expect(described_class.suggest('ABC')).to eq([])
+    end
+
+    it 'returns [] for nil input' do
+      expect(described_class.suggest(nil)).to eq([])
+    end
+
+    it 'raises ArgumentError for an unknown type in types:' do
+      expect { described_class.suggest('US5949181040', types: [:nope]) }.to raise_error(ArgumentError)
+    end
+  end
 end

@@ -16,6 +16,7 @@ module SecID
   #   SecID::FIGI.restore!('BBG000BLNQ1')  #=> #<SecID::FIGI>
   class FIGI < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Financial Instrument Global Identifier'

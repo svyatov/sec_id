@@ -38,9 +38,11 @@ module SecID
   # against the `:first`/`:raise` arm's `Base?` and fail. Widening here keeps `result` untyped.
   def self.parse!: (SecID::input str, ?types: Array[Symbol]?, ?on_ambiguous: Symbol) -> (Base | Array[Base])
   def self.generate: (Symbol key, ?random: Random) -> Base
+  def self.suggest: (SecID::input str, ?types: Array[Symbol]?) -> Array[Suggestion]
 
   # Singleton-method privacy must be declared inline (`private def self.…`); a bare
   # `private` section only affects instance methods, leaving these public.
+  private def self.suggestable_types: (String input, Array[Symbol]? types) -> Array[singleton(Base)]
   private def self.register_identifier: (singleton(Base) klass) -> void
   private def self.parse_any: (SecID::input str) -> Base?
   private def self.parse_from: (SecID::input str, Array[Symbol] types) -> Base?

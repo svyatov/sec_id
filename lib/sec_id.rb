@@ -143,7 +143,39 @@ module SecID
       self[key].generate(random: random)
     end
 
+    # Returns confidence-ranked repair candidates for a checksum-failing identifier,
+    # inferred across all format-compatible checksum types (or the given `types:`).
+    #
+    # @note Repair is only defined for checksum types; non-checksum types have no
+    #   oracle and are silently skipped.
+    #
+    # @param str [String, nil] the identifier string to repair
+    # @param types [Array<Symbol>, nil] restrict to specific types (non-checksum types are ignored)
+    # @return [Array<Suggestion>] cross-type ranked candidates, each carrying its `type`;
+    #   empty when no format-compatible checksum type matches
+    # @raise [ArgumentError] if any key in types is unknown
+    def suggest(str, types: nil)
+      input = str.to_s.strip.upcase
+      suggestable_types(input, types)
+        .flat_map { |klass| klass.suggest(input) }
+        .sort_by { |suggestion| [Suggestable::RANK.fetch(suggestion.edit), self[suggestion.type].detection_priority.last] }
+    end
+
     private
+
+    # Resolves the checksum types eligible to repair `input` (KTD4): the given `types:`
+    # narrowed to checksum types, or every checksum type whose length and charset admit it.
+    #
+    # @param input [String] the normalized (stripped, upcased) input
+    # @param types [Array<Symbol>, nil]
+    # @return [Array<Class>]
+    def suggestable_types(input, types)
+      return types.map { |key| self[key] }.select(&:has_checksum?) if types
+
+      identifier_list.select do |klass|
+        klass.has_checksum? && klass.length_values.include?(input.length) && input.match?(klass::VALID_CHARS_REGEX)
+      end
+    end
 
     # @return [void]
     def register_identifier(klass)
@@ -206,7 +238,9 @@ require 'sec_id/concerns/normalizable'
 require 'sec_id/concerns/validatable'
 require 'sec_id/concerns/checkable'
 require 'sec_id/concerns/generatable'
+require 'sec_id/concerns/suggestable'
 require 'sec_id/base'
+require 'sec_id/suggestion'
 require 'sec_id/detector'
 require 'sec_id/scanner'
 require 'sec_id/isin'

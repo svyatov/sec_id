@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC, DTI, UPI) — validate, normalize, parse, detect, convert, generate, classify, and calculate checksums. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
+This is a Ruby toolkit for securities identifiers (ISIN, CUSIP, CEI, SEDOL, FIGI, LEI, IBAN, CIK, OCC, WKN, Valoren, CFI, FISN, BIC, DTI, UPI) — validate, normalize, parse, detect, convert, generate, classify, calculate checksums, and repair. CFI is a full ISO 10962:2021 classifier (`CFI#decode`). Checksum-failing identifiers can be repaired via `suggest` (homoglyph + transposition candidates, confidence-ranked). Ships an opt-in ActiveModel/Rails validator that adds no runtime dependency to the zero-dependency core.
 
 ### Directory Layout
 
@@ -84,6 +84,7 @@ Identifier classes auto-register via `Base.inherited`. Access them through:
 - `SecID.scan(text, types: nil)` — lazy version of `extract`, returns `Enumerator<Match>`
 - `SecID.explain(str, types: nil)` — returns per-type validation results for debugging detection
 - `SecID.generate(key, random: Random.new)` — returns a generated, format-valid instance for a type symbol (raises `ArgumentError` on unknown type); generated values are valid in format only, not real securities
+- `SecID.suggest(str, types: nil)` — returns confidence-ranked `Suggestion` repair candidates for a checksum-failing identifier. Resolves candidate types via the format-only filters (`has_checksum?` + `length_values` + `VALID_CHARS_REGEX`, mirroring detector stages 2–3 — a checksum-failing string never survives `valid?`-based detection), runs each type's `.suggest`, flattens, and ranks cross-type by confidence tier then registration order. `types:` narrows to the given types (non-checksum types are silently dropped — no oracle). The private `suggestable_types` helper does the resolution
 
 ### Detector (`lib/sec_id/detector.rb`)
 
@@ -103,6 +104,10 @@ Lazily instantiated from `SecID.detect`; cache invalidated when new types regist
 `@api private` class that finds identifiers in freeform text. Uses a composite regex with three named groups (FISN, OCC, simple tokens) and cursor-based overlap prevention. Candidates are length-filtered, charset-filtered, and validated, then the most specific match is returned as a `Match` data object (`Data.define(:type, :raw, :range, :identifier)`).
 
 Lazily instantiated from `SecID.scan`/`SecID.extract`; cache invalidated when new types register.
+
+### Suggestion value object (`lib/sec_id/suggestion.rb`)
+
+`Suggestion = Data.define(:type, :identifier, :edit, :position, :from, :to, :confidence)` — the frozen record `suggest` returns, mirroring `Scanner::Match` (flat immutable `Data`, not the hand-rolled CFI value classes). `identifier` is the valid, parsed `SecID::Base` instance (so callers get `.to_s`, `.to_h`, `.country_code` for free); `edit` is `:substitution` / `:transposition` / `:checksum`. Coordinate system: `:substitution` — `position` is the 0-based index, `from`/`to` the single changed characters; `:transposition` — `position` is the left index, `from`/`to` the two-character adjacent substring before/after the swap; `:checksum` — `position` is `nil`, `from`/`to` the old/new check-character string, `confidence` is `nil`. `Data` supplies `==`/`hash`/`to_h`/`deconstruct_keys`; the reopened `class Suggestion` block (not the `Data.define` block, so Steep types `self` as the instance) adds `as_json(*) => to_h`, `to_s => identifier.to_s`, and the runtime-introspectable domain enumerations `EDIT_KINDS` (`%i[substitution transposition checksum]`, rank order) and `CONFIDENCE_LEVELS` (`%i[high medium]`; `:checksum` candidates carry `nil`) — mirroring `Validatable::ERROR_MAP`'s discoverability role so consumers enumerate legal values instead of parsing docs.
 
 ### ActiveModel / Rails Validator (`lib/sec_id/active_model.rb`, `lib/sec_id/railtie.rb`)
 
@@ -181,6 +186,15 @@ Per-type hooks:
 - FIGI resamples its prefix until it is not in `RESTRICTED_PREFIXES`; IBAN generates only numeric-BBAN countries (`NUMERIC_COUNTRY_RULES`); CIK/Valoren use a random integer (not a digit char-fill) to avoid leading-zero bodies
 - CFI samples each attribute position only from the letters `SecID::CFI::Tables` permits for that group (plus `X`; pure-N/A positions yield only `X`, so `K`'s `XXXX` falls out), then applies the `ED` cross-position rule — so every generated code passes strict `valid?`
 
+#### Suggestable (`suggestable.rb`)
+
+The repair engine for checksum-failing identifiers, opt-in `include`d by the 9 checksum types (**not** on `Base` — R9 requires non-checksum types to have no `.suggest`; and **not** folded into `Checkable`, keeping the one-capability-per-concern convention). Adds instance `#suggest` and, via `self.included(base) -> base.extend(ClassMethods)`, class-level `.suggest(str)` (which is `new(str).suggest`).
+
+- Constants: `HOMOGLYPHS` (a frozen `Hash[String, Array[String]]` — the bidirectional homoglyph/OCR confusion table that drives enumeration *and* is the sole substitution candidate space; the recall lever, tuned via `benchmark/suggest_precision.rb`); `RANK` (`{ substitution: 0, transposition: 1, checksum: 2 }`).
+- `#suggest` returns `[]` when the input is already `valid?` (nothing to repair) or not `valid_format?` (unparseable). Otherwise it enumerates, per position, the character's `HOMOGLYPHS` substitutions plus adjacent transpositions, adds the `restore` result (the `:checksum` fallback, guaranteeing the two-character-check case for LEI/IBAN), dedupes, keeps only `self.class.new(candidate).valid?` (the oracle — no false candidate escapes), classifies each survivor, and sorts by `RANK`.
+- Classification is **position-agnostic** (never assumes a trailing checksum — IBAN splices mid-string): `candidate.identifier == identifier` (equal bodies) → `:checksum`; else a single differing index → `:substitution` (`:high`), or an adjacent mutual swap → `:transposition` (`:medium`). No `:low`/coincidental tier is ever generated. `checksum_suggestion` renders `from`/`to` via `checksum` + private `checksum_width` (so a 2-char check reports the full field).
+- Candidate sets stay in the tens per identifier (25/37/52 for a 12/20/22-char id), not hundreds — the human-error net, not a full single-character net.
+
 ### Identifier Classes
 
 Each identifier type (`lib/sec_id/*.rb`) implements:
@@ -190,7 +204,7 @@ Each identifier type (`lib/sec_id/*.rb`) implements:
 - Private `components` method returning a hash of parsed attributes (read by both `#to_h` and `#deconstruct_keys`); classes with no type-specific attributes (CIK, WKN, Valoren) inherit the empty `{}` default
 
 **Classes with checksums** (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI):
-- Include `Checkable` concern
+- Include `Checkable` **and** `Suggestable` concerns (the repair engine rides the checksum-as-oracle, so the two are wired together across all 9)
 - Implement `calculate_checksum` with standard-specific algorithm
 - LEI and IBAN override `checksum_width` → `2` (two-character checksum)
 - DTI's and UPI's check "digit" is a `String` (can be a letter), not an `Integer` — the only types where this differs; `Checkable`'s `checksum`/`calculate_checksum` contracts are typed `Integer | String` to admit it

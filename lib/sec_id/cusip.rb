@@ -16,6 +16,7 @@ module SecID
   #   cusip.to_isin('US')  #=> #<SecID::ISIN>
   class CUSIP < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Committee on Uniform Securities Identification Procedures'

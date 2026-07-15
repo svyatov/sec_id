@@ -6,7 +6,8 @@ module SecID
 
     def self.included: (Module base) -> void
 
-    attr_reader checksum: (Integer | String)?
+    # `attr_reader checksum` is declared on Base (the repair surface) to keep the
+    # Base-self-typed Suggestable body type-checking; not redeclared here.
 
     # Class methods added when Checkable is included.
     module ClassMethods : SecID::_IdentifierClass

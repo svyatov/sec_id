@@ -17,6 +17,7 @@ module SecID
   #   SecID::DTI.restore('X9J9K872')  #=> 'X9J9K872S'
   class DTI < Base
     include Checkable
+    include Suggestable
 
     # Human-readable name of the standard.
     FULL_NAME = 'Digital Token Identifier'
