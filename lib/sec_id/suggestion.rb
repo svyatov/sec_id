@@ -46,11 +46,15 @@ module SecID
     # The non-nil confidence tiers `confidence` can take; `:checksum` candidates carry `nil`.
     CONFIDENCE_LEVELS = %i[high medium].freeze
 
+    # Returns a JSON-compatible hash representation of the suggestion.
+    #
     # @return [Hash] the symbol-keyed field hash (JSON-compatible)
     def as_json(*)
       to_h
     end
 
+    # Returns the corrected identifier as a string.
+    #
     # @return [String] the corrected identifier string
     def to_s
       identifier.to_s

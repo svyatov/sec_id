@@ -28,6 +28,10 @@ module SecID
     # Alphanumeric characters (digits then uppercase letters).
     ALPHANUMERIC = (DIGITS + ALPHA).freeze
 
+    # Extends the including identifier class with the concern's class methods.
+    #
+    # @param base [Class] the identifier class including this concern
+    # @return [void]
     # @api private
     def self.included(base)
       base.extend(ClassMethods)

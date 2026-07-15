@@ -143,28 +143,38 @@ RSpec.describe SecID::Suggestable do
     checksum_types.each do |key|
       context "when repairing #{key}" do
         let(:klass) { SecID[key] }
-        let(:alphanumeric) { ('0'..'9').to_a + ('A'..'Z').to_a }
-        # A single-character, format-valid but checksum-failing mutation of a generated
-        # identifier — a body typo the engine can repair, found for every type.
-        let(:corrupted) do
-          valid = klass.generate(random: Random.new(42)).to_s
+        let(:valid) { klass.generate(random: Random.new(42)).to_s }
+        # A homoglyph-reachable, format-valid but checksum-failing body typo. Since HOMOGLYPHS is
+        # bidirectional, the engine must revert it back to `valid` — except IBAN, whose all-numeric
+        # BBAN and numeric check admit no in-format letter/digit homoglyph.
+        let(:homoglyph_typo) do
           candidates = valid.each_char.with_index.flat_map do |char, index|
-            (alphanumeric - [char]).map { |replacement| valid.dup.tap { |mutant| mutant[index] = replacement } }
+            SecID::Suggestable::HOMOGLYPHS.fetch(char, []).map { |rep| valid.dup.tap { |m| m[index] = rep } }
           end
-          # A format-valid but checksum-failing single-char typo — a body error to repair.
-          candidates.find do |c|
-            i = klass.new(c)
-            !i.valid? && i.send(:valid_format?)
-          end || raise("no mutation for #{klass}")
+          candidates.find { |c| klass.new(c).then { |id| !id.valid? && id.send(:valid_format?) } }
+        end
+        # For IBAN (no homoglyph body fix), fall back to any format-valid checksum-failing typo.
+        let(:corrupted) do
+          homoglyph_typo || begin
+            candidates = valid.each_char.with_index.flat_map do |char, index|
+              ((('0'..'9').to_a + ('A'..'Z').to_a) - [char]).map { |rep| valid.dup.tap { |m| m[index] = rep } }
+            end
+            candidates.find { |c| klass.new(c).then { |id| !id.valid? && id.send(:valid_format?) } } ||
+              raise("no mutation for #{klass}")
+          end
         end
         let(:suggestions) { klass.suggest(corrupted) }
 
-        it 'returns only valid, correctly-tiered candidates with the checksum fallback last' do
+        it 'returns only valid, correctly-tiered candidates with the checksum fallback last', :aggregate_failures do
           expect(suggestions).not_to be_empty
           expect(suggestions).to all(satisfy { |s| s.identifier.valid? })
           expect(suggestions.map(&:confidence)).to all(satisfy { |c| [:high, :medium, nil].include?(c) })
           body_edits = suggestions.reject { |s| s.edit == :checksum }
           expect(body_edits.map(&:confidence)).to all(satisfy { |c| %i[high medium].include?(c) })
+          # A homoglyph typo must actually be reverted: the original identifier is among the body edits
+          # (guards against silently broken homoglyph/transposition generation — the :checksum fallback
+          # alone would otherwise satisfy every assertion above).
+          expect(body_edits.map(&:to_s)).to include(valid) if homoglyph_typo
           expect(suggestions.last.edit).to eq(:checksum)
         end
       end

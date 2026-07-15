@@ -7,7 +7,8 @@ module SecID
   #
   # Included by the 9 checksum types. The candidate space is the human-error net —
   # {HOMOGLYPHS} plus adjacent transpositions — never a full coincidental net. `valid?`
-  # is the oracle, so no false candidate ever escapes; the {HOMOGLYPHS} table bounds recall.
+  # is the oracle, so no checksum-invalid candidate ever escapes (a valid candidate is not
+  # necessarily the intended correction); the {HOMOGLYPHS} table bounds recall.
   #
   # @see SecID::Suggestion
   #
@@ -30,6 +31,10 @@ module SecID
     # then the checksum-recompute fallback last (R6/R7).
     RANK = { substitution: 0, transposition: 1, checksum: 2 }.freeze
 
+    # Extends the including identifier class with the concern's class methods.
+    #
+    # @param base [Class] the identifier class including this concern
+    # @return [void]
     # @api private
     def self.included(base)
       base.extend(ClassMethods)

@@ -8,6 +8,10 @@ module SecID
     # Characters stripped during normalization (whitespace and hyphens); classes may override.
     SEPARATORS = /[\s-]/
 
+    # Extends the including identifier class with the concern's class methods.
+    #
+    # @param base [Class] the identifier class including this concern
+    # @return [void]
     # @api private
     def self.included(base)
       base.extend(ClassMethods)

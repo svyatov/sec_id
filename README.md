@@ -352,12 +352,13 @@ SecID.suggest('US5949181O45', types: [:isin])   # => restrict to specific types
 Each candidate carries the corrected `identifier` (a parsed, valid instance), the `edit` kind, its `position`, the `from`/`to` characters, and a `confidence` tier. Candidates are ranked by confidence: `:high` homoglyph substitutions first, then `:medium` adjacent transpositions, then the `:checksum` recompute (body assumed correct, wrong check character) last as a fallback hypothesis. **There is no `:low` tier** — coincidental substitutions that merely satisfy the checksum are never generated, keeping the result small and high-precision.
 
 > **`suggest` returns candidates, never authoritative corrections, and never mutates its input.**
-> Every returned candidate fully re-validates (`valid?` is the oracle), so no false candidate escapes —
-> but the `confidence` tier is how *you* decide what to trust. This matters for financial identifiers.
+> Every returned candidate fully re-validates (`valid?` is the oracle), so no checksum-invalid candidate escapes —
+> but a valid candidate is not necessarily *the* correction, so the `confidence` tier is how *you* decide what to
+> trust. This matters for financial identifiers.
 
 Notes and limitations:
 
-- **Never empty for structurally-valid input** — a parseable but checksum-failing identifier always yields at least the `:checksum` fallback. Only wrong-length or illegal-charset input (which fails the format gate) returns `[]`.
+- **Never empty for structurally-valid input** — a parseable but checksum-failing identifier always yields at least the `:checksum` fallback. Only wrong-length or illegal-charset input (which fails the format gate), or an already-valid identifier (nothing to repair), returns `[]`.
 - **Vowel-free reachability** — SEDOL, FIGI, DTI, and UPI exclude vowels from their charset, so an `O`-for-`0` or `I`-for-`1` typo is unparseable and therefore unrepairable (it fails the format gate before enumeration). The mistyped character must be *in* the type's charset to be reachable.
 - **Single body error only** — two or more wrong body characters, or a dropped/doubled character (insertion/deletion), are out of scope; such input returns only the `:checksum` fallback, never additional body candidates.
 - **Non-checksum types are unsupported** — CIK, OCC, WKN, Valoren, CFI, FISN, and BIC have no checksum oracle, so they have no `suggest`; `SecID.suggest` silently skips them.

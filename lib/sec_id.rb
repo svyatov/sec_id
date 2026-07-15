@@ -158,7 +158,9 @@ module SecID
       input = str.to_s.strip.upcase
       suggestable_types(input, types)
         .flat_map { |klass| klass.suggest(input) }
-        .sort_by { |suggestion| [Suggestable::RANK.fetch(suggestion.edit), self[suggestion.type].detection_priority.last] }
+        .sort_by do |suggestion|
+          [Suggestable::RANK.fetch(suggestion.edit), self[suggestion.type].detection_priority.last]
+        end
     end
 
     private

@@ -56,6 +56,10 @@ module SecID
       '*' => 36, '@' => 37, '#' => 38
     }.freeze
 
+    # Extends the including identifier class with the concern's class methods and checksum reader.
+    #
+    # @param base [Class] the identifier class including this concern
+    # @return [void]
     # @api private
     def self.included(base)
       base.attr_reader :checksum
