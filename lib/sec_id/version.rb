@@ -2,5 +2,5 @@
 
 module SecID
   # Current gem version.
-  VERSION = '7.1.0'
+  VERSION = '7.1.1'
 end
