@@ -27,11 +27,16 @@ gem 'rubocop', '~> 1.88.0'
 gem 'rubocop-rspec', '~> 3.10.0'
 
 # Type signatures (sig/) — dev/test only; the gem keeps zero runtime dependencies.
-gem 'rbs', '~> 4.0', require: false
+#
+# rbs is held at 4.0.x: 4.1 retyped `Array#to_h`'s block return from the tuple `[K, V]` to the
+# `Hash::_Pair[K, V]` interface, and Steep 2.0 cannot infer an array literal as a tuple against an
+# interface hint, so `CFI::AttributeSet#to_h` stops type-checking. Tracked upstream in
+# https://github.com/soutaro/steep/issues/2253 — drop the patch pin once a Steep release fixes it.
+gem 'rbs', '~> 4.0.3', require: false
 gem 'steep', '~> 2.0', require: false
 
 # API documentation (rake yard) and the 100%-coverage gate (rake yard:stats) — dev/test only.
 gem 'yard', '~> 0.9', require: false
 
-gem 'simplecov', '~> 0.22', require: false
+gem 'simplecov', '~> 1.0', require: false
 gem 'simplecov-cobertura', require: false
