@@ -1,6 +1,7 @@
 /.bundle/
-/Gemfile.lock
-/gemfiles/*.lock
+# rails_head.gemfile tracks a git branch, so its resolution is expected to drift; the
+# other lockfiles are committed (see `rake lock:refresh`).
+/gemfiles/rails_head.gemfile.lock
 /.yardoc
 /_yardoc/
 /coverage/

@@ -13,14 +13,19 @@ on:
 permissions:
   contents: read
 
+env:
+  # Fail on a stale or missing lockfile rather than silently re-resolving it.
+  BUNDLE_FROZEN: 'true'
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     name: RuboCop
+    timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
       with:
         ruby-version: '4.0'
         bundler-cache: true
@@ -33,10 +38,11 @@ jobs:
   types:
     runs-on: ubuntu-latest
     name: Types (Steep + RBS)
+    timeout-minutes: 20
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
       with:
         ruby-version: '4.0'
         bundler-cache: true
@@ -56,6 +62,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby_version }}
+    timeout-minutes: 15
     strategy:
       matrix:
         ruby_version: [ruby-head, '4.0', '3.4', '3.3', '3.2']
@@ -64,9 +71,9 @@ jobs:
       COVERAGE: true
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
       with:
         ruby-version: ${{ matrix.ruby_version }}
         bundler-cache: true
@@ -76,7 +83,7 @@ jobs:
       continue-on-error: ${{ matrix.ruby_version == 'ruby-head' }}
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v7
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: svyatov/sec_id
@@ -88,6 +95,7 @@ jobs:
   rails:
     runs-on: ubuntu-latest
     name: Rails ${{ matrix.rails_version }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -95,11 +103,14 @@ jobs:
 
     env:
       BUNDLE_GEMFILE: gemfiles/rails_${{ matrix.rails_version }}.gemfile
+      # rails_head.gemfile tracks a git branch and ships no lockfile, so it must resolve on
+      # every run; freezing it would pin the "head" job to a stale revision.
+      BUNDLE_FROZEN: ${{ matrix.rails_version != 'head' }}
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
       with:
         ruby-version: '4.0'
         bundler-cache: true
