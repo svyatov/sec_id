@@ -1,8 +1,8 @@
-# Eurex Reference Data API Integration
+# Eurex reference data API integration
 
 Look up Eurex-listed derivative products by ISIN using the [Eurex Reference Data GraphQL API](https://www.eurex.com/ex-en/data/free-reference-data-api).
 
-## Service Overview
+## Service overview
 
 Eurex provides free reference data for its listed derivatives via a GraphQL API. The API covers products, contracts, trading hours, and expirations. Use it to look up derivative product metadata by ISIN, product code, or name.
 
@@ -123,7 +123,7 @@ result[:products].each do |prod|
 end
 ```
 
-## Available Queries
+## Available queries
 
 The GraphQL API supports several root queries beyond `ProductInfos`:
 
@@ -153,7 +153,7 @@ query {
 }
 ```
 
-## Rate Limiting
+## Rate limiting
 
 The shared API key has undisclosed rate limits. For production use, register a dedicated key. The API does not return rate-limit headers.
 
@@ -170,7 +170,7 @@ sleep 1.0
 - **Contract data** (settlement prices): cache for 1 hour (updates daily)
 - **Trading hours/holidays:** cache for 24 hours
 
-## Error Handling
+## Error handling
 
 | Scenario | Response |
 |---|---|
@@ -189,6 +189,6 @@ GraphQL errors are returned in the response body even with HTTP 200:
 }
 ```
 
-## Runnable Example
+## Runnable example
 
 See [`examples/eurex_lookup.rb`](../../examples/eurex_lookup.rb) for a self-contained script.

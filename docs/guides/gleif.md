@@ -1,8 +1,8 @@
-# GLEIF API Integration
+# GLEIF API integration
 
 Look up legal entities by LEI using the [GLEIF API](https://www.gleif.org/en/lei-data/gleif-api).
 
-## Service Overview
+## Service overview
 
 The Global Legal Entity Identifier Foundation (GLEIF) provides free access to LEI data. The API returns entity registration details, legal names, addresses, and relationship data for any valid LEI.
 
@@ -114,7 +114,7 @@ puts "#{result[:name]} (#{result[:jurisdiction]})"
 puts "Status: #{result[:status]}"
 ```
 
-## Rate Limiting
+## Rate limiting
 
 GLEIF allows approximately **60 requests per minute**. The API returns HTTP 429 when exceeded.
 
@@ -133,7 +133,7 @@ sleep 1.0
 
 LEI registrations are renewed annually, so data is relatively stable.
 
-## Error Handling
+## Error handling
 
 | Scenario | Response |
 |---|---|
@@ -156,6 +156,6 @@ The GLEIF API uses [JSON:API](https://jsonapi.org/) format. Errors are returned 
 }
 ```
 
-## Runnable Example
+## Runnable example
 
 See [`examples/gleif_lookup.rb`](../../examples/gleif_lookup.rb) for a self-contained script.

@@ -2,18 +2,18 @@
 
 Thank you for your interest in contributing! This guide will help you get started.
 
-## Code of Conduct
+## Code of conduct
 
 This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
-## Development Setup
+## Development setup
 
 1. Fork and clone the repository
 2. Run `bin/setup` to install dependencies
 3. Run `bundle exec rake` to verify tests and linting pass
 4. Use `bin/console` for an interactive prompt to experiment
 
-## Running Tests and Linting
+## Running tests and linting
 
 ```bash
 bundle exec rake          # Run RuboCop, RBS validation, and RSpec (recommended)
@@ -22,15 +22,15 @@ bundle exec rubocop       # Run linter only
 bundle exec rubocop -a    # Auto-fix safe lint issues
 ```
 
-## Code Style
+## Code style
 
 - **Ruby 3.2+** required
 - **Max line length:** 120 characters
-- **RuboCop** with `rubocop-rspec` extension — run `bundle exec rubocop` before committing
+- **RuboCop** with `rubocop-rspec` extension, run `bundle exec rubocop` before committing
 - **RSpec** with `expect` syntax only (no monkey patching)
 - Follow the **Stepdown Rule**: callers before callees, high-level methods first
 
-## Commit Convention
+## Commit convention
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
@@ -57,48 +57,46 @@ fix: correct CUSIP checksum for alphanumeric input
 docs: update README with LEI usage examples
 ```
 
-## Pull Request Process
+## Pull request process
 
 1. **Fork** the repository and create a feature branch from `main`
 2. **Write tests** for any new functionality
 3. **Run `bundle exec rake`** to ensure all tests pass and RuboCop is clean
 4. **Update documentation** as needed:
-   - `CHANGELOG.md` — add an entry under `[Unreleased]`
-   - `README.md` — update usage examples if the public API changed
+   - `CHANGELOG.md`: add an entry under `[Unreleased]`
+   - `README.md`: update usage examples if the public API changed
 5. **Commit** using Conventional Commits format
 6. **Push** your branch and open a Pull Request
 
-## What Makes a Good Contribution
+## What makes a good contribution
 
-### Bug Reports
+### Bug reports
 
 - Include the SecID version, Ruby version, and OS
 - Provide a minimal code snippet that reproduces the issue
 - Describe expected vs actual behavior
 
-### Feature Requests
+### Feature requests
 
 - Explain the problem you're trying to solve
 - Describe your proposed solution
 - Consider alternatives you've evaluated
 
-### Code Contributions
+### Code contributions
 
-- Keep changes focused — one feature or fix per PR
+- Keep changes focused: one feature or fix per PR
 - Add tests for new functionality
 - Follow existing code patterns and conventions
-- Update YARD documentation for the public API — 100% coverage is enforced in CI (`bundle exec rake yard:stats`)
+- Update YARD documentation for the public API. 100% coverage is enforced in CI (`bundle exec rake yard:stats`)
 
 ## Governance
 
-SecID has one maintainer, [Leonid Svyatov](https://github.com/svyatov), who reviews and merges every
-change and publishes every release. Decisions are theirs. There is no steering group, no vote, and no
-second person who can merge.
+SecID has one maintainer, [Leonid Svyatov](https://github.com/svyatov). They review and merge every
+change, and they publish every release. There is no steering group, no vote, and no second person who
+can merge.
 
 No succession is arranged. If the maintainer stops, the project stops with them. The MIT license lets
-anyone fork and continue from the last published state, and that is the intended fallback rather than
-an oversight. This is stated plainly so you can weigh it before depending on the gem or investing in a
-contribution.
+anyone fork and continue from the last published state, and that is the intended fallback.
 
 ## Questions?
 
