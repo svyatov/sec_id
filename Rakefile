@@ -94,6 +94,31 @@ task :fetch_otp do
   ENV['GEM_HOST_OTP_CODE'] = `op item get "RubyGems" --account my --otp`.strip
 end
 
+# The platform the CI runners use, which a lock resolved on a developer machine misses.
+CI_PLATFORM = 'x86_64-linux'
+
+# Dependabot refreshes Gemfile.lock only. It detects lockfiles by name, and
+# `gemfiles/rails_8.0.gemfile.lock` is not a name it parses, so the Rails matrix locks
+# have to be refreshed by hand: run this whenever a Dependabot PR touches the root lock.
+desc 'Refresh every committed lockfile (root Gemfile plus the Rails matrix gemfiles)'
+task 'lock:refresh' do
+  # with_unbundled_env, because `bundle exec rake` exports BUNDLE_GEMFILE and the nested
+  # `bundle` restores it from BUNDLER_ORIG_BUNDLE_GEMFILE, discarding the override below
+  # and writing every gemfile's resolution into the root Gemfile.lock.
+  Bundler.with_unbundled_env do
+    # --add-platform, because a lock resolved on macOS lists only arm64-darwin, and a
+    # frozen install on the Linux runners refuses to add the missing platform itself.
+    sh "bundle lock --add-platform #{CI_PLATFORM}"
+    Dir['gemfiles/*.gemfile'].each do |gemfile|
+      # rails_head.gemfile tracks a git branch, so its resolution is expected to drift; it
+      # ships no lockfile and CI resolves it fresh on every run.
+      next if gemfile.end_with?('rails_head.gemfile')
+
+      sh "BUNDLE_GEMFILE=#{gemfile} bundle lock --add-platform #{CI_PLATFORM}"
+    end
+  end
+end
+
 desc 'Run validation/detection throughput and allocation benchmarks'
 task :bench do
   ruby '-Ilib benchmark/run.rb'
