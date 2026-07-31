@@ -8,6 +8,18 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [7.1.1] - 2026-07-31
+
+Documentation and packaging only. No identifier, checksum, or public method changed.
+
+This is the first release published from CI through RubyGems trusted publishing, signed with sigstore and pushed with a build provenance attestation.
+
+### Changed
+
+- README declares the public API that Semantic Versioning covers, names the `@api private` internals excluded from it, and links where to ask a question and where to report a defect
+- CHANGELOG version headings resolve to comparison links, and 2.0.1 has the entry it never had
+- Gem summary punctuation matches the README tagline
+
 ## [7.1.0] - 2026-07-15
 
 ### Added
@@ -273,7 +285,8 @@ Gem metadata only: corrected the gemspec description and README wording. No libr
 
 - ISIN numbers support: `SecID::ISIN`
 
-[Unreleased]: https://github.com/svyatov/sec_id/compare/v7.1.0...HEAD
+[Unreleased]: https://github.com/svyatov/sec_id/compare/v7.1.1...HEAD
+[7.1.1]: https://github.com/svyatov/sec_id/compare/v7.1.0...v7.1.1
 [7.1.0]: https://github.com/svyatov/sec_id/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/svyatov/sec_id/compare/v6.1.0...v7.0.0
 [6.1.0]: https://github.com/svyatov/sec_id/compare/v6.0.0...v6.1.0
