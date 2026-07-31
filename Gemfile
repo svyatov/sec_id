@@ -37,7 +37,7 @@ gem 'parallel', '< 2', require: false
 # `Hash::_Pair[K, V]` interface, and Steep 2.0 cannot infer an array literal as a tuple against an
 # interface hint, so `CFI::AttributeSet#to_h` stops type-checking. Tracked upstream in
 # https://github.com/soutaro/steep/issues/2253 — drop the patch pin once a Steep release fixes it.
-gem 'rbs', '~> 4.0.3', require: false
+gem 'rbs', '~> 4.1.0', require: false
 gem 'steep', '~> 2.0', require: false
 
 # API documentation (rake yard) and the 100%-coverage gate (rake yard:stats) — dev/test only.
