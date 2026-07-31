@@ -11,7 +11,7 @@ if ENV['COVERAGE']
   end
 
   SimpleCov.start do
-    add_filter { |src| !src.filename.start_with?("#{SimpleCov.root}/lib") }
+    skip { |src| !src.filename.start_with?("#{SimpleCov.root}/lib") }
   end
 end
 

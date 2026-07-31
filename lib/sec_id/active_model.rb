@@ -5,11 +5,11 @@ require 'sec_id'
 begin
   require 'active_model'
 rescue LoadError => e
-  # :nocov: ActiveModel is always loadable in the test suite
+  # simplecov:disable ActiveModel is always loadable in the test suite
   raise LoadError, 'sec_id/active_model requires ActiveModel, which could not be loaded. Add ' \
                    '`gem "activemodel"` to your Gemfile (or use this inside a Rails app) before ' \
                    "requiring 'sec_id/active_model'. (#{e.message})"
-  # :nocov:
+  # simplecov:enable
 end
 
 # ActiveModel validator for securities identifiers, registered under the `sec_id` key.
@@ -115,9 +115,10 @@ class SecIdValidator < ActiveModel::EachValidator
   # @return [String, nil] the message of the SecID::Error raised when normalizing `value` as `type`
   def capture_reason(type, value)
     SecID[type].normalize(value)
-    # :nocov: unreachable — only called after normalize already raised in valid_value?, kept as a safe fallback
+    # simplecov:disable unreachable — only called after normalize already raised in valid_value?,
+    # kept as a safe fallback
     nil
-    # :nocov:
+    # simplecov:enable
   rescue SecID::Error => e
     e.message
   end
