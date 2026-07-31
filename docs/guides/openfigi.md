@@ -1,8 +1,8 @@
-# OpenFIGI API Integration
+# OpenFIGI API integration
 
 Look up financial instruments by FIGI using the [OpenFIGI API](https://www.openfigi.com/api).
 
-## Service Overview
+## Service overview
 
 OpenFIGI provides free mapping between Financial Instrument Global Identifiers (FIGIs) and other market identifiers. The API maps FIGIs to instrument metadata including ticker, exchange, security type, and market sector.
 
@@ -121,7 +121,7 @@ body = [{ idType: 'ID_CUSIP', idValue: '594918104' }]
 body = [{ idType: 'TICKER', idValue: 'MSFT', exchCode: 'US' }]
 ```
 
-## Rate Limiting
+## Rate limiting
 
 | | Without API Key | With API Key |
 |---|---|---|
@@ -162,7 +162,7 @@ def cached_lookup(figi_str)
 end
 ```
 
-## Error Handling
+## Error handling
 
 | Scenario | Response |
 |---|---|
@@ -176,6 +176,6 @@ end
 
 Note that a 200 response can still contain per-job errors. Always check each result element for `"error"` or `"warning"` keys.
 
-## Runnable Example
+## Runnable example
 
 See [`examples/openfigi_lookup.rb`](../../examples/openfigi_lookup.rb) for a self-contained script.

@@ -1,8 +1,8 @@
-# SEC EDGAR API Integration
+# SEC EDGAR API integration
 
 Look up SEC filing entities by CIK using the [SEC EDGAR API](https://www.sec.gov/edgar/sec-api-documentation).
 
-## Service Overview
+## Service overview
 
 SEC EDGAR (Electronic Data Gathering, Analysis, and Retrieval) provides free access to company filings, ownership data, and entity information. The submissions endpoint returns entity metadata and recent filings for a given CIK.
 
@@ -106,7 +106,7 @@ Validate and normalize with SecID before calling the API. `SecID::CIK#normalized
 ```ruby
 adapter = SecEdgarAdapter.new(user_agent: 'MyApp admin@example.com')
 
-# validate! accepts any CIK format — with or without leading zeros
+# validate! accepts any CIK format, with or without leading zeros
 cik = SecID::CIK.validate!('1521365')
 cik.normalized  # => "0001521365"
 
@@ -116,7 +116,7 @@ puts result[:tickers]        # Trading tickers
 puts result[:recent_filings] # Last 5 filings
 ```
 
-## Rate Limiting
+## Rate limiting
 
 SEC EDGAR allows **10 requests per second**. Exceeding this results in temporary IP blocks.
 
@@ -135,7 +135,7 @@ For bulk lookups, consider downloading the [full company index](https://www.sec.
 - **Recent filings:** cache for 1 hour (new filings appear daily for active filers)
 - **Historical filings:** cache indefinitely (they don't change)
 
-## Error Handling
+## Error handling
 
 | Scenario | Response |
 |---|---|
@@ -146,6 +146,6 @@ For bulk lookups, consider downloading the [full company index](https://www.sec.
 
 SEC EDGAR may silently block your IP if you exceed rate limits without returning a 429. If requests start timing out, back off significantly.
 
-## Runnable Example
+## Runnable example
 
 See [`examples/sec_edgar_lookup.rb`](../../examples/sec_edgar_lookup.rb) for a self-contained script.

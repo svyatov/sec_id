@@ -1,19 +1,27 @@
-# SecID [![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://rubygems.org/gems/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg)](https://github.com/svyatov/sec_id/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/svyatov/sec_id/graph/badge.svg?token=VV49EMQIIC)](https://codecov.io/gh/svyatov/sec_id) [![Documentation](https://img.shields.io/badge/docs-rubydoc.info-blue.svg)](https://rubydoc.info/gems/sec_id) [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.2-CC342D.svg)](https://www.ruby-lang.org) [![Types: RBS](https://img.shields.io/badge/types-RBS-8A2BE2.svg)](https://github.com/svyatov/sec_id/tree/main/sig)
+# SecID
 
-> A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, generate, classify, and repair.
+A Ruby toolkit for securities identifiers: validate, parse, normalize, detect, convert, generate, classify, and repair.
 
-## Table of Contents
+[![Gem Version](https://badge.fury.io/rb/sec_id.svg)](https://rubygems.org/gems/sec_id) [![CI](https://github.com/svyatov/sec_id/actions/workflows/main.yml/badge.svg)](https://github.com/svyatov/sec_id/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/svyatov/sec_id/graph/badge.svg?token=VV49EMQIIC)](https://codecov.io/gh/svyatov/sec_id) [![Documentation](https://img.shields.io/badge/docs-rubydoc.info-blue.svg)](https://rubydoc.info/gems/sec_id) [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.2-CC342D.svg)](https://www.ruby-lang.org) [![Types: RBS](https://img.shields.io/badge/types-RBS-8A2BE2.svg)](https://github.com/svyatov/sec_id/tree/main/sig)
 
-- [Supported Ruby Versions](#supported-ruby-versions)
+- **Nothing to call, nothing to sign up for.** SecID validates all 16 identifier standards offline. No registry lookup, no API key, no network call anywhere in [`lib/`](lib/).
+- **9 of the 16 carry a checksum.** SecID validates it, restores a missing one, and repairs a wrong one.
+- **Zero runtime dependencies.** Runs on Ruby 3.2 or newer.
+- **Rails, if you want it.** An opt-in ActiveModel validator adds `validates :isin, sec_id: true`. It stays off the default require path, so the dependency count stays at zero.
+- **Typed.** Ships RBS signatures for the whole public API, checked by Steep in strict mode.
+
+## Table of contents
+
+- [Supported Ruby versions](#supported-ruby-versions)
 - [Installation](#installation)
-- [Supported Standards and Usage](#supported-standards-and-usage)
-  - [Metadata Registry](#metadata-registry) - enumerate, filter, look up, and detect identifier types
-  - [Text Scanning](#text-scanning) - find identifiers in freeform text
-  - [Debugging Detection](#debugging-detection) - understand why strings match or don't
-  - [Structured Validation](#structured-validation) - detailed error codes and messages
-  - [Pattern Matching](#pattern-matching) - destructure identifiers with `case/in`
-  - [Generating Test Fixtures](#generating-test-fixtures) - produce valid identifiers for tests
-  - [Repairing Typos](#repairing-typos) - suggest corrections for checksum-failing identifiers
+- [Supported standards and usage](#supported-standards-and-usage)
+  - [Metadata registry](#metadata-registry) - enumerate, filter, look up, and detect identifier types
+  - [Text scanning](#text-scanning) - find identifiers in freeform text
+  - [Debugging detection](#debugging-detection) - understand why strings match or don't
+  - [Structured validation](#structured-validation) - detailed error codes and messages
+  - [Pattern matching](#pattern-matching) - destructure identifiers with `case/in`
+  - [Generating test fixtures](#generating-test-fixtures) - produce valid identifiers for tests
+  - [Repairing typos](#repairing-typos) - suggest corrections for checksum-failing identifiers
   - [ISIN](#isin) - International Securities Identification Number
   - [CUSIP](#cusip) - Committee on Uniform Securities Identification Procedures
   - [CEI](#cei) - CUSIP Entity Identifier
@@ -30,16 +38,17 @@
   - [BIC](#bic) - Business Identifier Code / SWIFT code
   - [DTI](#dti) - Digital Token Identifier
   - [UPI](#upi) - Unique Product Identifier
-- [ActiveModel / Rails Validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
-- [Lookup Service Integration](#lookup-service-integration)
-- [Type Signatures (RBS)](#type-signatures-rbs)
+- [ActiveModel / Rails validator](#activemodel--rails-validator) - declarative `validates :isin, sec_id: {...}`
+- [Lookup service integration](#lookup-service-integration)
+- [Type signatures (RBS)](#type-signatures-rbs)
 - [Development](#development)
+- [Support and status](#support-and-status)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
 - [Versioning](#versioning)
 - [License](#license)
 
-## Supported Ruby Versions
+## Supported Ruby versions
 
 Ruby 3.2+ is required.
 
@@ -65,7 +74,7 @@ gem install sec_id
 
 **Upgrading from v4?** See [MIGRATION.md](MIGRATION.md) for a step-by-step guide.
 
-## Supported Standards and Usage
+## Supported standards and usage
 
 All identifier classes provide `valid?`, `errors`, `validate`, `validate!` methods at both class and instance levels.
 
@@ -90,7 +99,7 @@ SecID::ISIN.new('INVALID').to_h
 #      valid: false, components: { country_code: nil, nsin: nil, checksum: nil } }
 ```
 
-**All identifiers** support value equality — two instances of the same type with the same normalized form are equal:
+**All identifiers** support value equality. Two instances of the same type with the same normalized form are equal:
 
 ```ruby
 a = SecID::ISIN.new('US5949181045')
@@ -109,7 +118,7 @@ Set.new([a, b]).size         # => 1
 - `restore!` / `.restore!` - restores checksum in place and returns `self` / instance
 - `checksum` / `calculate_checksum` - calculates and returns the checksum
 
-### Metadata Registry
+### Metadata registry
 
 All identifier classes are registered automatically and can be enumerated, filtered, and looked up by symbol key:
 
@@ -165,7 +174,7 @@ SecID.parse('514000', on_ambiguous: :all)          # => [#<SecID::WKN>, #<SecID:
 SecID.parse('US5949181045', on_ambiguous: :raise)  # => #<SecID::ISIN> (unambiguous, no error)
 ```
 
-### Text Scanning
+### Text scanning
 
 Find identifiers embedded in freeform text:
 
@@ -191,12 +200,12 @@ match.identifier.normalized  # => "US5949181045"
 
 > **Known limitations:** Format-only types (CIK, Valoren, WKN, BIC) can false-positive on
 > common numbers and short words in prose (a BIC8 is 8 letters with a valid country code in the
-> middle) — use the `types:` filter to restrict scanning when
+> middle). Use the `types:` filter to restrict scanning when
 > this is a concern. Identifiers prefixed with special characters (e.g. `#US5949181045`) may be
 > consumed as a single token by CUSIP's `*@#` character class and fail validation, preventing
 > the embedded identifier from being found.
 
-### Debugging Detection
+### Debugging detection
 
 Understand why a string matches or doesn't match specific identifier types:
 
@@ -210,7 +219,7 @@ isin[:errors].first[:error]       # => :invalid_checksum
 SecID.explain('US5949181045', types: %i[isin cusip])
 ```
 
-### Structured Validation
+### Structured validation
 
 All identifier classes provide a Rails-like `#errors` API for detailed error reporting:
 
@@ -266,7 +275,7 @@ SecID::FIGI.new('BSG000BLNNH6').validate!
 isin = SecID::ISIN.validate!('US5949181045')  # => #<SecID::ISIN>
 ```
 
-### Pattern Matching
+### Pattern matching
 
 Every identifier destructures in `case/in` via its parsed components. Since `SecID.parse` returns `nil` for
 anything invalid, an `in nil` branch is a complete validity guard:
@@ -306,11 +315,11 @@ CIK, WKN, and Valoren have no sub-fields: they match a bare `in SecID::CIK` but 
 
 Watch the `:type` key: on a `SecID::Match` it is the registry symbol (`:occ`), while on an `OCC` instance it is the
 OSI option type (`'C'` or `'P'`), so `in SecID::OCC[type: :occ]` never matches. Other types have no `:type` component
-at all — `#to_h`'s envelope keys (`:type`, `:full_id`, `:normalized`, `:valid`) are not part of the pattern surface.
+at all. `#to_h`'s envelope keys (`:type`, `:full_id`, `:normalized`, `:valid`) are not part of the pattern surface.
 
-### Generating Test Fixtures
+### Generating test fixtures
 
-Generate syntactically valid identifiers — with correct checksum where applicable — for use as test fixtures. Available per class and via the central dispatcher:
+Generate syntactically valid identifiers, with correct checksum where applicable, for use as test fixtures. Available per class and via the central dispatcher:
 
 ```ruby
 SecID::ISIN.generate          # => #<SecID::ISIN ...>
@@ -324,17 +333,17 @@ SecID.generate(:nope)         # => raises ArgumentError: Unknown identifier type
 SecID::LEI.generate(random: Random.new(42)) == SecID::LEI.generate(random: Random.new(42))  # => true
 ```
 
-> **Generated identifiers are valid in format only — they are not real, registered securities.**
+> **Generated identifiers are valid in format only. They are not real, registered securities.**
 > Country codes, FIGI prefixes, OCC expiry dates, and CFI category/group/attribute choices are
 > randomly selected (from the values each standard permits) and do not map to real-world
 > instruments. Use them as test fixtures, not as references to actual securities.
 
-### Repairing Typos
+### Repairing typos
 
-Turn the checksum from a gatekeeper into a repair engine. For a checksum-**failing** identifier, `suggest` enumerates the plausible single-character human errors — visual/OCR homoglyph substitutions (`O`↔`0`, `I`↔`1`, `5`↔`S`, `8`↔`B`, …) and adjacent transpositions — keeps only the edits that re-validate, and returns them as confidence-ranked `SecID::Suggestion` candidates that report *what changed*. Available for all 9 checksum types (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI) per class and via the central dispatcher:
+Turn the checksum from a gatekeeper into a repair engine. For a checksum-**failing** identifier, `suggest` enumerates the plausible single-character human errors (visual/OCR homoglyph substitutions such as `O`↔`0`, `I`↔`1`, `5`↔`S`, `8`↔`B`, plus adjacent transpositions), keeps only the edits that re-validate, and returns them as confidence-ranked `SecID::Suggestion` candidates that report *what changed*. Available for all 9 checksum types (ISIN, CUSIP, SEDOL, FIGI, LEI, IBAN, CEI, DTI, UPI) per class and via the central dispatcher:
 
 ```ruby
-# A letter O typed where a 0 belongs — 'US5949181O45' should be 'US5949181045'
+# A letter O typed where a 0 belongs: 'US5949181O45' should be 'US5949181045'
 top = SecID::ISIN.suggest('US5949181O45').first
 top.to_s          # => 'US5949181045'  (the corrected identifier)
 top.edit          # => :substitution
@@ -342,28 +351,28 @@ top.position      # => 9
 top.from          # => 'O'
 top.to            # => '0'
 top.confidence    # => :high
-top.identifier    # => #<SecID::ISIN ...>  (parsed and valid — call .country_code, .to_h, etc.)
+top.identifier    # => #<SecID::ISIN ...>  (parsed and valid; call .country_code, .to_h, etc.)
 
 # Module-level: infers every format-compatible checksum type (like parse / detect)
 SecID.suggest('US5949181O45')                   # => [#<SecID::Suggestion type=:isin ...>, ...]
 SecID.suggest('US5949181O45', types: [:isin])   # => restrict to specific types
 ```
 
-Each candidate carries the corrected `identifier` (a parsed, valid instance), the `edit` kind, its `position`, the `from`/`to` characters, and a `confidence` tier. Candidates are ranked by confidence: `:high` homoglyph substitutions first, then `:medium` adjacent transpositions, then the `:checksum` recompute (body assumed correct, wrong check character) last as a fallback hypothesis. **There is no `:low` tier** — coincidental substitutions that merely satisfy the checksum are never generated, keeping the result small and high-precision.
+Each candidate carries the corrected `identifier` (a parsed, valid instance), the `edit` kind, its `position`, the `from`/`to` characters, and a `confidence` tier. Candidates are ranked by confidence: `:high` homoglyph substitutions first, then `:medium` adjacent transpositions, then the `:checksum` recompute (body assumed correct, wrong check character) last as a fallback hypothesis. **There is no `:low` tier.** Coincidental substitutions that merely satisfy the checksum are never generated, keeping the result small and high-precision.
 
 > **`suggest` returns candidates, never authoritative corrections, and never mutates its input.**
-> Every returned candidate fully re-validates (`valid?` is the oracle), so no checksum-invalid candidate escapes —
+> Every returned candidate fully re-validates (`valid?` is the oracle), so no checksum-invalid candidate escapes,
 > but a valid candidate is not necessarily *the* correction, so the `confidence` tier is how *you* decide what to
 > trust. This matters for financial identifiers.
 
 Notes and limitations:
 
-- **Never empty for structurally-valid input** — a parseable but checksum-failing identifier always yields at least the `:checksum` fallback. Only wrong-length or illegal-charset input (which fails the format gate), or an already-valid identifier (nothing to repair), returns `[]`.
-- **Vowel-free reachability** — SEDOL, FIGI, DTI, and UPI exclude vowels from their charset, so an `O`-for-`0` or `I`-for-`1` typo is unparseable and therefore unrepairable (it fails the format gate before enumeration). The mistyped character must be *in* the type's charset to be reachable.
-- **Single body error only** — two or more wrong body characters, or a dropped/doubled character (insertion/deletion), are out of scope; such input returns only the `:checksum` fallback, never additional body candidates.
-- **Non-checksum types are unsupported** — CIK, OCC, WKN, Valoren, CFI, FISN, and BIC have no checksum oracle, so they have no `suggest`; `SecID.suggest` silently skips them.
+- **Never empty for structurally-valid input.** A parseable but checksum-failing identifier always yields at least the `:checksum` fallback. Only wrong-length or illegal-charset input (which fails the format gate), or an already-valid identifier (nothing to repair), returns `[]`.
+- **Vowel-free reachability.** SEDOL, FIGI, DTI, and UPI exclude vowels from their charset, so an `O`-for-`0` or `I`-for-`1` typo is unparseable and therefore unrepairable (it fails the format gate before enumeration). The mistyped character must be *in* the type's charset to be reachable.
+- **Single body error only.** Two or more wrong body characters, or a dropped/doubled character (insertion/deletion), are out of scope; such input returns only the `:checksum` fallback, never additional body candidates.
+- **Non-checksum types are unsupported.** CIK, OCC, WKN, Valoren, CFI, FISN, and BIC have no checksum oracle, so they have no `suggest`; `SecID.suggest` silently skips them.
 
-**Precision** (simulated over 1,000 seeded samples per checksum type — see [`benchmark/suggest_precision.rb`](benchmark/suggest_precision.rb)): every reachable, single-error homoglyph or transposition that yields a checksum-failing identifier is recovered — the correct identifier is **always** among the returned candidates (100%), and is the top-ranked body candidate ~89% of the time for homoglyph errors. In-charset homoglyph reachability averages ~96% (100% for the letter-permitting types, lower for the four vowel-free ones).
+**Precision** (simulated over 1,000 seeded samples per checksum type; see [`benchmark/suggest_precision.rb`](benchmark/suggest_precision.rb)): every reachable, single-error homoglyph or transposition that yields a checksum-failing identifier is recovered: the correct identifier is **always** among the returned candidates (100%), and is the top-ranked body candidate ~89% of the time for homoglyph errors. In-charset homoglyph reachability averages ~96% (100% for the letter-permitting types, lower for the four vowel-free ones).
 
 ### ISIN
 
@@ -703,7 +712,7 @@ SecID::CFI.new('QQXXXX').decode     # => nil (decode returns nil for an invalid 
 
 CFI is validated strictly against the ISO 10962:2021 code tables for all 14 categories: the category (position 1), the group (position 2), and every attribute (positions 3-6) must be a value the standard defines for that group. `X` means "not applicable" and is accepted in every position; `Strategies` (`K`) codes carry no attributes and require `XXXX`. An impermissible attribute letter raises `InvalidStructureError` (`:invalid_attribute`).
 
-> **Migration from &lt; 6.0:** the old category-wide equity predicates (`cfi.voting?`, `cfi.fully_paid?`, …) are removed. Use `cfi.decode` and its scoped fields instead — a predicate now lives on the field whose domain defines it: `cfi.voting?` → `cfi.decode.attributes.voting_right.voting?`. Two do not map name-for-name: `cfi.equity?` → `cfi.decode.category.equity?` (or `cfi.category == :equity`), and `cfi.no_restrictions?` → `cfi.decode.attributes.ownership_restrictions.free_of_restrictions?`. Several group letters and symbols also changed to match ISO 10962:2021 (e.g. non-listed options `H` are now classified by underlying, and `LS` → `:securities_lending`, `TI` → `:indices`).
+> **Migration from &lt; 6.0:** the old category-wide equity predicates (`cfi.voting?`, `cfi.fully_paid?`, …) are removed. Use `cfi.decode` and its scoped fields instead. A predicate now lives on the field whose domain defines it: `cfi.voting?` → `cfi.decode.attributes.voting_right.voting?`. Two do not map name-for-name: `cfi.equity?` → `cfi.decode.category.equity?` (or `cfi.category == :equity`), and `cfi.no_restrictions?` → `cfi.decode.attributes.ownership_restrictions.free_of_restrictions?`. Several group letters and symbols also changed to match ISO 10962:2021 (e.g. non-listed options `H` are now classified by underlying, and `LS` → `:securities_lending`, `TI` → `:indices`).
 
 ```ruby
 # Introspect valid codes
@@ -758,7 +767,7 @@ SecID::BIC.valid?('DEUTZZFF')       # => false ('ZZ' is not a recognized country
 SecID::BIC.countries                # => ['AD', 'AE', 'AF', ...] (sorted, includes 'XK')
 ```
 
-BIC validation confirms structure and a real country code only. It does **not** verify that the institution, location, or branch corresponds to a registered SWIFT participant — that requires the licensed SWIFT registry.
+BIC validation confirms structure and a real country code only. It does **not** verify that the institution, location, or branch corresponds to a registered SWIFT participant. That requires the licensed SWIFT registry.
 
 ### DTI
 
@@ -782,7 +791,7 @@ dti.restore!                # => #<SecID::DTI> (mutates instance)
 dti.calculate_checksum  # => 'S'
 ```
 
-DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet — digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike most checksum types in this gem, `checksum` and `calculate_checksum` return a `String`, not an `Integer` (as does UPI). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 — no registry lookup or paywalled ISO 24165-1 spec required.
+DTI accepts exactly 9 characters: an 8-character base (first character never `0`) plus 1 check character, both drawn from a 30-symbol alphabet: digits `0`-`9` and consonants (vowels and `Y` never appear). Unlike most checksum types in this gem, `checksum` and `calculate_checksum` return a `String`, not an `Integer` (as does UPI). The check character is computed fully offline via ISO 7064 hybrid MOD 31,30, with no registry lookup or paywalled ISO 24165-1 spec required.
 
 > **Grandfathered code:** Bitcoin's registered code (`4H95J0R2X`) predates the algorithm and fails the MOD 31,30 computation (which yields `4H95J0R2T`). A frozen exception map honors the registry's assignment across `valid?`, `restore`, and `checksum` alike:
 >
@@ -813,15 +822,15 @@ upi.restore!               # => #<SecID::UPI> (mutates instance)
 upi.calculate_checksum  # => '2'
 ```
 
-UPI accepts exactly 12 characters: a fixed `QZ` prefix, a 9-character body, and 1 check character, all drawn from the same 30-symbol alphabet as DTI — digits `0`-`9` and consonants (vowels and `Y` never appear). Like DTI, `checksum` and `calculate_checksum` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the 11 preceding characters — no DSB registry lookup or paywalled ISO 4914 spec required.
+UPI accepts exactly 12 characters: a fixed `QZ` prefix, a 9-character body, and 1 check character, all drawn from the same 30-symbol alphabet as DTI: digits `0`-`9` and consonants (vowels and `Y` never appear). Like DTI, `checksum` and `calculate_checksum` return a `String`, not an `Integer`. The check character is computed fully offline via ISO 7064 hybrid MOD 31,30 over the 11 preceding characters, with no DSB registry lookup or paywalled ISO 4914 spec required.
 
-> **Coexistence with ISIN:** a UPI shares the 12-character length bucket with ISIN. A UPI whose digit check character also satisfies ISIN's Luhn detects as both (`SecID.detect('QZXKR05S3DL1') # => [:isin, :upi]`), with ISIN ranked first; `SecID.parse(..., on_ambiguous: :raise)` surfaces the collision. UPI validation itself is fully offline and existence is **not** verified — that requires the licensed DSB registry.
+> **Coexistence with ISIN:** a UPI shares the 12-character length bucket with ISIN. A UPI whose digit check character also satisfies ISIN's Luhn detects as both (`SecID.detect('QZXKR05S3DL1') # => [:isin, :upi]`), with ISIN ranked first; `SecID.parse(..., on_ambiguous: :raise)` surfaces the collision. UPI validation itself is fully offline and existence is **not** verified. That requires the licensed DSB registry.
 
-## ActiveModel / Rails Validator
+## ActiveModel / Rails validator
 
-SecID ships an opt-in [ActiveModel](https://api.rubyonrails.org/classes/ActiveModel/Validations.html) validator, registered as `sec_id`, for declarative validation of any supported identifier type. It adds **no runtime dependency** — `require 'sec_id'` loads none of it, and ActiveModel is a development/test dependency only.
+SecID ships an opt-in [ActiveModel](https://api.rubyonrails.org/classes/ActiveModel/Validations.html) validator, registered as `sec_id`, for declarative validation of any supported identifier type. It adds **no runtime dependency**: `require 'sec_id'` loads none of it, and ActiveModel is a development/test dependency only.
 
-**In Rails it just works.** A Railtie loads the validator automatically after the framework boots, so `gem 'sec_id'` in your `Gemfile` is enough — no `require:` option and no initializer:
+**In Rails it just works.** A Railtie loads the validator automatically after the framework boots, so `gem 'sec_id'` in your `Gemfile` is enough, with no `require:` option and no initializer:
 
 ```ruby
 class Security < ApplicationRecord
@@ -838,13 +847,13 @@ require 'sec_id/active_model'
 ### Validation modes
 
 ```ruby
-# Single type — the value must be a valid ISIN
+# Single type: the value must be a valid ISIN
 validates :isin, sec_id: { type: :isin }
 
-# Allowlist — valid as at least one of the listed types
+# Allowlist: valid as at least one of the listed types
 validates :ref, sec_id: { types: %i[isin cusip] }
 
-# Type-agnostic — valid as any supported type
+# Type-agnostic: valid as any supported type
 validates :ref, sec_id: true
 ```
 
@@ -863,16 +872,16 @@ With `normalize: true` in allowlist or agnostic mode, a value valid as more than
 
 ### Error messages and `details:`
 
-On failure the validator adds one error under the `:sec_id` key with a type-aware default ("is not a valid ISIN" for a single type, "is not a valid securities identifier" for an allowlist/agnostic). Override the message in either of two ways: pass the standard `message:` option (the simplest, per-validation override), or define the attribute-scoped i18n key `activemodel.errors.models.<model>.attributes.<attribute>.sec_id` in your locale files. (The generic `activemodel.errors.messages.sec_id` key is not consulted, because the built-in default is supplied as ActiveModel's `message:` fallback.) Pass `details: true` (with a single `type:` — it is ignored for an allowlist/agnostic) to surface sec_id's specific reason instead of the generic text:
+On failure the validator adds one error under the `:sec_id` key with a type-aware default ("is not a valid ISIN" for a single type, "is not a valid securities identifier" for an allowlist/agnostic). Override the message in either of two ways: pass the standard `message:` option (the simplest, per-validation override), or define the attribute-scoped i18n key `activemodel.errors.models.<model>.attributes.<attribute>.sec_id` in your locale files. (The generic `activemodel.errors.messages.sec_id` key is not consulted, because the built-in default is supplied as ActiveModel's `message:` fallback.) Pass `details: true` (with a single `type:`; it is ignored for an allowlist/agnostic) to surface sec_id's specific reason instead of the generic text:
 
 ```ruby
 validates :isin, sec_id: { type: :isin, details: true }
 # a bad checksum reports e.g. "Checksum '4' is invalid, expected '5'"
 ```
 
-Standard `EachValidator` options — `allow_nil`, `allow_blank`, `if`, `unless`, `on` — work as usual. Tested against Rails 7.2, 8.0, and 8.1.
+Standard `EachValidator` options (`allow_nil`, `allow_blank`, `if`, `unless`, `on`) work as usual. Tested against Rails 7.2, 8.0, and 8.1.
 
-## Lookup Service Integration
+## Lookup service integration
 
 SecID validates identifiers but does not include HTTP clients. The [`docs/guides/`](docs/guides/) directory provides integration patterns for external lookup services using only stdlib (`net/http`, `json`):
 
@@ -885,10 +894,10 @@ SecID validates identifiers but does not include HTTP clients. The [`docs/guides
 
 Each guide includes a complete adapter class and a [runnable example](examples/).
 
-## Type Signatures (RBS)
+## Type signatures (RBS)
 
 sec_id ships hand-written [RBS](https://github.com/ruby/rbs) signatures under `sig/`,
-packaged in the gem — so if you use [Steep](https://github.com/soutaro/steep) or an
+packaged in the gem, so if you use [Steep](https://github.com/soutaro/steep) or an
 RBS-aware editor, sec_id's types resolve automatically on install, no `rbs collection`
 entry required. The only standard-library signature referenced is `date`, declared in
 `sig/manifest.yaml`.
@@ -914,10 +923,19 @@ committed signatures fall out of sync with the tables.
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies.
-Then, run `bundle exec rake` to run the tests. You can also run `bin/console`
-for an interactive prompt that will allow you to experiment.
+Then run `bundle exec rake` to run RuboCop, validate the RBS signatures, and run the specs.
+`bin/console` gives you an interactive prompt to experiment in.
 
-To install this gem onto your local machine, run `bundle exec rake install`.
+To use your working copy from another project, point its Gemfile at the checkout:
+`gem 'sec_id', path: '/path/to/sec_id'`.
+
+Releases are published from CI by pushing a tag, so there is no local publish task.
+
+## Support and status
+
+Ask questions in [Discussions](https://github.com/svyatov/sec_id/discussions). Report bugs in the [issue tracker](https://github.com/svyatov/sec_id/issues). Both are public and searchable, so the next reader with your question finds the answer.
+
+One person actively maintains SecID. They read bug reports and pull requests, and they track each identifier standard against its published specification. No response time is promised. See [Governance](CONTRIBUTING.md#governance) for who decides and what happens if they stop.
 
 ## Contributing
 

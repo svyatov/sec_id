@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Leonid Svyatov']
   spec.email         = ['leonid@svyatov.ru']
 
-  spec.summary       = 'A Ruby toolkit for securities identifiers — validate, parse, normalize, detect, convert, ' \
+  spec.summary       = 'A Ruby toolkit for securities identifiers: validate, parse, normalize, detect, convert, ' \
                        'generate, classify, and repair.'
   spec.description   = 'Validate, normalize, parse, convert, generate, classify, and repair securities identifiers. ' \
                        'Auto-detect identifier type from any string. Calculate and restore checksums. Suggest ' \
