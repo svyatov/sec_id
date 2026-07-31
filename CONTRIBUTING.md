@@ -89,6 +89,19 @@ docs: update README with LEI usage examples
 - Follow existing code patterns and conventions
 - Update YARD documentation for the public API — 100% coverage is enforced in CI (`bundle exec rake yard:stats`)
 
+## Governance
+
+SecID has one maintainer, [Leonid Svyatov](https://github.com/svyatov), who reviews and merges every
+change and publishes every release. Decisions are theirs. There is no steering group, no vote, and no
+second person who can merge.
+
+No succession is arranged. If the maintainer stops, the project stops with them. The MIT license lets
+anyone fork and continue from the last published state, and that is the intended fallback rather than
+an oversight. This is stated plainly so you can weigh it before depending on the gem or investing in a
+contribution.
+
 ## Questions?
 
-Open a [GitHub issue](https://github.com/svyatov/sec_id/issues) for questions or discussion.
+Open a [discussion](https://github.com/svyatov/sec_id/discussions) for questions, ideas, and anything
+that is not a defect. The [issue tracker](https://github.com/svyatov/sec_id/issues) is for bug reports
+and feature requests.

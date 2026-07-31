@@ -2,10 +2,12 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-|---------|--------------------|
-| 5.x     | :white_check_mark: |
-| < 5.0   | :x:                |
+| Version | Supported |
+|---------|-----------|
+| 7.x     | Yes       |
+| < 7.0   | No        |
+
+Fixes land on the current major only. Older majors receive no backports.
 
 ## Reporting a Vulnerability
 
