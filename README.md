@@ -949,7 +949,21 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes, following [K
 
 ## Versioning
 
-This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
+This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
+
+The public API that version promise covers is everything documented in this README and in the [API docs](https://rubydoc.info/gems/sec_id), except anything marked `@api private` in YARD. Concretely, it covers:
+
+- the `SecID` module methods: `[]`, `identifiers`, `valid?`, `detect`, `parse`, `parse!`, `extract`, `scan`, `explain`, `generate`, and `suggest`
+- every identifier class and its documented instance and class methods
+- the `SecID::Errors`, `SecID::Suggestion`, `SecID::Scanner::Match`, and `SecID::CFI::Classification` value objects, and the exception hierarchy under `SecID::Error`
+- the `sec_id` ActiveModel validator and its options
+- the RBS signatures under `sig/`
+
+Marked `@api private` and outside the promise: `SecID::Detector`, `SecID::Scanner` itself, `SecID::CFI::Tables`, `SecID::IBAN::CountryRules`, `SecID::BIC::CountryCodes`, `Base.detection_priority`, and the internals of the four concerns. These can change in any release.
+
+Raising the minimum Ruby version is a breaking change and ships in a MAJOR release.
+
+Removals follow a deprecation window; see [Deprecation policy](CONTRIBUTING.md#deprecation-policy).
 
 ## License
 
