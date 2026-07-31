@@ -1,0 +1,10 @@
+# The two issue templates cover defects and feature requests. Everything else has a home
+# in Discussions, and this file is the only place a newcomer finds out.
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/svyatov/sec_id/discussions/categories/q-a
+    about: Ask how to validate, parse, convert, or classify an identifier. Answers stay searchable here.
+
+  - name: Ideas and general discussion
+    url: https://github.com/svyatov/sec_id/discussions
+    about: Propose a new identifier standard, share what you built, or talk through an approach before opening an issue.
