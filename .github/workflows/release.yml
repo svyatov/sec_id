@@ -1,0 +1,100 @@
+name: Release
+
+# Tag-triggered so the gem that ships is a commit that is in the repository and that CI
+# has tested, rather than whatever happened to be in a developer's working tree.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+env:
+  BUNDLE_FROZEN: 'true'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    # No Bundler cache anywhere in this workflow: a restored cache is a poisoning vector
+    # in a tag-triggered publish, and releases are rare enough that the cost is nothing.
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+      with:
+        ruby-version: '4.0'
+        bundler-cache: false
+
+    - run: bundle install
+
+    - run: bundle exec rake
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+      with:
+        ruby-version: '4.0'
+        bundler-cache: false
+
+    # A tag that disagrees with SecID::VERSION would publish a version nobody can trace
+    # back to a tag, and the push cannot be undone. Fail here instead.
+    - name: Verify the tag matches SecID::VERSION
+      run: |
+        ruby -e 'tag = ENV.fetch("GITHUB_REF_NAME").delete_prefix("v");
+                 version = Gem::Specification.load("sec_id.gemspec").version.to_s;
+                 abort("tag v#{tag} does not match sec_id.gemspec #{version}") unless tag == version'
+
+    - run: mkdir -p pkg && gem build sec_id.gemspec --output pkg/sec_id.gem
+
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: built-gem
+        path: pkg/sec_id.gem
+        retention-days: 1
+
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish to RubyGems
+    needs: [test, build]
+    # Approval gate: the `release` environment requires a reviewer, and the RubyGems
+    # trusted publisher names this environment, so no token is minted before approval.
+    environment: release
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: built-gem
+        path: pkg/
+
+    # This job installs no Gemfile dependencies; it only needs a Ruby to run `gem`.
+    - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+      with:
+        ruby-version: '4.0'
+        bundler-cache: false
+
+    # Exchanges this run's OIDC token for a short-lived publish token. No RubyGems API
+    # key is stored anywhere, so there is nothing to steal between releases.
+    - uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
+
+    # Explicit rather than implicit: signing behaviour varies by RubyGems client version,
+    # and this is the same tool and version rubygems/release-gem calls internally.
+    - name: Sign the gem with sigstore
+      run: gem exec --conservative sigstore-cli:0.2.3 sign pkg/sec_id.gem --bundle pkg/sec_id.gem.sigstore.json
+
+    - name: Push to RubyGems with provenance
+      run: gem push pkg/sec_id.gem --attestation pkg/sec_id.gem.sigstore.json

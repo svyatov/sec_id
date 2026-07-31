@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+# Deliberately no `require 'bundler/gem_tasks'`: it defines `rake release`, which builds,
+# tags, and pushes to RubyGems from whatever is in the working tree, on a long-lived
+# credential. Releasing happens in .github/workflows/release.yml, triggered by a tag.
+
 require 'English'
-require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'steep/rake_task'
@@ -86,12 +89,6 @@ task 'rbs:test' do
   # the instrumented run and pass having verified nothing.
   Rake::Task[:spec].reenable
   Rake::Task[:spec].invoke
-end
-
-Rake::Task['release:rubygem_push'].enhance(['fetch_otp'])
-
-task :fetch_otp do
-  ENV['GEM_HOST_OTP_CODE'] = `op item get "RubyGems" --account my --otp`.strip
 end
 
 # The platform the CI runners use, which a lock resolved on a developer machine misses.
