@@ -22,6 +22,20 @@ bundle exec rubocop       # Run linter only
 bundle exec rubocop -a    # Auto-fix safe lint issues
 ```
 
+## Changing dependencies
+
+The lockfiles are committed and CI installs them frozen, so a dependency change is not complete until
+the lockfiles are regenerated:
+
+```bash
+bundle exec rake lock:refresh   # relocks the root Gemfile and the Rails matrix gemfiles
+```
+
+CI runs Ruby 3.2 through 4.0 against a single lockfile. Bundler resolves against whichever Ruby you
+run, so a lock written on a newer Ruby can pin a gem that will not install on 3.2, and only the oldest
+jobs fail. If that happens, pin the offending gem in the `Gemfile` with a comment saying when the pin
+can be lifted.
+
 ## Code style
 
 - **Ruby 3.2+** required

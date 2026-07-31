@@ -17,9 +17,28 @@ expected. The non-obvious ones:
 - **Regenerate CFI dynamic-method sigs**: `bundle exec rake sig:cfi`
 - **Documentation coverage gate**: `bundle exec rake yard:stats` (fails unless 100% of the public API is documented; a CI step)
 - **Run benchmarks**: `bundle exec rake bench` (machine-dependent, for catching regressions)
-- **Refresh lockfiles**: `bundle exec rake lock:refresh` (required after a version bump — see the release skill)
+- **Refresh lockfiles**: `bundle exec rake lock:refresh` (after a version bump or a dependency change — see below)
 
 The default `rake` task is `rubocop` + `rbs` + `spec`.
+
+### Dependencies and lockfiles
+
+Four lockfiles are committed (root plus `gemfiles/rails_{7.2,8.0,8.1}.gemfile.lock`) and CI installs
+them frozen, so the resolution is reviewable and GitHub's dependency graph sees transitive deps. Three
+consequences that are not visible from the files themselves:
+
+- **One lock must install on every Ruby in the matrix, down to 3.2.** Bundler resolves against the
+  *running* Ruby, so a lock written on 4.0 can pin a gem whose own `required_ruby_version` excludes
+  3.2, and the frozen install then fails only the oldest jobs. The gemspec's `required_ruby_version`
+  does not constrain this. `gem 'parallel', '< 2'` exists for exactly that reason.
+- **`RUBY_VERSION`-conditional Gemfile lines are impossible.** A frozen install compares the Gemfile's
+  evaluated dependency set against the lock's `DEPENDENCIES`, so a conditional line disagrees on every
+  Ruby but the one that wrote the lock.
+- **`rails_head.gemfile` ships no lock on purpose** (it tracks a git branch), so CI unfreezes that job
+  alone. It is also `continue-on-error`, so it can never be the job that catches lock drift.
+
+Run `bundle exec rake lock:refresh` after any dependency change, including merging a Dependabot PR
+that touches the root lock. Full write-up: `docs/solutions/build-errors/`.
 
 ## Architecture
 
