@@ -5,6 +5,15 @@
 
 version: 2
 updates:
+  # Dependabot refreshes Gemfile.lock only. It finds lockfiles by name, and
+  # `gemfiles/rails_8.0.gemfile.lock` is not a name it parses, so the three Rails matrix
+  # locks are left behind. Run `bundle exec rake lock:refresh` to relock all four.
+  #
+  # Only a changed requirement needs that. The matrix gemfiles eval the root Gemfile, so
+  # their locks record its requirement strings; a PR that edits one leaves them
+  # disagreeing, and the frozen install fails all four Rails jobs on the PR itself. A bump
+  # inside an unchanged requirement drifts silently and harmlessly. Red Rails jobs on an
+  # otherwise green Dependabot PR are the signal to relock.
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
