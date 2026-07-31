@@ -11,9 +11,10 @@ updates:
   #
   # Only a changed requirement needs that. The matrix gemfiles eval the root Gemfile, so
   # their locks record its requirement strings; a PR that edits one leaves them
-  # disagreeing, and the frozen install fails all four Rails jobs on the PR itself. A bump
-  # inside an unchanged requirement drifts silently and harmlessly. Red Rails jobs on an
-  # otherwise green Dependabot PR are the signal to relock.
+  # disagreeing, and the frozen install fails the three frozen Rails jobs (7.2, 8.0, 8.1)
+  # on the PR itself. The `head` job cannot catch it: it is unfrozen and continue-on-error.
+  # A bump inside an unchanged requirement drifts silently and harmlessly. Red Rails jobs
+  # on an otherwise green Dependabot PR are the signal to relock.
   - package-ecosystem: "bundler" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
