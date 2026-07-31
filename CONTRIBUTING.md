@@ -89,6 +89,18 @@ docs: update README with LEI usage examples
 - Follow existing code patterns and conventions
 - Update YARD documentation for the public API. 100% coverage is enforced in CI (`bundle exec rake yard:stats`)
 
+## Deprecation policy
+
+Nothing in the public API is removed without a released warning first.
+
+1. Deprecate in a MINOR release. The old path keeps working.
+2. The notice names the replacement and the earliest version that removes it. For a method, that is a runtime warning through `SecID::Deprecation.warn`.
+3. Remove no earlier than the next MAJOR release.
+
+The v7 rename of `check_digit` to `checksum` is the worked example: v7.0.0 kept every old name working behind a warning naming its replacement and v8 as the removal version. Releases before v7 did not follow this, and their `Removed` entries have no matching `Deprecated` entry.
+
+See [Versioning](README.md#versioning) for what counts as public API.
+
 ## Governance
 
 SecID has one maintainer, [Leonid Svyatov](https://github.com/svyatov). They review and merge every
