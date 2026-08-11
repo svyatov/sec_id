@@ -1,27 +1,34 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
-  # Dependabot refreshes Gemfile.lock only. It finds lockfiles by name, and
-  # `gemfiles/rails_8.0.gemfile.lock` is not a name it parses, so the three Rails matrix
-  # locks are left behind. Run `bundle exec rake lock:refresh` to relock all four.
+  # Dependabot refreshes Gemfile.lock only; `gemfiles/rails_8.0.gemfile.lock` is not a name
+  # it parses. Run `bundle exec rake lock:refresh` to relock all four.
   #
   # Only a changed requirement needs that. The matrix gemfiles eval the root Gemfile, so
-  # their locks record its requirement strings; a PR that edits one leaves them
-  # disagreeing, and the frozen install fails the three frozen Rails jobs (7.2, 8.0, 8.1)
-  # on the PR itself. The `head` job cannot catch it: it is unfrozen and continue-on-error.
-  # A bump inside an unchanged requirement drifts silently and harmlessly. Red Rails jobs
-  # on an otherwise green Dependabot PR are the signal to relock.
-  - package-ecosystem: "bundler" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # their locks record its requirement strings; a PR that edits one leaves them disagreeing,
+  # and the frozen install fails the three frozen Rails jobs (7.2, 8.0, 8.1) on the PR
+  # itself. The `head` job cannot catch it: it is unfrozen and continue-on-error. A bump
+  # inside an unchanged requirement drifts silently and harmlessly. Red Rails jobs on an
+  # otherwise green Dependabot PR are the signal to relock.
+  - package-ecosystem: "bundler"
+    directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+    groups:
+      bundler:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
 
-  # CI actions are pinned to commit SHAs, so without an updater "pinned" means "unpatched".
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: weekly
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
