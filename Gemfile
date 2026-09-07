@@ -32,8 +32,13 @@ gem 'rubocop-rspec', '~> 3.10.0'
 gem 'parallel', '< 2', require: false
 
 # Type signatures (sig/) — dev/test only; the gem keeps zero runtime dependencies.
-gem 'rbs', '~> 4.2', require: false
-gem 'steep', '~> 2.1', require: false
+#
+# rbs is held at 4.0.x and steep at 2.0.x. rbs 4.1 retyped `Array#to_h`'s block return to the
+# `Hash::_Pair` interface, which Steep 2.0 cannot check (soutaro/steep#2253). Steep 2.1 fixes that
+# but requires Ruby >= 3.3 and rbs >= 4.2, and the frozen lock must install on 3.2 (see `parallel`
+# above). Lift both when required_ruby_version does; dependabot.yml ignores them until then.
+gem 'rbs', '~> 4.0.3', require: false
+gem 'steep', '~> 2.0.0', require: false
 
 # API documentation (rake yard) and the 100%-coverage gate (rake yard:stats) — dev/test only.
 gem 'yard', '~> 0.9', require: false

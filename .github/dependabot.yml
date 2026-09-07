@@ -20,6 +20,14 @@ updates:
     schedule:
       interval: "weekly"
 
+    # rbs 4.1+ and steep 2.1+ need Ruby 3.3, and the frozen lock must install on 3.2.
+    # The Gemfile explains; drop these when required_ruby_version moves past 3.2.
+    ignore:
+      - dependency-name: "rbs"
+        versions: [">= 4.1"]
+      - dependency-name: "steep"
+        versions: [">= 2.1"]
+
   # CI actions are pinned to commit SHAs, so without an updater "pinned" means "unpatched".
   - package-ecosystem: "github-actions"
     directory: "/"
