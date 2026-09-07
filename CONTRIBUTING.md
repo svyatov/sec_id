@@ -31,14 +31,14 @@ the lockfiles are regenerated:
 bundle exec rake lock:refresh   # relocks the root Gemfile and the Rails matrix gemfiles
 ```
 
-CI runs Ruby 3.2 through 4.0 against a single lockfile. Bundler resolves against whichever Ruby you
-run, so a lock written on a newer Ruby can pin a gem that will not install on 3.2, and only the oldest
+CI runs Ruby 3.3 through 4.0 against a single lockfile. Bundler resolves against whichever Ruby you
+run, so a lock written on a newer Ruby can pin a gem that will not install on 3.3, and only the oldest
 jobs fail. If that happens, pin the offending gem in the `Gemfile` with a comment saying when the pin
 can be lifted.
 
 ## Code style
 
-- **Ruby 3.2+** required
+- **Ruby 3.3+** required
 - **Max line length:** 120 characters
 - **RuboCop** with `rubocop-rspec` extension, run `bundle exec rubocop` before committing
 - **RSpec** with `expect` syntax only (no monkey patching)

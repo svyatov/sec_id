@@ -10,7 +10,7 @@ module SecID
     #
     # @api private
     # @see https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-    # rubocop:disable Metrics/CollectionLiteralLength
+    # rubocop:disable-next Metrics/CollectionLiteralLength
     COUNTRY_CODES = Set.new(
       %w[
         AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ
@@ -41,6 +41,5 @@ module SecID
         XK
       ]
     ).freeze
-    # rubocop:enable Metrics/CollectionLiteralLength
   end
 end

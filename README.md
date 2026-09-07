@@ -6,7 +6,7 @@ A Ruby toolkit for securities identifiers: validate, parse, normalize, detect, c
 
 - **Nothing to call, nothing to sign up for.** SecID validates all 16 identifier standards offline. No registry lookup, no API key, no network call anywhere in [`lib/`](lib/).
 - **9 of the 16 carry a checksum.** SecID validates it, restores a missing one, and repairs a wrong one.
-- **Zero runtime dependencies.** Runs on Ruby 3.2 or newer.
+- **Zero runtime dependencies.** Runs on Ruby 3.3 or newer.
 - **Rails, if you want it.** An opt-in ActiveModel validator adds `validates :isin, sec_id: true`. It stays off the default require path, so the dependency count stays at zero.
 - **Typed.** Ships RBS signatures for the whole public API, checked by Steep in strict mode.
 
@@ -50,7 +50,7 @@ A Ruby toolkit for securities identifiers: validate, parse, normalize, detect, c
 
 ## Supported Ruby versions
 
-Ruby 3.2+ is required.
+Ruby 3.3+ is required.
 
 ## Installation
 
