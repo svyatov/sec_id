@@ -65,7 +65,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby_version: [ruby-head, '4.0', '3.4', '3.3', '3.2']
+        ruby_version: [ruby-head, '4.0', '3.4', '3.3']
 
     env:
       COVERAGE: true

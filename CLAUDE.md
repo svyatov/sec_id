@@ -27,10 +27,10 @@ Four lockfiles are committed (root plus `gemfiles/rails_{7.2,8.0,8.1}.gemfile.lo
 them frozen, so the resolution is reviewable and GitHub's dependency graph sees transitive deps. Three
 consequences that are not visible from the files themselves:
 
-- **One lock must install on every Ruby in the matrix, down to 3.2.** Bundler resolves against the
+- **One lock must install on every Ruby in the matrix, down to 3.3.** Bundler resolves against the
   *running* Ruby, so a lock written on 4.0 can pin a gem whose own `required_ruby_version` excludes
-  3.2, and the frozen install then fails only the oldest jobs. The gemspec's `required_ruby_version`
-  does not constrain this. `gem 'parallel', '< 2'` exists for exactly that reason.
+  3.3, and the frozen install then fails only the oldest jobs. The gemspec's `required_ruby_version`
+  does not constrain this.
 - **`RUBY_VERSION`-conditional Gemfile lines are impossible.** A frozen install compares the Gemfile's
   evaluated dependency set against the lock's `DEPENDENCIES`, so a conditional line disagrees on every
   Ruby but the one that wrote the lock.
@@ -144,7 +144,7 @@ When editing `lib/` in the typed scope, update the corresponding `sig/` file and
 
 ## Code Style
 
-- Ruby 3.2+ required
+- Ruby 3.3+ required
 - Max line length: 120 characters
 - RuboCop with rubocop-rspec extension
 - RSpec with `expect` syntax only (no monkey patching)

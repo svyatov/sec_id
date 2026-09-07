@@ -8,6 +8,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** Minimum Ruby version raised from 3.2 to 3.3 (Ruby 3.2 reached EOL on 2026-03-31)
+
 ## [7.1.1] - 2026-07-31
 
 Documentation and packaging only. No identifier, checksum, or public method changed.
