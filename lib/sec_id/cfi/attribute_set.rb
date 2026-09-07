@@ -36,8 +36,11 @@ module SecID
       end
 
       # @return [Hash{Symbol => Hash}]
+      # @raise [ArgumentError] if a field has no meaning (category/group fields; never the case for attributes)
       def to_h
-        @fields.to_h { |field| [field.meaning, field.to_h] }
+        @fields.to_h do |field|
+          [field.meaning || raise(ArgumentError, "attribute field #{field.code} has no meaning"), field.to_h]
+        end
       end
 
       # @return [Hash{Symbol => Hash}]

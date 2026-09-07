@@ -95,8 +95,8 @@ module CFISignatureGenerator
                     | () -> Enumerator[Field, self]
             def []: (Symbol meaning) -> Field?
             def empty?: () -> bool
-            def to_h: () -> Hash[Symbol?, Hash[Symbol, untyped]]
-            def as_json: (*untyped) -> Hash[Symbol?, Hash[Symbol, untyped]]
+            def to_h: () -> Hash[Symbol, Hash[Symbol, untyped]]
+            def as_json: (*untyped) -> Hash[Symbol, Hash[Symbol, untyped]]
 
             # Per-meaning readers — the union of every attribute meaning. Each instance
             # only answers the meanings actually present; an absent one raises
