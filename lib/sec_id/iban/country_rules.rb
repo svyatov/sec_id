@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SecID
-  # rubocop:disable Metrics/ClassLength
+  # rubocop:disable-next Metrics/ClassLength
   class IBAN < Base
     # Country-specific BBAN rules for EU/EEA countries
     # Each entry defines:
@@ -265,5 +265,4 @@ module SecID
       'XK' => 16  # Kosovo
     }.freeze
   end
-  # rubocop:enable Metrics/ClassLength
 end

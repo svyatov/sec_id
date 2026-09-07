@@ -240,7 +240,7 @@ RSpec.describe SecID::Detector do
     end
 
     context 'with cache invalidation' do
-      # rubocop:disable RSpec/ExampleLength
+      # rubocop:disable-next RSpec/ExampleLength
       it 'recreates detector when a new identifier type is registered' do
         # Warm up the detector cache
         SecID.detect('US5949181045')
@@ -261,7 +261,6 @@ RSpec.describe SecID::Detector do
         SecID.__send__(:identifier_list).delete(stub_class)
         SecID.instance_variable_set(:@detector, nil)
       end
-      # rubocop:enable RSpec/ExampleLength
     end
 
     context 'with performance' do

@@ -407,7 +407,7 @@ RSpec.describe SecID::IBAN do
 
   describe '.valid?' do
     context 'when IBAN is valid' do
-      # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
+      # rubocop:disable-next RSpec/ExampleLength, RSpec/MultipleExpectations
       it 'returns true for real-world examples from various countries' do
         expect(described_class.valid?('DE89370400440532013000')).to be(true) # Germany
         expect(described_class.valid?('FR1420041010050500013M02606')).to be(true) # France
@@ -426,7 +426,6 @@ RSpec.describe SecID::IBAN do
         expect(described_class.valid?('PT50000201231234567890154')).to be(true) # Portugal
         expect(described_class.valid?('IE29AIBK93115212345678')).to be(true) # Ireland
       end
-      # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
     end
   end
 

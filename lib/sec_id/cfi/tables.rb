@@ -21,7 +21,7 @@ module SecID
     # +:not_applicable+, so it is never listed in a value map.
     #
     # @api private
-    # rubocop:disable Metrics/ModuleLength
+    # rubocop:disable-next Metrics/ModuleLength
     module Tables
       # Marker for a pure not-applicable attribute position (accepts only +X+).
       NA = nil
@@ -1028,6 +1028,5 @@ module SecID
         GROUPS.dig(category_code, group_code)
       end
     end
-    # rubocop:enable Metrics/ModuleLength
   end
 end
