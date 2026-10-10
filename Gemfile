@@ -23,7 +23,7 @@ gem 'benchmark-ips', '~> 2.0', require: false
 gem 'rspec', '~> 3.9'
 gem 'rspec_junit_formatter'
 
-gem 'rubocop', '~> 1.90.0'
+gem 'rubocop', '~> 1.91.0'
 gem 'rubocop-rspec', '~> 3.10.0'
 
 # Type signatures (sig/) — dev/test only; the gem keeps zero runtime dependencies.
@@ -33,5 +33,5 @@ gem 'steep', '~> 2.1', require: false
 # API documentation (rake yard) and the 100%-coverage gate (rake yard:stats) — dev/test only.
 gem 'yard', '~> 0.9', require: false
 
-gem 'simplecov', '~> 1.0', require: false
+gem 'simplecov', '~> 1.3', require: false
 gem 'simplecov-cobertura', require: false
