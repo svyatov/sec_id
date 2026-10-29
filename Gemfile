@@ -23,7 +23,7 @@ gem 'benchmark-ips', '~> 2.0', require: false
 gem 'rspec', '~> 3.9'
 gem 'rspec_junit_formatter'
 
-gem 'rubocop', '~> 1.91.0'
+gem 'rubocop', '~> 1.92.0'
 gem 'rubocop-rspec', '~> 3.10.0'
 
 # Type signatures (sig/) — dev/test only; the gem keeps zero runtime dependencies.
