@@ -69,7 +69,7 @@ module SecID
     # @raise [InvalidFormatError] if the FIGI format is invalid
     def calculate_checksum
       validate_format_for_calculation!
-      mod10(luhn_sum_indexed(reversed_digits_single(identifier)))
+      mod10(luhn_sum_single(identifier, double_first: false))
     end
 
     # Generates a random FIGI body: non-reserved 2-char prefix + 'G' + 8-char random part.

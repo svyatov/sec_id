@@ -86,7 +86,7 @@ module SecID
     # @raise [InvalidFormatError] if the ISIN format is invalid
     def calculate_checksum
       validate_format_for_calculation!
-      mod10(luhn_sum_standard(reversed_digits_multi(identifier)))
+      mod10(luhn_sum_standard(identifier))
     end
 
     # Generates a random ISIN body: 2-letter country code + 9-character NSIN.

@@ -18,6 +18,7 @@ expected. The non-obvious ones:
 - **Regenerate CFI dynamic-method sigs**: `bundle exec rake sig:cfi`
 - **Documentation coverage gate**: `bundle exec rake yard:stats` (fails unless 100% of the public API is documented; a CI step)
 - **Run benchmarks**: `bundle exec rake bench` (machine-dependent, for catching regressions)
+- **Compare checksum allocations**: `ruby -Ilib benchmark/checksums.rb` (JSON samples; use `-I/path/to/baseline/lib` for comparison)
 - **Refresh lockfiles**: `bundle exec rake lock:refresh` (after a version bump or a dependency change — see below)
 
 The default `rake` task is `rubocop` + `rbs` + `spec`.
@@ -74,6 +75,7 @@ These are the decisions the code can't explain on its own.
 - Detector and Scanner caches are invalidated when a new type registers.
 
 **Checksums**
+- Luhn helpers consume validated ASCII bodies directly. ISIN letters consume two decimal positions. CUSIP/CEI and FIGI use opposite doubling parity.
 - Classes that include `Checkable` **must** implement `calculate_checksum`. A `NotImplementedError` from a concrete identifier class means that implementation is missing.
 - `checksum_width` defaults to `1`; LEI and IBAN override it to `2`. `restore`/`to_s` right-justify against it (`5` → `"05"`). IBAN overrides `restore`/`to_s` outright because its checksum sits mid-string, not at the end.
 - `mod31_30_check_char(base, alphabet, alphabet_value)` takes the alphabet as an **explicit argument** rather than reading `self.class::ALPHABET` — this avoids RBS's `UnknownConstant`. Don't refactor it back.
@@ -139,7 +141,7 @@ Key facts for working in `sig/`:
   - Two Steep diagnostics are relaxed in the `Steepfile` for idioms RBS simply can't express: `UnannotatedEmptyCollection` (base.rb's `regexp.match(...) || {}`) and `UnknownConstant` (`Normalizable::ClassMethods`' polymorphic `self::SEPARATORS`). Neither affects the untyped-call gate.
 - **Coverage gate is a pinned baseline**, not literal zero: `Rakefile`'s `STEEP_UNTYPED_BASELINE` caps the residual untyped calls that are intrinsic, not a gap to close — receivers that are genuinely nilable at runtime (the `valid?`/`errors` design) plus idioms RBS/stdlib can't express (nilable stdlib `MatchData` in the scanner, `Array#map!`'s type-invariance, `freeze`-after-`case` in `DeepFreeze`, widening CFI table literals). Forcing them to zero would only add dead guards to checksum/classification math; `rake rbs:test` verifies them at runtime instead. `rake steep:coverage` fails if the count exceeds the baseline — lower it whenever it drops.
 - **CFI dynamic methods are generated**: `Field`'s `<symbol>?` predicates and `AttributeSet`'s `<meaning>` readers are per-instance singleton methods RBS can't express per-instance, so `rake sig:cfi` emits the union of all names from `SecID::CFI::Tables` into `sig/sec_id/cfi/{field,attribute_set}.rbs` (marked generated; don't hand-edit). `tasks/cfi_signature_generator.rb` holds the walk; `spec/sig/cfi_signatures_spec.rb` regenerates in memory and fails if the committed files drift from the tables. Because these predicates/readers are defined per-instance via `define_singleton_method`, RBS::Test cannot hook them — `rake rbs:test` does **not** runtime-verify the generated CFI sigs; their guardrail is the drift spec (name-set equality against `SecID::CFI::Tables`) plus Steep's static call-site checks.
-- **RBS::Test exclusions**: five specs are tagged `:rbs_test_incompatible` and skipped under `rake rbs:test` (performance/timing budgets, an alias-identity check via `#method`, a missing-keyword `ArgumentError` assertion, and the deprecation-warning `uplevel` attribution check whose stack depth the instrumentation frame shifts) — the instrumentation changes their runtime behavior; they aren't signature-conformance tests.
+- **RBS::Test exclusions**: specs tagged `:rbs_test_incompatible` are skipped under `rake rbs:test` (allocation/timing budgets, an alias-identity check via `#method`, a missing-keyword `ArgumentError` assertion, and the deprecation-warning `uplevel` attribution check whose stack depth the instrumentation frame shifts). Instrumentation changes their runtime behavior; they are not signature-conformance tests.
 
 When editing `lib/` in the typed scope, update the corresponding `sig/` file and keep `bundle exec rake steep` / `rake steep:coverage` / `rake rbs:test` green.
 
