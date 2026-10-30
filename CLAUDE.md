@@ -12,6 +12,7 @@ Standard invocations (`bundle exec rspec`, `rubocop`, `rake`, `bin/setup`, `bin/
 expected. The non-obvious ones:
 
 - **Run tests with coverage**: `COVERAGE=1 bundle exec rspec` (opt-in via env var)
+- **Check CRAP scores**: `COVERAGE=1 bundle exec rake spec crap` (maximum 10 for `lib/`; CI runs this on Ruby 4.0)
 - **Type coverage gate**: `bundle exec rake steep:coverage` (fails if untyped calls exceed the pinned baseline)
 - **Runtime signature check**: `bundle exec rake rbs:test` (runs the spec suite under RBS::Test)
 - **Regenerate CFI dynamic-method sigs**: `bundle exec rake sig:cfi`

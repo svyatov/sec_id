@@ -926,6 +926,13 @@ After checking out the repo, run `bin/setup` to install dependencies.
 Then run `bundle exec rake` to run RuboCop, validate the RBS signatures, and run the specs.
 `bin/console` gives you an interactive prompt to experiment in.
 
+CI checks library methods with [crap4ruby](https://github.com/svyatov/crap4ruby), using fresh test coverage and a maximum CRAP score of 10.
+Run the same check locally:
+
+```sh
+COVERAGE=1 bundle exec rake spec crap
+```
+
 To use your working copy from another project, point its Gemfile at the checkout:
 `gem 'sec_id', path: '/path/to/sec_id'`.
 
