@@ -128,15 +128,13 @@ Optional, opt-in adapter — **never on the default `require 'sec_id'` path**, s
 - No locale files ship. The only i18n override point is the attribute-scoped key `activemodel.errors.models.<model>.attributes.<attr>.sec_id` — the generic `errors.messages.sec_id` is **not** consulted. `message:` is the general override.
 - The Rails-version matrix (7.2, 8.0, 8.1, head) runs via `gemfiles/rails_*.gemfile`, each `eval_gemfile`ing the root `Gemfile`; the root `Gemfile` only declares `activemodel`/`railties` unpinned when not run through a `gemfiles/` variant. `rails_head` is `continue-on-error`.
 
-### v7 Deprecation Bridge (`deprecation.rb`)
+### Checksum migration
 
-The v7 rename of the check-digit concept to `checksum` keeps the pre-v7 names working through v7 (all removed in v8; the `Checkable` concern name itself is unchanged):
-
-- `SecID::Deprecation.warn` emits one `Kernel#warn` per call — no dedup. It passes **no** `category:`, because `Warning[:deprecated]` defaults off and would hide the migration signal.
-- Deprecated aliases are written as explicit typed methods, **not** metaprogrammed, so Steep sees both name sets and `STEEP_UNTYPED_BASELINE` holds. Per-type sigs narrow the deprecated `calculate_check_digit`/`self.check_digit` to the same concrete return type as their canonical counterparts; the `check_digit` reader stays the unified `(Integer | String)?` (an `attr_reader` can't be narrowed per subclass).
-- `SecID::InvalidCheckDigitError` is a constant alias of `InvalidChecksumError` — the same class object, so `rescue` under either name works.
-- `to_h`/`deconstruct_keys` carry both `:checksum` and a mirrored `:check_digit` through the single `Base#components_with_deprecation_bridge` wrapper. Each type's own `components` returns only `:checksum`, so the deprecated reader never fires internally. **v8 removal is a one-file revert**: drop the wrapper and point `to_h`/`deconstruct_keys` back at `components`.
-- The `:invalid_check_digit` error code flips hard to `:invalid_checksum` with **no** dual emission (dual would duplicate `errors.details` entries). See `MIGRATION.md` for the matcher change.
+The deprecated v7 check-digit bridge was retained in 8.0.0 and removed in 8.0.1 by explicit maintainer decision.
+This is a deliberate exception to Semantic Versioning. Do not restore the aliases or their RBS declarations.
+Use `checksum`, `calculate_checksum`, `has_checksum?`, `InvalidChecksumError`, and the `:checksum` components key.
+`to_h` and `deconstruct_keys` call `components` directly. The `Checkable` concern name is unchanged.
+The error code has been `:invalid_checksum` since v7. See `MIGRATION.md` for replacements.
 
 ### RBS Type Signatures (`sig/`)
 
@@ -152,7 +150,7 @@ Key facts for working in `sig/`:
   - Two Steep diagnostics are relaxed in the `Steepfile` for idioms RBS simply can't express: `UnannotatedEmptyCollection` (base.rb's `regexp.match(...) || {}`) and `UnknownConstant` (`Normalizable::ClassMethods`' polymorphic `self::SEPARATORS`). Neither affects the untyped-call gate.
 - **Coverage gate is a pinned baseline**, not literal zero: `Rakefile`'s `STEEP_UNTYPED_BASELINE` caps the residual untyped calls that are intrinsic, not a gap to close — receivers that are genuinely nilable at runtime (the `valid?`/`errors` design) plus idioms RBS/stdlib can't express (nilable stdlib `MatchData` in the scanner, `Array#map!`'s type-invariance, `freeze`-after-`case` in `DeepFreeze`, widening CFI table literals). Forcing them to zero would only add dead guards to checksum/classification math; `rake rbs:test` verifies them at runtime instead. `rake steep:coverage` fails if the count exceeds the baseline — lower it whenever it drops.
 - **CFI dynamic methods are generated**: `Field`'s `<symbol>?` predicates and `AttributeSet`'s `<meaning>` readers are per-instance singleton methods RBS can't express per-instance, so `rake sig:cfi` emits the union of all names from `SecID::CFI::Tables` into `sig/sec_id/cfi/{field,attribute_set}.rbs` (marked generated; don't hand-edit). `tasks/cfi_signature_generator.rb` holds the walk; `spec/sig/cfi_signatures_spec.rb` regenerates in memory and fails if the committed files drift from the tables. Because these predicates/readers are defined per-instance via `define_singleton_method`, RBS::Test cannot hook them — `rake rbs:test` does **not** runtime-verify the generated CFI sigs; their guardrail is the drift spec (name-set equality against `SecID::CFI::Tables`) plus Steep's static call-site checks.
-- **RBS::Test exclusions**: specs tagged `:rbs_test_incompatible` are skipped under `rake rbs:test` (allocation/timing budgets, an alias-identity check via `#method`, a missing-keyword `ArgumentError` assertion, and the deprecation-warning `uplevel` attribution check whose stack depth the instrumentation frame shifts). Instrumentation changes their runtime behavior; they are not signature-conformance tests.
+- **RBS::Test exclusions**: specs tagged `:rbs_test_incompatible` are skipped under `rake rbs:test` (allocation/timing budgets, an alias-identity check via `#method`, and a missing-keyword `ArgumentError` assertion). Instrumentation changes their runtime behavior; they are not signature-conformance tests.
 
 When editing `lib/` in the typed scope, update the corresponding `sig/` file and keep `bundle exec rake steep` / `rake steep:coverage` / `rake rbs:test` green.
 

@@ -8,6 +8,15 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+This patch release contains a breaking API change as an explicit exception to Semantic Versioning. The v7 bridge removal was scheduled for 8.0.0 but was omitted.
+
+### Removed
+
+- **BREAKING:** Remove deprecated instance methods `check_digit` and `calculate_check_digit`, and class methods `check_digit` and `has_check_digit?`. Use `checksum`, `calculate_checksum`, and `has_checksum?`.
+- **BREAKING:** Remove the `SecID::InvalidCheckDigitError` alias. Rescue `SecID::InvalidChecksumError` instead.
+- **BREAKING:** Remove the `:check_digit` key from `to_h`, `as_json`, and pattern matching. Use `:checksum`.
+- Remove the unused `SecID::Deprecation` warning helper and the bridge's RBS declarations.
+
 ## [8.0.0] - 2026-10-30
 
 Ruby 3.3 or later is now required. Dropping Ruby 3.2 support is the breaking change that requires this major release.

@@ -47,9 +47,6 @@ module SecID
     # module-level `SecID.suggest` can call it on any registered class object.
     def self.suggest: (SecID::input str) -> Array[Suggestion]
 
-    # @deprecated v7 bridge alias for `has_checksum?`; removed in v8.
-    def self.has_check_digit?: () -> bool
-
     def self.inherited: (singleton(Base) subclass) -> void
 
     def initialize: (SecID::input _sec_id_number) -> void
@@ -75,7 +72,6 @@ module SecID
 
     private
 
-    def components_with_deprecation_bridge: () -> Hash[Symbol, untyped]
     def components: () -> Hash[Symbol, untyped]
     def parse: (SecID::input sec_id_number) -> (::MatchData | ::Hash[Symbol, untyped])
 

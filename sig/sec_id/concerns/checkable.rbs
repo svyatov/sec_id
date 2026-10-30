@@ -17,8 +17,6 @@ module SecID
       def restore!: (SecID::input id_without_checksum) -> Base
       def checksum: (SecID::input id) -> (Integer | String)
 
-      # @deprecated v7 bridge alias for `checksum`; removed in v8.
-      def check_digit: (SecID::input id) -> (Integer | String)
     end
 
     def valid?: () -> bool
@@ -26,12 +24,6 @@ module SecID
     def restore!: () -> self
     def calculate_checksum: () -> (Integer | String)
     def to_s: () -> String
-
-    # @deprecated v7 bridge alias for `checksum`; removed in v8.
-    def check_digit: () -> (Integer | String)?
-
-    # @deprecated v7 bridge alias for `calculate_checksum`; removed in v8.
-    def calculate_check_digit: () -> (Integer | String)
 
     private
 
