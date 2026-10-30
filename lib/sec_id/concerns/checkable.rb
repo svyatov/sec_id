@@ -45,6 +45,9 @@ module SecID
     # ASCII byte lookup avoids allocating a String for each checksum character.
     BYTE_TO_DIGIT = CHAR_TO_DIGIT.transform_keys(&:ord).freeze
 
+    # Decimal expansions reused by LEI and IBAN without allocating replacement strings.
+    DECIMAL_VALUES = CHAR_TO_DIGIT.transform_values { |value| value.to_s.freeze }.freeze
+
     # Doubled decimal digits with their digits summed, for expanded ISIN Luhn.
     LUHN_DOUBLE = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9].freeze
 

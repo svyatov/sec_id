@@ -3,6 +3,13 @@
 RSpec.describe SecID::IBAN do
   let(:iban) { described_class.new(iban_number) }
 
+  it 'rejects unmapped characters inserted through a length-only BBAN reader' do
+    instance = described_class.new('ZZ000000000000000')
+    instance.bban[0] = '!'
+
+    expect { instance.calculate_checksum }.to raise_error(KeyError)
+  end
+
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 

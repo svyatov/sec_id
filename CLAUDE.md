@@ -84,6 +84,7 @@ These are the decisions the code can't explain on its own.
 
 **Checksums**
 - Luhn helpers consume validated ASCII bodies directly. ISIN letters consume two decimal positions. CUSIP/CEI and FIGI use opposite doubling parity.
+- LEI and IBAN reuse frozen decimal expansions for MOD 97 calculations. IBAN preserves digits without expansion.
 - Classes that include `Checkable` **must** implement `calculate_checksum`. A `NotImplementedError` from a concrete identifier class means that implementation is missing.
 - `checksum_width` defaults to `1`; LEI and IBAN override it to `2`. `restore`/`to_s` right-justify against it (`5` → `"05"`). IBAN overrides `restore`/`to_s` outright because its checksum sits mid-string, not at the end.
 - `mod31_30_check_char(base, alphabet, alphabet_value)` takes the alphabet as an **explicit argument** rather than reading `self.class::ALPHABET` — this avoids RBS's `UnknownConstant`. Don't refactor it back.

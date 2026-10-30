@@ -226,7 +226,7 @@ module SecID
 
     # @return [String] the numeric string representation
     def numeric_string_for_check
-      "#{bban}#{country_code}00".each_char.map { |char| CHAR_TO_DIGIT.fetch(char) }.join
+      "#{bban}#{country_code}00".gsub(/[^0-9]/) { |char| DECIMAL_VALUES.fetch(char) }
     end
   end
 end

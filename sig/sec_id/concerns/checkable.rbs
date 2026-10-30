@@ -3,6 +3,7 @@ module SecID
   module Checkable : SecID::Base
     CHAR_TO_DIGIT: Hash[String, Integer]
     BYTE_TO_DIGIT: Hash[Integer, Integer]
+    DECIMAL_VALUES: Hash[String, String]
     LUHN_DOUBLE: Array[Integer]
 
     def self.included: (Module base) -> void
