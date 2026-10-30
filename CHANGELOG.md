@@ -15,6 +15,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- Reduce detector allocations by sorting candidate types once and stopping parsing at the first valid match. Unsupported input lengths no longer grow the detector cache.
 - Reduce LEI and IBAN checksum allocations by reusing decimal expansions and preserving IBAN numeric characters.
 - Reduce scanner allocations by sorting candidate types once, stopping at the first valid type, and reusing the validated instance.
 - Reduce temporary allocations in ISIN, CUSIP, CEI, and FIGI checksum calculations by processing ASCII bytes directly.

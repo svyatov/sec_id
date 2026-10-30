@@ -19,7 +19,7 @@ module SecID
   class Detector
     # @param identifier_list [Array<Class>] registered identifier classes
     def initialize(identifier_list)
-      @classes = identifier_list.dup.freeze
+      @classes = identifier_list.sort_by(&:detection_priority).freeze
       precompute
     end
 
@@ -33,7 +33,7 @@ module SecID
 
       upcased = input.upcase
       candidates = filter_candidates(upcased)
-      validate_and_sort(input, candidates)
+      valid_types(input, candidates)
     end
 
     # Returns whether any registered type matches, short-circuiting on the first
@@ -57,8 +57,11 @@ module SecID
       return if input.empty?
 
       candidates = filter_candidates(input.upcase)
-      matches = candidates.filter_map { |klass| (i = klass.new(input)).valid? ? i : nil }
-      matches.min_by { |instance| instance.class.detection_priority }
+      candidates.each do |klass|
+        instance = klass.new(input)
+        return instance if instance.valid?
+      end
+      nil
     end
 
     private
@@ -74,14 +77,13 @@ module SecID
       stage3_charset(upcased, candidates)
     end
 
-    # Validates candidates and returns sorted symbol keys.
+    # Validates candidates in precomputed specificity order.
     #
     # @param input [String]
     # @param candidates [Array<Class>]
     # @return [Array<Symbol>]
-    def validate_and_sort(input, candidates)
+    def valid_types(input, candidates)
       matches = candidates.select { |klass| klass.valid?(input) }
-      matches.sort_by!(&:detection_priority)
       matches.map!(&:type_key)
     end
 
@@ -105,11 +107,12 @@ module SecID
     #
     # @return [void]
     def build_length_table
-      @candidates_by_length = Hash.new { |h, k| h[k] = [] }
+      @candidates_by_length = {}
       @classes.each do |klass|
-        klass.length_values.each { |len| @candidates_by_length[len] << klass }
+        klass.length_values.each { |len| (@candidates_by_length[len] ||= []) << klass }
       end
       @candidates_by_length.each_value(&:freeze)
+      @candidates_by_length.default = [].freeze
     end
 
     # Stage 1: route strings with special characters to the only types that accept them.
@@ -130,7 +133,7 @@ module SecID
     # @param length [Integer]
     # @return [Array<Class>]
     def stage2_length(length)
-      @candidates_by_length[length] || []
+      @candidates_by_length[length]
     end
 
     # Stage 3: filter candidates by character set.

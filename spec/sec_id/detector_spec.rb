@@ -5,6 +5,38 @@ require 'spec_helper'
 RSpec.describe SecID::Detector do
   subject(:detector) { described_class.new(SecID.__send__(:identifier_list)) }
 
+  describe '#first_match' do
+    it 'prefers checksum types even when the supplied classes are reversed' do
+      reversed = described_class.new(SecID.identifiers.reverse)
+
+      expect(reversed.first_match('037833100')).to be_a(SecID::CUSIP)
+    end
+
+    it 'continues past a more specific type with an invalid checksum' do
+      expect(detector.first_match('037833105')).to be_a(SecID::Valoren)
+    end
+
+    it 'prefers ISIN when a UPI satisfies both checksums' do
+      expect(detector.first_match('QZ6VLPW19DZ6')).to be_a(SecID::ISIN)
+    end
+
+    it 'parses ambiguous input with fewer than 20 allocations per call', :rbs_test_incompatible do
+      100.times { detector.first_match('514000') }
+      before = GC.stat(:total_allocated_objects)
+      100.times { detector.first_match('514000') }
+
+      expect(GC.stat(:total_allocated_objects) - before).to be < 2000
+    end
+  end
+
+  it 'does not retain cache entries for unsupported input lengths' do
+    table = detector.instance_variable_get(:@candidates_by_length)
+    original_size = table.size
+    (100..200).each { |length| detector.call('A' * length) }
+
+    expect(table.size).to eq(original_size)
+  end
+
   describe '#call' do
     context 'with single-type detection' do
       {
