@@ -12,6 +12,11 @@ require 'yard'
 
 RSpec::Core::RakeTask.new(:spec)
 
+desc 'Check library CRAP scores against 10 using the latest coverage report'
+task :crap do
+  sh 'crap4ruby lib --coverage coverage/.resultset.json --threshold 10 --no-save'
+end
+
 RuboCop::RakeTask.new
 
 Steep::RakeTask.new

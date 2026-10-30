@@ -8,10 +8,15 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- CI checks library CRAP scores with crap4ruby and fresh test coverage, with a maximum score of 10.
+
 ### Changed
 
 - **BREAKING:** Minimum Ruby version raised from 3.2 to 3.3 (Ruby 3.2 reached EOL on 2026-03-31)
 - RBS: `SecID::CFI::AttributeSet#to_h` and `#as_json` are now typed `Hash[Symbol, Hash[Symbol, untyped]]` instead of `Hash[untyped, untyped]` (Steep 2.1 tuple inference)
+- Refresh development dependencies and GitHub Actions, including all four committed lockfiles.
 
 ## [7.1.1] - 2026-07-31
 

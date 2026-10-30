@@ -3,7 +3,11 @@
 require 'bundler/setup'
 
 if ENV['COVERAGE']
+  require 'fileutils'
   require 'simplecov'
+
+  # crap4ruby reads every stored suite, so discard results from previous runs.
+  FileUtils.rm_f(File.expand_path('../coverage/.resultset.json', __dir__))
 
   if ENV['CI']
     require 'simplecov-cobertura'
