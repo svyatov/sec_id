@@ -34,8 +34,10 @@ module SecID
 
     private
 
-    def luhn_sum_single: (String id, ?double_first: bool) -> Integer
-    def luhn_sum_standard: (String id) -> Integer
+    # Readers are nilable before validation. The callers validate first; local
+    # annotations keep the byte traversal typed without adding runtime guards.
+    def luhn_sum_single: (untyped id, ?double_first: bool) -> Integer
+    def luhn_sum_standard: (untyped id) -> Integer
     def error_codes: () -> Array[Symbol]
     def checksum_width: () -> Integer
     def validation_message: (Symbol code) -> String?

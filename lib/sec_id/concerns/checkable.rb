@@ -161,6 +161,7 @@ module SecID
     # @param double_first [Boolean] whether to double the rightmost value
     # @return [Integer] the Luhn sum
     def luhn_sum_single(id, double_first: true)
+      # @type var id: String
       sum = 0
       double = double_first
       (id.bytesize - 1).downto(0) do |index|
@@ -178,6 +179,7 @@ module SecID
     # @param id [String] validated identifier body
     # @return [Integer] the Luhn sum
     def luhn_sum_standard(id)
+      # @type var id: String
       sum = 0
       double = true
       (id.bytesize - 1).downto(0) do |index|
