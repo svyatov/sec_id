@@ -22,26 +22,12 @@ module SecID
   #
   #     def calculate_checksum
   #       validate_format_for_calculation!
-  #       mod10(luhn_sum_standard(reversed_digits_multi(identifier)))
+  #       mod10(luhn_sum_standard(identifier))
   #     end
   #   end
   #
   # @see https://en.wikipedia.org/wiki/Luhn_algorithm
   module Checkable
-    # Character-to-digit mapping for Luhn algorithm variants.
-    # Maps alphanumeric characters to digit arrays for multi-digit expansion.
-    # Used by ISIN for checksum calculation.
-    CHAR_TO_DIGITS = {
-      '0' => 0,      '1' => 1,      '2' => 2,      '3' => 3,      '4' => 4,
-      '5' => 5,      '6' => 6,      '7' => 7,      '8' => 8,      '9' => 9,
-      'A' => [1, 0], 'B' => [1, 1], 'C' => [1, 2], 'D' => [1, 3], 'E' => [1, 4],
-      'F' => [1, 5], 'G' => [1, 6], 'H' => [1, 7], 'I' => [1, 8], 'J' => [1, 9],
-      'K' => [2, 0], 'L' => [2, 1], 'M' => [2, 2], 'N' => [2, 3], 'O' => [2, 4],
-      'P' => [2, 5], 'Q' => [2, 6], 'R' => [2, 7], 'S' => [2, 8], 'T' => [2, 9],
-      'U' => [3, 0], 'V' => [3, 1], 'W' => [3, 2], 'X' => [3, 3], 'Y' => [3, 4], 'Z' => [3, 5],
-      '*' => [3, 6], '@' => [3, 7], '#' => [3, 8]
-    }.freeze
-
     # Character-to-digit mapping for single-digit conversion.
     # Maps alphanumeric characters to values 0-38 (A=10, B=11, ..., Z=35, *=36, @=37, #=38).
     # Used by CUSIP, FIGI, SEDOL, LEI, and IBAN for checksum calculations.
@@ -55,6 +41,12 @@ module SecID
       'U' => 30, 'V' => 31, 'W' => 32, 'X' => 33, 'Y' => 34, 'Z' => 35,
       '*' => 36, '@' => 37, '#' => 38
     }.freeze
+
+    # ASCII byte lookup avoids allocating a String for each checksum character.
+    BYTE_TO_DIGIT = CHAR_TO_DIGIT.transform_keys(&:ord).freeze
+
+    # Doubled decimal digits with their digits summed, for expanded ISIN Luhn.
+    LUHN_DOUBLE = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9].freeze
 
     # Extends the including identifier class with the concern's class methods and checksum reader.
     #
@@ -162,61 +154,46 @@ module SecID
 
     private
 
-    # CUSIP/CEI style: "Double Add Double" algorithm.
-    # Processes pairs of digits, doubling the first (even-positioned from right),
-    # then summing both digit's div10mod10 values.
+    # CUSIP/CEI double the rightmost body character; FIGI starts one position left.
+    # Input must already have passed the identifier's ASCII format validation.
     #
-    # @param digits [Array<Integer>] reversed array of digit values
+    # @param id [String] validated identifier body
+    # @param double_first [Boolean] whether to double the rightmost value
     # @return [Integer] the Luhn sum
-    def luhn_sum_double_add_double(digits)
-      digits.each_slice(2).reduce(0) do |sum, (even, odd)|
-        double_even = (even || 0) * 2
-        sum + div10mod10(double_even) + div10mod10(odd || 0)
+    def luhn_sum_single(id, double_first: true)
+      # @type var id: String
+      sum = 0
+      double = double_first
+      (id.bytesize - 1).downto(0) do |index|
+        value = BYTE_TO_DIGIT.fetch(id.getbyte(index))
+        value *= 2 if double
+        sum += div10mod10(value)
+        double = !double
       end
+      sum
     end
 
-    # FIGI style: index-based doubling algorithm.
-    # Doubles odd-indexed digits (from right), then sums div10mod10 values.
+    # ISIN expands letters into two decimal digits before applying Luhn.
+    # A letter consumes two positions, so only a numeric character flips parity.
     #
-    # @param digits [Array<Integer>] reversed array of digit values
+    # @param id [String] validated identifier body
     # @return [Integer] the Luhn sum
-    def luhn_sum_indexed(digits)
-      digits.each_with_index.reduce(0) do |sum, (digit, index)|
-        digit *= 2 if index.odd?
-        sum + div10mod10(digit)
+    def luhn_sum_standard(id)
+      # @type var id: String
+      sum = 0
+      double = true
+      (id.bytesize - 1).downto(0) do |index|
+        value = BYTE_TO_DIGIT.fetch(id.getbyte(index))
+        units = value % 10
+        sum += double ? LUHN_DOUBLE.fetch(units) : units
+        if value >= 10
+          tens = value / 10
+          sum += double ? tens : LUHN_DOUBLE.fetch(tens)
+        else
+          double = !double
+        end
       end
-    end
-
-    # ISIN style: standard Luhn with subtract-9 for values > 9.
-    # Processes pairs of digits, doubling the first (even-positioned from right),
-    # subtracting 9 if result > 9.
-    #
-    # @param digits [Array<Integer>] reversed array of digit values
-    # @return [Integer] the Luhn sum
-    def luhn_sum_standard(digits)
-      digits.each_slice(2).reduce(0) do |sum, (even, odd)|
-        double_even = (even || 0) * 2
-        double_even -= 9 if double_even > 9
-        sum + double_even + (odd || 0)
-      end
-    end
-
-    # Converts identifier characters to reversed digit array using single-digit mapping.
-    # Used by CUSIP, CEI, FIGI, and SEDOL.
-    #
-    # @param id [String] the identifier string
-    # @return [Array<Integer>] reversed array of digit values
-    def reversed_digits_single(id)
-      id.each_char.map { |c| CHAR_TO_DIGIT.fetch(c) }.reverse!
-    end
-
-    # Converts identifier characters to reversed digit array using multi-digit mapping.
-    # Used by ISIN where letters expand to two digits.
-    #
-    # @param id [String] the identifier string
-    # @return [Array<Integer>] reversed array of digit values
-    def reversed_digits_multi(id)
-      id.each_char.flat_map { |c| CHAR_TO_DIGITS.fetch(c) }.reverse!
+      sum
     end
 
     # Returns error codes including checksum validation.

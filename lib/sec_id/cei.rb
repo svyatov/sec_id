@@ -55,7 +55,7 @@ module SecID
     # @raise [InvalidFormatError] if the CEI format is invalid
     def calculate_checksum
       validate_format_for_calculation!
-      mod10(luhn_sum_double_add_double(reversed_digits_single(identifier)))
+      mod10(luhn_sum_single(identifier))
     end
 
     # Generates a random CEI body: 1 letter + 1 digit + 7 alphanumeric characters.

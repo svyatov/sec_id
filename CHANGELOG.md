@@ -14,6 +14,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- Reduce temporary allocations in ISIN, CUSIP, CEI, and FIGI checksum calculations by processing ASCII bytes directly.
 - Refresh development dependencies, all four lockfiles, and GitHub Actions for frozen CI installs.
 
 - **BREAKING:** Minimum Ruby version raised from 3.2 to 3.3 (Ruby 3.2 reached EOL on 2026-03-31)

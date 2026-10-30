@@ -1,8 +1,9 @@
 module SecID
   # Provides checksum validation and calculation for identifiers with a checksum.
   module Checkable : SecID::Base
-    CHAR_TO_DIGITS: Hash[String, Integer | Array[Integer]]
     CHAR_TO_DIGIT: Hash[String, Integer]
+    BYTE_TO_DIGIT: Hash[Integer, Integer]
+    LUHN_DOUBLE: Array[Integer]
 
     def self.included: (Module base) -> void
 
@@ -33,11 +34,10 @@ module SecID
 
     private
 
-    def luhn_sum_double_add_double: (Array[Integer] digits) -> Integer
-    def luhn_sum_indexed: (Array[Integer] digits) -> Integer
-    def luhn_sum_standard: (Array[Integer] digits) -> Integer
-    def reversed_digits_single: (untyped id) -> Array[Integer]
-    def reversed_digits_multi: (untyped id) -> Array[Integer]
+    # Readers are nilable before validation. The callers validate first; local
+    # annotations keep the byte traversal typed without adding runtime guards.
+    def luhn_sum_single: (untyped id, ?double_first: bool) -> Integer
+    def luhn_sum_standard: (untyped id) -> Integer
     def error_codes: () -> Array[Symbol]
     def checksum_width: () -> Integer
     def validation_message: (Symbol code) -> String?

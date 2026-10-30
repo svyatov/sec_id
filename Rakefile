@@ -45,10 +45,10 @@ end
 # add dead "can't-happen" guards to checksum math, so RBS::Test verifies them at
 # runtime instead. The gate pins that floor so coverage cannot silently regress; lower
 # BASELINE whenever it drops.
-# 119: DTI's calculate_checksum passes the nilable `identifier` reader into
+# 113: DTI's calculate_checksum passes the nilable `identifier` reader into
 # grandfathered_checksum/iso7064_mod31_30_check_char, both typed `(untyped base)` per
-# the same nilable-but-runtime-safe convention as Checkable#reversed_digits_single.
-STEEP_UNTYPED_BASELINE = 119
+# the nilable-but-runtime-safe convention used by checksum calculation helpers.
+STEEP_UNTYPED_BASELINE = 113
 
 desc 'Fail if Steep reports more untyped calls than the pinned baseline'
 task 'steep:coverage' do
