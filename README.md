@@ -52,6 +52,8 @@ A Ruby toolkit for securities identifiers: validate, parse, normalize, detect, c
 
 Ruby 3.3+ is required.
 
+Version 8.0.1 removes the deprecated check-digit aliases retained in 8.0.0. This patch release contains a breaking API change; see the [migration guide](MIGRATION.md#upgrading-to-secid-801).
+
 ## Installation
 
 Add this line to your application's Gemfile:

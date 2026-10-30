@@ -1,4 +1,23 @@
-# Upgrading to SecID 7.0
+# Migration guide
+
+## Upgrading to SecID 8.0.1
+
+Version 8.0.1 removes the deprecated v7 bridge that remained in 8.0.0. This is an explicit exception to Semantic Versioning: the patch release contains a breaking API change.
+
+Replace these names before upgrading:
+
+| Removed | Replacement |
+|---|---|
+| Instance `check_digit` | `checksum` |
+| Instance `calculate_check_digit` | `calculate_checksum` |
+| Class `check_digit(id)` | `checksum(id)` |
+| Class `has_check_digit?` | `has_checksum?` |
+| `SecID::InvalidCheckDigitError` | `SecID::InvalidChecksumError` |
+| `:check_digit` in `to_h`, `as_json`, and pattern matching | `:checksum` |
+
+The `SecID::Deprecation` warning helper is also removed. The canonical checksum API, `restore`, `restore!`, and checksum calculations are unchanged.
+
+## Upgrading to SecID 7.0
 
 This guide covers all breaking changes when upgrading from SecID 6.x to 7.0. They are all one
 mechanical rename: the **check-digit** concept became **checksum** across the public API —
@@ -25,7 +44,7 @@ deprecation warnings changed.
 `restore` / `restore!` and the `Checkable` concern name are unchanged.
 
 **Bridge:** the old method names, the `InvalidCheckDigitError` constant, and the `:check_digit`
-components key all keep working through v7 (the methods warn on use); they are removed in v8.
+components key all keep working through v7 and 8.0.0 (the methods warn on use); they are removed in 8.0.1.
 **The one exception is the error code** — `:invalid_check_digit` flips hard to `:invalid_checksum`
 at v7 with no bridge, so an error-code matcher must be updated immediately.
 
@@ -56,7 +75,7 @@ SecID::ISIN.has_checksum?
 ```
 
 The old names still work through v7 but emit a deprecation warning on every call and are removed
-in v8. See step 6 to silence them if you cannot migrate every call site yet.
+in 8.0.1. See step 6 to silence them on older releases if you cannot migrate every call site yet.
 
 ### 3. Rename the rescued error class
 
@@ -70,7 +89,7 @@ rescue SecID::InvalidChecksumError => e
 
 `SecID::InvalidCheckDigitError` remains as a constant alias of `SecID::InvalidChecksumError`
 through v7 (it is the *same class object*, so `rescue` under either name catches the same error),
-and is removed in v8.
+and is removed in 8.0.1.
 
 The constant alias emits **no** deprecation warning at runtime (it is a plain constant, not a
 warned method), so `-W` output won't reveal your rescue sites — find them statically:
@@ -100,15 +119,15 @@ SecID.explain('US5949181040', types: [:isin])[:candidates].first[:errors]
 If you use the opt-in ActiveModel/Rails validator with `details: true`, the surfaced reason
 follows the same flip: an invalid checksum now reports `:invalid_checksum`.
 
-### 5. Migrate pattern matches and `to_h` readers before v8
+### 5. Migrate pattern matches and `to_h` readers before 8.0.1
 
 `components` (and therefore `to_h` and `deconstruct_keys`) carries **both** `:checksum` and the
 deprecated `:check_digit` key through v7, so existing pattern matches keep working. The
-`:check_digit` key is removed in v8 — migrate to `:checksum` before then.
+`:check_digit` key is removed in 8.0.1. Migrate to `:checksum` before then.
 
 ```ruby
 # Both work through v7, binding the same value:
-isin => { check_digit: }   # deprecated, removed in v8
+isin => { check_digit: }   # deprecated, removed in 8.0.1
 isin => { checksum: }      # canonical
 
 isin.to_h[:components]
