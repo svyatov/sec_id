@@ -19,6 +19,7 @@ expected. The non-obvious ones:
 - **Documentation coverage gate**: `bundle exec rake yard:stats` (fails unless 100% of the public API is documented; a CI step)
 - **Run benchmarks**: `bundle exec rake bench` (machine-dependent, for catching regressions)
 - **Compare checksum allocations**: `ruby -Ilib benchmark/checksums.rb` (JSON samples; use `-I/path/to/baseline/lib` for comparison)
+- **Compare scanner allocations**: `ruby -Ilib benchmark/scanner.rb` (JSON samples and match output; same baseline option)
 - **Refresh lockfiles**: `bundle exec rake lock:refresh` (after a version bump or a dependency change — see below)
 
 The default `rake` task is `rubocop` + `rbs` + `spec`.
@@ -79,6 +80,7 @@ These are the decisions the code can't explain on its own.
 - Detection is a three-stage pipeline: special-char dispatch (`/`→FISN, ` `→OCC, `*@#`→CUSIP), length lookup, then charset pre-filter before `valid?`. Adding a type means keeping all three consistent.
 - Specificity sorting reads `Base.detection_priority` (checksum rank, length specificity, registration order; `Float::INFINITY` when unregistered). `#matches?` and `#first_match` are fast paths that deliberately bypass the full sort — don't "simplify" them into it.
 - Detector and Scanner caches are invalidated when a new type registers.
+- Scanner length buckets are sorted by detection priority once. The first valid instance is returned in the match.
 
 **Checksums**
 - Luhn helpers consume validated ASCII bodies directly. ISIN letters consume two decimal positions. CUSIP/CEI and FIGI use opposite doubling parity.

@@ -121,6 +121,21 @@ RSpec.describe SecID::Scanner do
     end
 
     describe 'types: filtering' do
+      it 'selects the most specific type regardless of allowlist order' do
+        matches = SecID.extract('514000', types: %i[valoren wkn cik])
+        expect(matches.map(&:type)).to eq([:wkn])
+      end
+
+      it 'falls back when a more specific candidate fails validation' do
+        matches = SecID.extract('2046250')
+        expect(matches.map(&:type)).to eq([:valoren])
+      end
+
+      it 'uses registration order to break equal-specificity ties' do
+        matches = SecID.extract('ESVUFR', types: %i[cfi wkn])
+        expect(matches.map(&:type)).to eq([:wkn])
+      end
+
       it 'restricts to specified types' do
         matches = SecID.extract('US5949181045 594918104', types: [:isin])
         expect(matches.size).to eq(1)
@@ -255,6 +270,17 @@ RSpec.describe SecID::Scanner do
   end
 
   describe 'performance' do
+    it 'extracts identifiers with fewer than 250 allocations per paragraph', :rbs_test_incompatible do
+      text = 'Portfolio: US5949181045, DE000BAY0017 and 2046251 plus BIC DEUTDEFF500 with ' \
+             'noise word1 word2 and 037833100 in the same paragraph for the scanner to chew on.'
+      100.times { SecID.extract(text) }
+      before = GC.stat(:total_allocated_objects)
+      100.times { SecID.extract(text) }
+      allocated = GC.stat(:total_allocated_objects) - before
+
+      expect(allocated).to be < 25_000
+    end
+
     it 'scans 1000-word text with identifiers in reasonable time', :rbs_test_incompatible do
       words = Array.new(990) { ('a'..'z').to_a.sample(5).join }
       identifiers = %w[US5949181045 594918104 B0YBKJ7 BBG000BLNNH6 7LTWFZYICNSX8D621K86

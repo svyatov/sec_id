@@ -73,7 +73,7 @@ module SecID
       @classes.each do |klass|
         klass.length_values.each { |len| @candidates_by_length[len] << klass }
       end
-      @candidates_by_length.each_value(&:freeze)
+      @candidates_by_length.each_value { |classes| classes.sort_by!(&:detection_priority).freeze }
     end
 
     # @param input [String]
@@ -118,18 +118,23 @@ module SecID
       return unless best
 
       end_pos = start_pos + raw.length
-      Match.new(type: best.type_key, raw: raw, range: start_pos...end_pos, identifier: best.new(cleaned))
+      Match.new(type: best.class.type_key, raw: raw, range: start_pos...end_pos, identifier: best)
     end
 
-    # @return [Class, nil]
+    # @return [Base, nil]
     def best_match(cleaned, classes)
       return if classes.empty?
 
-      candidates = (@candidates_by_length[cleaned.length] || []) & classes
-      return if candidates.empty?
+      candidates = @candidates_by_length[cleaned.length]
+      return unless candidates
 
-      validated = candidates.select { |k| cleaned.match?(k::VALID_CHARS_REGEX) && k.valid?(cleaned) }
-      validated.min_by(&:detection_priority)
+      candidates.each do |klass|
+        next unless classes.include?(klass) && cleaned.match?(klass::VALID_CHARS_REGEX)
+
+        instance = klass.new(cleaned)
+        return instance if instance.valid?
+      end
+      nil
     end
   end
 end
