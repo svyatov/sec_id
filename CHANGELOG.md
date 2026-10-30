@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [8.0.1] - 2026-10-30
+
 This patch release contains a breaking API change as an explicit exception to Semantic Versioning. The v7 bridge removal was scheduled for 8.0.0 but was omitted.
 
 ### Removed
@@ -315,7 +317,8 @@ Gem metadata only: corrected the gemspec description and README wording. No libr
 
 - ISIN numbers support: `SecID::ISIN`
 
-[Unreleased]: https://github.com/svyatov/sec_id/compare/v8.0.0...HEAD
+[Unreleased]: https://github.com/svyatov/sec_id/compare/v8.0.1...HEAD
+[8.0.1]: https://github.com/svyatov/sec_id/compare/v8.0.0...v8.0.1
 [8.0.0]: https://github.com/svyatov/sec_id/compare/v7.1.1...v8.0.0
 [7.1.1]: https://github.com/svyatov/sec_id/compare/v7.1.0...v7.1.1
 [7.1.0]: https://github.com/svyatov/sec_id/compare/v7.0.0...v7.1.0
