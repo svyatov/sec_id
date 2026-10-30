@@ -957,7 +957,7 @@ One person actively maintains SecID. They read bug reports and pull requests, an
 
 Bug reports and pull requests are welcome on [GitHub](https://github.com/svyatov/sec_id). See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and PR guidelines.
 
-For checksum throughput and allocation comparisons, run `ruby -Ilib benchmark/checksums.rb`. It prints repeated samples as JSON with garbage collection enabled. Run the same script with `-I/path/to/baseline/lib` to compare another checkout on the same Ruby version.
+For checksum throughput and allocation comparisons, run `ruby -Ilib benchmark/checksums.rb`. It covers Luhn checksums, LEI, and IBAN, including numeric and letter-heavy inputs. It prints repeated samples as JSON with garbage collection enabled. Run the same script with `-I/path/to/baseline/lib` to compare another checkout on the same Ruby version.
 
 For scanner comparisons, run `ruby -Ilib benchmark/scanner.rb`. It measures paragraphs, dense identifiers, noise, type filters, ambiguous identifiers, and compound patterns. JSON output includes matches to check correctness alongside timings and allocations. Use the same baseline option to compare another checkout.
 

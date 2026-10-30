@@ -90,7 +90,7 @@ module SecID
 
     # @return [String] the numeric string representation
     def numeric_identifier
-      identifier.each_char.map { |char| CHAR_TO_DIGIT.fetch(char) }.join
+      identifier.each_char.with_object(+'') { |char, numeric| numeric << DECIMAL_VALUES.fetch(char) }
     end
   end
 end

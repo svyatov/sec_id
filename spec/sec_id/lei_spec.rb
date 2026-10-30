@@ -3,6 +3,13 @@
 RSpec.describe SecID::LEI do
   let(:lei) { described_class.new(lei_number) }
 
+  it 'rejects unmapped characters inserted through the identifier reader' do
+    instance = described_class.new(described_class.example)
+    instance.identifier[0] = '!'
+
+    expect { instance.calculate_checksum }.to raise_error(KeyError)
+  end
+
   # Edge cases - applicable to all identifiers
   it_behaves_like 'handles edge case inputs'
 
