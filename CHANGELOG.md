@@ -15,6 +15,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- Reduce scanner allocations by sorting candidate types once, stopping at the first valid type, and reusing the validated instance.
 - Reduce temporary allocations in ISIN, CUSIP, CEI, and FIGI checksum calculations by processing ASCII bytes directly.
 - Refresh development dependencies, all four lockfiles, and GitHub Actions for frozen CI installs.
 

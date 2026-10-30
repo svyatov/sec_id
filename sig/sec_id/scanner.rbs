@@ -33,7 +33,7 @@ module SecID
     def scan_text: (String input, Array[singleton(Base)] target_classes) { (Match) -> void } -> void
     def identify_candidate: (untyped match_data, Array[singleton(Base)] target_classes) -> Match?
     def try_classes: (String raw, String cleaned, Integer start_pos, Array[singleton(Base)] classes) -> Match?
-    def best_match: (String cleaned, Array[singleton(Base)] classes) -> singleton(Base)?
+    def best_match: (String cleaned, Array[singleton(Base)] classes) -> Base?
 
     @classes: Array[singleton(Base)]
     @fisn_classes: Array[singleton(Base)]
