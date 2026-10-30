@@ -10,6 +10,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [8.0.0] - 2026-10-30
 
+Ruby 3.3 or later is now required. Dropping Ruby 3.2 support is the breaking change that requires this major release.
+
+The deprecated v7 check-digit methods, error alias, and component key remain available in 8.0.0.
+
 ### Added
 
 - Lefthook Git hooks for staged secret scanning, Ruby autocorrection, whitespace, commit messages, tests, types, and documentation coverage.
@@ -17,13 +21,12 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Changed
 
+- **BREAKING:** Drop support for Ruby 3.2 and require Ruby 3.3 or later.
 - Reduce detector allocations by sorting candidate types once and stopping parsing at the first valid match. Unsupported input lengths no longer grow the detector cache.
 - Reduce LEI and IBAN checksum allocations by reusing decimal expansions and preserving IBAN numeric characters.
 - Reduce scanner allocations by sorting candidate types once, stopping at the first valid type, and reusing the validated instance.
 - Reduce temporary allocations in ISIN, CUSIP, CEI, and FIGI checksum calculations by processing ASCII bytes directly.
 - Refresh development dependencies, all four lockfiles, and GitHub Actions for frozen CI installs.
-
-- **BREAKING:** Minimum Ruby version raised from 3.2 to 3.3 (Ruby 3.2 reached EOL on 2026-03-31)
 - RBS: `SecID::CFI::AttributeSet#to_h` and `#as_json` are now typed `Hash[Symbol, Hash[Symbol, untyped]]` instead of `Hash[untyped, untyped]` (Steep 2.1 tuple inference)
 
 ## [7.1.1] - 2026-07-31
