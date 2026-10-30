@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+
+assert_lefthook_installed: true
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: secrets
+      run: betterleaks git --pre-commit --staged --redact --verbose
+    - name: rubocop
+      glob:
+        - "*.{rb,rake,gemspec,gemfile}"
+        - Gemfile
+        - Rakefile
+        - Steepfile
+      run: bundle exec rubocop -a --force-exclusion {staged_files}
+      stage_fixed: true
+    - name: whitespace
+      run: git diff --cached --check
+
+pre-push:
+  jobs:
+    - name: types
+      run: bundle exec rake rbs steep steep:coverage
+    - name: specs
+      run: bundle exec rake spec
+    - name: runtime-signatures
+      run: bundle exec rake rbs:test
+    - name: documentation
+      run: bundle exec rake yard:stats
+
+commit-msg:
+  jobs:
+    - name: conventional
+      run: |
+        ruby -e 'subject = File.open(ARGV.fetch(0), &:readline); abort "Use Conventional Commits: type(scope): description" unless subject.match?(/\A(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore)(?:\([^\r\n()]+\))?!?: \S[^\r\n]*\r?\n?\z/)' "{1}"

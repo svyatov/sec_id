@@ -10,6 +10,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Added
 
+- Lefthook Git hooks for staged secret scanning, Ruby autocorrection, whitespace, commit messages, tests, types, and documentation coverage.
 - CI checks library CRAP scores with crap4ruby and fresh test coverage, with a maximum score of 10.
 
 ### Changed

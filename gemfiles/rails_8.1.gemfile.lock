@@ -71,6 +71,7 @@ GEM
       reline (>= 0.4.2)
     json (3.1.0)
     language_server-protocol (3.17.0.6)
+    lefthook (2.2.2)
     lint_roller (1.1.0)
     listen (3.10.1)
       logger
@@ -235,6 +236,7 @@ DEPENDENCIES
   activemodel (~> 8.1.0)
   benchmark-ips (~> 2.0)
   crap4ruby (~> 0.2.2)
+  lefthook (~> 2.2)
   railties (~> 8.1.0)
   rake (>= 13)
   rbs (~> 4.2)
@@ -282,6 +284,7 @@ CHECKSUMS
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (3.1.0) sha256=3ce7ccf8fde58960177a3a756c31f292a4c1e1dedee884547096a5b0604e3bd8
   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
+  lefthook (2.2.2) sha256=c43405b5fd14cd6de0dad8bfb76895767e8f21bb342460f6434191b32c5be333
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   listen (3.10.1) sha256=4c3f32855657f348747da4dd2372ff3790d90a6b1d3e4f21a3706adb2d04783c
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203

@@ -10,6 +10,10 @@ gemspec
 # Specify your gem's development dependencies below
 gem 'rake', '>= 13'
 
+group :development do
+  gem 'lefthook', '~> 2.2', require: false
+end
+
 # ActiveModel/Rails validator (sec_id/active_model) — dev/test only; never a runtime dependency.
 # The gemfiles/*.gemfile variants eval this file and pin activemodel/railties per Rails version, so
 # declare them here (unpinned, tracking the latest) only for the default root Gemfile run.
