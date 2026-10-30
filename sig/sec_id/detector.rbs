@@ -11,7 +11,7 @@ module SecID
     private
 
     def filter_candidates: (String upcased) -> Array[singleton(Base)]
-    def validate_and_sort: (String input, Array[untyped] candidates) -> Array[Symbol]
+    def valid_types: (String input, Array[untyped] candidates) -> Array[Symbol]
     def precompute: () -> void
     def build_discriminator_sets: () -> void
     def build_length_table: () -> void

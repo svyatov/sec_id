@@ -961,6 +961,8 @@ For checksum throughput and allocation comparisons, run `ruby -Ilib benchmark/ch
 
 For scanner comparisons, run `ruby -Ilib benchmark/scanner.rb`. It measures paragraphs, dense identifiers, noise, type filters, ambiguous identifiers, and compound patterns. JSON output includes matches to check correctness alongside timings and allocations. Use the same baseline option to compare another checkout.
 
+For detection and parsing comparisons, run `ruby -Ilib benchmark/detector.rb`. It measures valid identifiers, ambiguous inputs, invalid checksums, and unsupported lengths. JSON output includes results, timings, and allocations with garbage collection enabled. Use the same baseline option to compare another checkout.
+
 This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Changelog

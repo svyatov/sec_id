@@ -20,6 +20,7 @@ expected. The non-obvious ones:
 - **Run benchmarks**: `bundle exec rake bench` (machine-dependent, for catching regressions)
 - **Compare checksum allocations**: `ruby -Ilib benchmark/checksums.rb` (JSON samples; use `-I/path/to/baseline/lib` for comparison)
 - **Compare scanner allocations**: `ruby -Ilib benchmark/scanner.rb` (JSON samples and match output; same baseline option)
+- **Compare detector allocations**: `ruby -Ilib benchmark/detector.rb` (JSON samples and results; same baseline option)
 - **Refresh lockfiles**: `bundle exec rake lock:refresh` (after a version bump or a dependency change — see below)
 
 The default `rake` task is `rubocop` + `rbs` + `spec`.
@@ -78,7 +79,8 @@ These are the decisions the code can't explain on its own.
 
 **Detection**
 - Detection is a three-stage pipeline: special-char dispatch (`/`→FISN, ` `→OCC, `*@#`→CUSIP), length lookup, then charset pre-filter before `valid?`. Adding a type means keeping all three consistent.
-- Specificity sorting reads `Base.detection_priority` (checksum rank, length specificity, registration order; `Float::INFINITY` when unregistered). `#matches?` and `#first_match` are fast paths that deliberately bypass the full sort — don't "simplify" them into it.
+- Detector candidates are sorted once by `Base.detection_priority` (checksum rank, length specificity, registration order). `#matches?` and `#first_match` stop at the first valid candidate. Preserve this order through filtering.
+- Unsupported lengths return a shared frozen empty bucket. Lookups must not insert entries into the detector cache.
 - Detector and Scanner caches are invalidated when a new type registers.
 - Scanner length buckets are sorted by detection priority once. The first valid instance is returned in the match.
 
