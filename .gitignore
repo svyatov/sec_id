@@ -15,3 +15,5 @@ CONCEPTS.md
 
 # rspec failure tracking
 .rspec_status
+
+/lefthook-local.yml

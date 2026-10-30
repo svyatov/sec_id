@@ -922,9 +922,18 @@ committed signatures fall out of sync with the tables.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies.
+Install [Betterleaks](https://github.com/betterleaks/betterleaks) and make its `betterleaks` command available on your `PATH`.
+After checking out the repo, run `bin/setup` to install dependencies and Git hooks.
 Then run `bundle exec rake` to run RuboCop, validate the RBS signatures, and run the specs.
 `bin/console` gives you an interactive prompt to experiment in.
+
+Pre-commit scans staged changes for secrets and whitespace errors, and safely corrects staged Ruby files with RuboCop.
+Corrected Ruby files are staged automatically.
+Pre-push runs static type checks, type coverage, specs, runtime signature checks, and documentation coverage.
+Commit messages must follow Conventional Commits.
+Put personal hook overrides in the ignored `lefthook-local.yml` file.
+
+Run all pre-push jobs manually with `bundle exec lefthook run pre-push`.
 
 CI checks library methods with [crap4ruby](https://github.com/svyatov/crap4ruby), using fresh test coverage and a maximum CRAP score of 10.
 Run the same check locally:

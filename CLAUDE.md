@@ -23,6 +23,12 @@ expected. The non-obvious ones:
 
 The default `rake` task is `rubocop` + `rbs` + `spec`.
 
+`bin/setup` installs Lefthook Git hooks. Betterleaks must be available as `betterleaks` on `PATH`.
+Pre-commit jobs run in parallel: staged secrets, whitespace, and safe RuboCop corrections with automatic staging.
+Pre-push runs `rbs steep steep:coverage`, `spec`, `rbs:test`, and `yard:stats` as separate Rake jobs in sequence.
+Commit messages use Conventional Commits. Personal overrides belong in the ignored `lefthook-local.yml` file.
+Coverage-backed CRAP checks and the Ruby/Rails matrices remain in CI.
+
 ### Dependencies and lockfiles
 
 Four lockfiles are committed (root plus `gemfiles/rails_{7.2,8.0,8.1}.gemfile.lock`) and CI installs
