@@ -57,7 +57,7 @@ Ruby 3.3+ is required.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sec_id', '~> 7.1'
+gem 'sec_id', '~> 8.0'
 ```
 
 And then execute:

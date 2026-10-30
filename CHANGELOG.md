@@ -8,6 +8,8 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-10-30
+
 ### Added
 
 - Lefthook Git hooks for staged secret scanning, Ruby autocorrection, whitespace, commit messages, tests, types, and documentation coverage.
@@ -301,7 +303,8 @@ Gem metadata only: corrected the gemspec description and README wording. No libr
 
 - ISIN numbers support: `SecID::ISIN`
 
-[Unreleased]: https://github.com/svyatov/sec_id/compare/v7.1.1...HEAD
+[Unreleased]: https://github.com/svyatov/sec_id/compare/v8.0.0...HEAD
+[8.0.0]: https://github.com/svyatov/sec_id/compare/v7.1.1...v8.0.0
 [7.1.1]: https://github.com/svyatov/sec_id/compare/v7.1.0...v7.1.1
 [7.1.0]: https://github.com/svyatov/sec_id/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/svyatov/sec_id/compare/v6.1.0...v7.0.0
